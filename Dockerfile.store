@@ -1,6 +1,6 @@
 FROM golang:latest
 
-COPY /batch.go /go/src/topaz.io/topaz/batch.go
+COPY /store.go /go/src/topaz.io/topaz/store.go
 WORKDIR /go/src/topaz.io/topaz/
 
 RUN go get -v ./
@@ -8,4 +8,4 @@ RUN go build
 
 CMD topaz
 
-EXPOSE 8081
+EXPOSE 8080

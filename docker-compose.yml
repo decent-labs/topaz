@@ -1,18 +1,12 @@
 version: "3"
 
 services:
-  batch:
+  flush:
     build:
       context: .
-      dockerfile: Dockerfile.batch
+      dockerfile: Dockerfile.flush
     ports:
       - "8081:8081"
-  collect:
-    build:
-      context: .
-      dockerfile: Dockerfile.collect
-    ports:
-      - "8080:8080"
   ipfs:
     image: "jbenet/go-ipfs:latest"
     ports:
@@ -25,3 +19,9 @@ services:
     image: "postgres:latest"
     ports:
       - "5432:5432"
+  store:
+    build:
+      context: .
+      dockerfile: Dockerfile.store
+    ports:
+      - "8080:8080"
