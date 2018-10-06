@@ -1,0 +1,11 @@
+FROM golang:latest
+
+COPY /collect.go /go/src/topaz.io/topaz/collect.go
+WORKDIR /go/src/topaz.io/topaz/
+
+RUN go get -v ./
+RUN go build
+
+CMD topaz
+
+EXPOSE 8080

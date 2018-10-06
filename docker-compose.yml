@@ -1,0 +1,27 @@
+version: "3"
+
+services:
+  batch:
+    build:
+      context: .
+      dockerfile: Dockerfile.batch
+    ports:
+      - "8081:8081"
+  collect:
+    build:
+      context: .
+      dockerfile: Dockerfile.collect
+    ports:
+      - "8080:8080"
+  ipfs:
+    image: "jbenet/go-ipfs:latest"
+    ports:
+      - "4001:4001"
+      - "127.0.0.1:5001:5001"
+    volumes:
+      - "./ipfs/staging:/export"
+      - "./ipfs/data:/data/ipfs"
+  postgres:
+    image: "postgres:latest"
+    ports:
+      - "5432:5432"
