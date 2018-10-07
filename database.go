@@ -16,7 +16,18 @@ func main() {
 	} else {
 		defer db.Close()
 
-		_, err := db.Exec("CREATE TABLE queue (hash varchar(255));")
+		_, err := db.Exec(`CREATE TABLE users (
+			"uuid" uuid primary key
+		);`)
+		if err != nil {
+			log.Println(err)
+		}
+
+		_, err = db.Exec(`CREATE TABLE queue (
+			"uuid" uuid primary key,
+			"hash" varchar(255),
+			"user" uuid references users(uuid)
+		);`)
 		if err != nil {
 			log.Println(err)
 		}
