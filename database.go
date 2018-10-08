@@ -13,23 +13,48 @@ func main() {
 	db, err := sql.Open("postgres", conn)
 	if err != nil {
 		log.Println(err)
-	} else {
-		defer db.Close()
-
-		_, err := db.Exec(`CREATE TABLE users (
-			"uuid" uuid primary key
-		);`)
-		if err != nil {
-			log.Println(err)
-		}
-
-		_, err = db.Exec(`CREATE TABLE queue (
-			"uuid" uuid primary key,
-			"hash" varchar(255),
-			"user" uuid references users(uuid)
-		);`)
-		if err != nil {
-			log.Println(err)
-		}
 	}
+	defer db.Close()
+
+	_, err = db.Exec(`create table users (
+		"id" uuid primary key,
+		"name" varchar(255),
+		"interval" interval,
+		"created_at" timestamp default now(),
+		"flushed_at" timestamp
+	);`)
+	if err != nil {
+		log.Println(err)
+	}
+
+	_, err = db.Exec(`create table flushes (
+		"id" uuid primary key,
+		"user_id" uuid references users(id),
+		"hash" varchar(255),
+		"created_at" timestamp default now()
+	);`)
+	if err != nil {
+		log.Println(err)
+	}
+
+	_, err = db.Exec(`create table objects (
+		"id" uuid primary key,
+		"user_id" uuid references users(id),
+		"flush_id" uuid references flushes(id),
+		"hash" varchar(255),
+		"created_at" timestamp default now()
+	);`)
+	if err != nil {
+		log.Println(err)
+	}
+
+	_, err = db.Exec(`insert into users (
+		id,
+		name,
+		interval
+	) values (
+		'966D1035-73A1-4E57-9D1F-95920524689B',
+		'parker',
+		'10'
+	);`)
 }
