@@ -4,63 +4,115 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"net/http"
-	"time"
+	"os"
+	"os/exec"
+	"strings"
 
 	shell "github.com/ipfs/go-ipfs-api"
 	_ "github.com/lib/pq"
 )
 
-func main() {
-	ticker := time.NewTicker(10 * time.Second)
-	go func() {
-		for t := range ticker.C {
-			fmt.Println("Flush at", t)
-			dbConn := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=%s",
-				"localhost",
-				"5432",
-				"postgres",
-				"postgres",
-				"disable",
-			)
+// Given a specific user in our system, link any queued objects to an IPFS directory.
+func flush(userId string) {
+	dbConn := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable",
+		os.Getenv("PQ_HOST"),
+		os.Getenv("PQ_PORT"),
+		os.Getenv("PQ_USER"),
+		os.Getenv("PQ_NAME"),
+	)
 
-			db, err := sql.Open("postgres", dbConn)
-			if err != nil {
-				log.Fatal(err)
-			}
-			defer db.Close()
+	db, err := sql.Open("postgres", dbConn)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
 
-			rows, err := db.Query("SELECT hash FROM queue")
-			if err != nil {
-				log.Fatal(err)
-			}
-			defer rows.Close()
+	out, err := exec.Command("uuidgen").Output()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-			sh := shell.NewShell("localhost:5001")
+	flushId := strings.TrimSpace(fmt.Sprintf("%s", out))
 
-			dir, err := sh.NewObject("unixfs-dir")
-			if err != nil {
-				log.Fatal(err)
-			}
+	flushStmt := fmt.Sprintf(
+		"insert into flushes (id, user_id) values ('%s', '%s') returning created_at;",
+		flushId,
+		userId,
+	)
 
-			for rows.Next() {
-				var hash string
+	flushRows, err := db.Query(flushStmt)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer flushRows.Close()
 
-				err = rows.Scan(&hash)
-				if err != nil {
-					log.Fatal(err)
-				}
+	var flushCreatedAt string
 
-				dirHash, err := sh.PatchLink(dir, hash, hash, true)
-				if err != nil {
-					log.Fatal(err)
-				}
-
-				log.Println(dirHash)
-			}
+	for flushRows.Next() {
+		err = flushRows.Scan(&flushCreatedAt)
+		if err != nil {
+			log.Fatal(err)
 		}
-	}()
+	}
 
-	log.Println("Wake up, flush...")
-	log.Fatal(http.ListenAndServe(":8081", nil))
+	objStmt := fmt.Sprintf("selt id, hash from objects where user_id = '%s' AND flush_id is null;",
+		userId,
+	)
+
+	objRows, err := db.Query(objStmt)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer objRows.Close()
+
+	shConn := fmt.Sprintf("%s:%s", os.Getenv("IPFS_HOST"), os.Getenv("IPFS_PORT"))
+	sh := shell.NewShell(shConn)
+
+	dir, err := sh.NewObject("unixfs-dir")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for objRows.Next() {
+		var id string
+		var hash string
+
+		err = objRows.Scan(&id, &hash)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		dir, err = sh.PatchLink(dir, hash, hash, true)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		objUpdateStmt := fmt.Sprintf("update objects set flush_id = '%s' where id = '%s'", flushId, id)
+
+		_, err := db.Exec(objUpdateStmt)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	flushUpdateStmt := fmt.Sprintf("update flushes set hash = '%s' where id = '%s'", dir, flushId)
+
+	_, err = db.Exec(flushUpdateStmt)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	userUpdateStmt := fmt.Sprintf("update users set flushed_at = '%s' where id = '%s'",
+		flushCreatedAt,
+		userId,
+	)
+
+	_, err = db.Exec(userUpdateStmt)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func main() {
+
 }
