@@ -50,6 +50,11 @@ services:
     volumes:
       - "./ipfs/staging:/export"
       - "./ipfs/data:/data/ipfs"
+  ethereum:
+    build: ./ethereum
+    environment:
+      CONN:    "https://ropsten.infura.io"
+      PRIVKEY: ""
   postgres:
     build: ./postgres
     ports:
