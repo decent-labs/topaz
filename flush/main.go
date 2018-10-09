@@ -3,10 +3,10 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
-	"os/exec"
-	"strings"
 
 	shell "github.com/ipfs/go-ipfs-api"
 	_ "github.com/lib/pq"
@@ -27,18 +27,12 @@ func flush(userId string) {
 	}
 	defer db.Close()
 
-	out, err := exec.Command("uuidgen").Output()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	flushId := strings.TrimSpace(fmt.Sprintf("%s", out))
-
 	flushStmt := fmt.Sprintf(
-		"insert into flushes (id, user_id) values ('%s', '%s') returning created_at;",
-		flushId,
+		"insert into flushes (user_id) values ('%s') returning id, created_at;",
 		userId,
 	)
+
+	log.Printf("Beggining flush for user '%s'.", userId)
 
 	flushRows, err := db.Query(flushStmt)
 	if err != nil {
@@ -46,16 +40,17 @@ func flush(userId string) {
 	}
 	defer flushRows.Close()
 
+	var flushId string
 	var flushCreatedAt string
 
 	for flushRows.Next() {
-		err = flushRows.Scan(&flushCreatedAt)
+		err = flushRows.Scan(&flushId, &flushCreatedAt)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	objStmt := fmt.Sprintf("selt id, hash from objects where user_id = '%s' AND flush_id is null;",
+	objStmt := fmt.Sprintf("select id, hash from objects where user_id = '%s' AND flush_id is null;",
 		userId,
 	)
 
@@ -81,6 +76,8 @@ func flush(userId string) {
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		log.Printf("Flushing object '%s' with hash '%s'.", id, hash)
 
 		dir, err = sh.PatchLink(dir, hash, hash, true)
 		if err != nil {
@@ -111,8 +108,23 @@ func flush(userId string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	log.Printf("Finished flush '%s' for user '%s'.", flushId, userId)
+}
+
+// Take the request body and use it to flush a user's queued objects.
+func requestHandler(w http.ResponseWriter, r *http.Request) {
+	b, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	flush(string(b))
 }
 
 func main() {
+	http.HandleFunc("/", requestHandler)
 
+	log.Println("Wake up, flush...")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
