@@ -1,0 +1,24 @@
+{
+  "author": "Adam Gall",
+  "bugs": {
+    "url": "https://github.com/decentorganization/topaz-ethereum/issues"
+  },
+  "gx": {
+    "dvcsimport": "topaz.io/topaz-ethereum"
+  },
+  "gxDependencies": [
+    {
+      "author": "multiformats",
+      "hash": "QmPnFwZ2JXKnXgMw8CdBPxn7FWh6LLdjUjxV1fKHuJnkr8",
+      "name": "go-multihash",
+      "version": "1.0.8"
+    }
+  ],
+  "gxVersion": "0.12.1",
+  "language": "go",
+  "license": "",
+  "name": "topaz-ethereum",
+  "releaseCmd": "git commit -a -m \"gx publish $VERSION\"",
+  "version": "0.0.0"
+}
+
