@@ -8,14 +8,12 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"os/exec"
-	"strings"
 
 	shell "github.com/ipfs/go-ipfs-api"
 	_ "github.com/lib/pq"
 )
 
-// Take the request body and store it in IPFS, then store the resulting hash in the `objects` table.
+// Take the request body and store it in IPFS, then store the resulting hash in the 'objects' table.
 func requestHandler(w http.ResponseWriter, r *http.Request) {
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -44,15 +42,7 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer db.Close()
 
-	out, err := exec.Command("uuidgen").Output()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	id := strings.TrimSpace(fmt.Sprintf("%s", out))
-
-	stmt := fmt.Sprintf("insert into objects (id, hash, user_id) values ('%s', '%s', '%s')",
-		id,
+	stmt := fmt.Sprintf("insert into objects (hash, user_id) values ('%s', '%s')",
 		hash,
 		os.Getenv("TOPAZ_USER"),
 	)
@@ -62,7 +52,7 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	log.Printf("'%s' is now in the queue.", hash)
+	log.Printf("'%s' is now in the 'objects' table.", hash)
 }
 
 func main() {
