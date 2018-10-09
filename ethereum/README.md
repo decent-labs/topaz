@@ -29,24 +29,6 @@ $ cd contracts
 $ go test
 ```
 
-## Cloud Deployment
-
-!!! This likely does not work - it's leftover from another README !!!
-
-```
-$ cd deployments/develop
-```
-
-```
-$ cp terraform.tfvars.example terraform.tfvars
-```
-
-set your environment variables
-
-```
-$ terraform apply
-```
-
 ## Where You At
 
 When you make a commit to the project from somewhere new, add it to the list!
