@@ -44,6 +44,7 @@ $ curl --request POST -d "your-data-here" http://localhost:8081
 ### postgres
 
 * decide on migrations system (ask Parker about this)
+* hold connections between requests and reuse them - there's no reason to continually open and close connections between server and database
 
 ### store
 
