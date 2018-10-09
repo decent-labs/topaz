@@ -1,1 +1,1 @@
-FROM ipfs/go-ipfs:v4.17.0
+FROM ipfs/go-ipfs:v0.4.17
