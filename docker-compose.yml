@@ -1,14 +1,49 @@
 version: "3"
 
 services:
+  dispatch:
+    build: ./dispatch
+    depends_on:
+      - postgres
+      - flush
+    environment:
+      FLUSH_HOST:  "flush"
+      FLUSH_PORT:  "8080"
+      PQ_HOST:     "postgres"
+      PQ_PORT:     "5432"
+      PQ_USER:     "postgres"
+      PQ_NAME:     "postgres"
   flush:
-    build:
-      context: .
-      dockerfile: Dockerfile.flush
+    build: ./flush
+    depends_on:
+      - ipfs
+      - postgres
     ports:
-      - "8081:8081"
+      - "8080:8080"
+    environment:
+      IPFS_HOST:  "ipfs"
+      IPFS_PORT:  "5001"
+      PQ_HOST:    "postgres"
+      PQ_PORT:    "5432"
+      PQ_USER:    "postgres"
+      PQ_NAME:    "postgres"
+  store:
+    build: ./store
+    depends_on:
+      - ipfs
+      - postgres
+    ports:
+      - "8081:8080"
+    environment:
+      IPFS_HOST:  "ipfs"
+      IPFS_PORT:  "5001"
+      PQ_HOST:    "postgres"
+      PQ_PORT:    "5432"
+      PQ_USER:    "postgres"
+      PQ_NAME:    "postgres"
+      TOPAZ_USER: "966d1035-73a1-4e57-9D1f-95920524689a"
   ipfs:
-    image: "jbenet/go-ipfs:latest"
+    build: ./ipfs
     ports:
       - "4001:4001"
       - "127.0.0.1:5001:5001"
@@ -16,12 +51,6 @@ services:
       - "./ipfs/staging:/export"
       - "./ipfs/data:/data/ipfs"
   postgres:
-    image: "postgres:latest"
+    build: ./postgres
     ports:
       - "5432:5432"
-  store:
-    build:
-      context: .
-      dockerfile: Dockerfile.store
-    ports:
-      - "8080:8080"
