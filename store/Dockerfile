@@ -4,7 +4,7 @@ WORKDIR /go/src/github.com/decentorganization/topaz/store
 
 COPY . .
 
-RUN go get
+RUN go get -v
 RUN CGO_ENABLED=0 GOOS=linux go build  -o store -a -installsuffix cgo main.go
 
 FROM alpine:latest

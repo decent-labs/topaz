@@ -4,7 +4,7 @@ WORKDIR /go/src/github.com/decentorganization/topaz/flush
 
 COPY . .
 
-RUN go get
+RUN go get -v
 RUN CGO_ENABLED=0 GOOS=linux go build  -o flush -a -installsuffix cgo main.go
 
 FROM alpine:latest
