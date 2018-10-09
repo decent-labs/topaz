@@ -1,6 +1,7 @@
 ### IPFS ###
 
-ipfs/
+data/
+staging/
 
 ### Go ###
 
