@@ -31,7 +31,13 @@ func main() {
 
 	for range time.Tick(time.Millisecond * 500) {
 		go func() {
-			stmt := "select id from users where flushed_at is null or now() - flushed_at >= interval"
+			stmt := `
+				select distinct u.id 
+				from users u
+					inner join objects o on o.user_id = u.id
+				where (u.flushed_at is null or now() - u.flushed_at >= u.interval)
+					and o.flush_id is null
+			`
 
 			rows, err := db.Query(stmt)
 			if err != nil {
