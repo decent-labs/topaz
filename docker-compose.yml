@@ -16,13 +16,14 @@ services:
   flush:
     build: ./flush
     depends_on:
+      - ethereum
       - ipfs
       - postgres
     ports:
       - "8082:8080"
     environment:
-      ETH_HOST:   "host.docker.internal"
-      ETH_PORT:   "8082"
+      ETH_HOST:   "ethereum"
+      ETH_PORT:   "8080"
       IPFS_HOST:  "ipfs"
       IPFS_PORT:  "5001"
       PQ_HOST:    "postgres"
@@ -44,6 +45,13 @@ services:
       PQ_USER:    "postgres"
       PQ_NAME:    "postgres"
       TOPAZ_USER: "966d1035-73a1-4e57-9D1f-95920524689a"
+  ethereum:
+    build: ./ethereum
+    ports:
+      - "8083:8080"
+    environment:
+      CONN:    "https://ropsten.infura.io"
+      PRIVKEY: ""
   ipfs:
     build: ./ipfs
     ports:
@@ -52,11 +60,6 @@ services:
     volumes:
       - "./ipfs/staging:/export"
       - "./ipfs/data:/data/ipfs"
-  ethereum:
-    build: ./ethereum
-    environment:
-      CONN:    "https://ropsten.infura.io"
-      PRIVKEY: ""
   postgres:
     build: ./postgres
     ports:
