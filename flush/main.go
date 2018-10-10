@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -112,6 +114,40 @@ func flush(userID string) {
 	log.Printf("Finished flush '%s' for user '%s'.", flushID, userID)
 
 	log.Printf("Dir: %s", dir)
+
+	url := fmt.Sprintf("http://%s:%s/store", os.Getenv("ETH_HOST"), os.Getenv("ETH_PORT"))
+
+	m := Message{"0xd5fBBa05da18d524b5F2f0ade82f2190517b1314", dir}
+
+	b, err := json.Marshal(m)
+	if err != nil {
+		log.Println("could not create JSON out of Message")
+		log.Fatal(err)
+	}
+
+	r := bytes.NewReader(b)
+	resp, err := http.Post(url, "application/octet-stream", r)
+	if err != nil {
+		log.Println("failed posting data to ethereum service")
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+
+	txresp := new(TXResp)
+	json.NewDecoder(resp.Body).Decode(txresp)
+
+	log.Printf("ETH TX: %s", txresp.TX)
+}
+
+// TXResp is what gets returned
+type TXResp struct {
+	TX string
+}
+
+// Message is what gest posted to ethereum service
+type Message struct {
+	Address string
+	Hash    string
 }
 
 // Take the request body and use it to flush a user's queued objects.
