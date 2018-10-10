@@ -13,7 +13,7 @@ import (
 )
 
 // Given a specific user in our system, link any queued objects to an IPFS directory.
-func flush(userId string) {
+func flush(userID string) {
 	dbConn := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable",
 		os.Getenv("PQ_HOST"),
 		os.Getenv("PQ_PORT"),
@@ -29,10 +29,10 @@ func flush(userId string) {
 
 	flushStmt := fmt.Sprintf(
 		"insert into flushes (user_id) values ('%s') returning id, created_at;",
-		userId,
+		userID,
 	)
 
-	log.Printf("Beggining flush for user '%s'.", userId)
+	log.Printf("Beginning flush for user '%s'.", userID)
 
 	flushRows, err := db.Query(flushStmt)
 	if err != nil {
@@ -40,18 +40,18 @@ func flush(userId string) {
 	}
 	defer flushRows.Close()
 
-	var flushId string
+	var flushID string
 	var flushCreatedAt string
 
 	for flushRows.Next() {
-		err = flushRows.Scan(&flushId, &flushCreatedAt)
+		err = flushRows.Scan(&flushID, &flushCreatedAt)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
 
 	objStmt := fmt.Sprintf("select id, hash from objects where user_id = '%s' AND flush_id is null;",
-		userId,
+		userID,
 	)
 
 	objRows, err := db.Query(objStmt)
@@ -84,7 +84,7 @@ func flush(userId string) {
 			log.Fatal(err)
 		}
 
-		objUpdateStmt := fmt.Sprintf("update objects set flush_id = '%s' where id = '%s'", flushId, id)
+		objUpdateStmt := fmt.Sprintf("update objects set flush_id = '%s' where id = '%s'", flushID, id)
 
 		_, err := db.Exec(objUpdateStmt)
 		if err != nil {
@@ -92,7 +92,7 @@ func flush(userId string) {
 		}
 	}
 
-	flushUpdateStmt := fmt.Sprintf("update flushes set hash = '%s' where id = '%s'", dir, flushId)
+	flushUpdateStmt := fmt.Sprintf("update flushes set hash = '%s' where id = '%s'", dir, flushID)
 
 	_, err = db.Exec(flushUpdateStmt)
 	if err != nil {
@@ -101,7 +101,7 @@ func flush(userId string) {
 
 	userUpdateStmt := fmt.Sprintf("update users set flushed_at = '%s' where id = '%s'",
 		flushCreatedAt,
-		userId,
+		userID,
 	)
 
 	_, err = db.Exec(userUpdateStmt)
@@ -109,7 +109,7 @@ func flush(userId string) {
 		log.Fatal(err)
 	}
 
-	log.Printf("Finished flush '%s' for user '%s'.", flushId, userId)
+	log.Printf("Finished flush '%s' for user '%s'.", flushID, userID)
 }
 
 // Take the request body and use it to flush a user's queued objects.
