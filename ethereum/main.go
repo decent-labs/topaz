@@ -40,6 +40,9 @@ func (api ConnectionHandler) Store(w http.ResponseWriter, r *http.Request) {
 		address := data.Address
 		hash := data.Hash
 
+		log.Printf("hash to store: '%s'", hash)
+		log.Printf("address to store it: '%s'\n", address)
+
 		m, err := multihash.FromB58String(hash)
 		if err != nil {
 			panic(err)

@@ -25,6 +25,7 @@ func main() {
 
 	db, err := sql.Open("postgres", conn)
 	if err != nil {
+		log.Println("error getting into DB")
 		log.Fatal(err)
 	}
 	defer db.Close()
@@ -41,6 +42,7 @@ func main() {
 
 			rows, err := db.Query(stmt)
 			if err != nil {
+				log.Println("error running query to find users")
 				log.Fatal(err)
 			}
 
@@ -49,13 +51,17 @@ func main() {
 
 				err = rows.Scan(&id)
 				if err != nil {
+					log.Println("error reading results from query")
 					log.Fatal(err)
 				}
+
+				log.Printf("handling current id: '%s'", id)
 
 				url := fmt.Sprintf("http://%s:%s", os.Getenv("FLUSH_HOST"), os.Getenv("FLUSH_PORT"))
 				sr := strings.NewReader(id)
 				_, err = http.Post(url, "application/octet-stream", sr)
 				if err != nil {
+					log.Println("error posting user id to flush service")
 					log.Fatal(err)
 				}
 			}

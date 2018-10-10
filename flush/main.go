@@ -110,6 +110,8 @@ func flush(userID string) {
 	}
 
 	log.Printf("Finished flush '%s' for user '%s'.", flushID, userID)
+
+	log.Printf("Dir: %s", dir)
 }
 
 // Take the request body and use it to flush a user's queued objects.
