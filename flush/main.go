@@ -14,6 +14,17 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// Message is what gest posted to ethereum service
+type Message struct {
+	Address string
+	Hash    string
+}
+
+// TXResp is what gets returned
+type TXResp struct {
+	TX string
+}
+
 // Given a specific user in our system, link any queued objects to an IPFS directory.
 func flush(userID string) {
 	dbConn := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable",
@@ -137,17 +148,6 @@ func flush(userID string) {
 	json.NewDecoder(resp.Body).Decode(txresp)
 
 	log.Printf("ETH TX: %s", txresp.TX)
-}
-
-// TXResp is what gets returned
-type TXResp struct {
-	TX string
-}
-
-// Message is what gest posted to ethereum service
-type Message struct {
-	Address string
-	Hash    string
 }
 
 // Take the request body and use it to flush a user's queued objects.

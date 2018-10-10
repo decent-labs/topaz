@@ -163,6 +163,6 @@ func main() {
 	http.HandleFunc("/deploy", c.Deploy)
 	http.HandleFunc("/store", c.Store)
 
-	log.Println("topaz-ethereum running")
+	log.Println("wake up, ethereum")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
