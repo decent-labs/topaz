@@ -5,9 +5,7 @@ WORKDIR /go/src/github.com/decentorganization/topaz/ethereum
 COPY . .
 
 RUN go get -v
-# RUN go get -u github.com/whyrusleeping/gx
-# RUN gx install
-RUN CGO_ENABLED=1 GOOS=linux go build -o ethereum -a -installsuffix cgo main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o ethereum -a -installsuffix cgo main.go
 
 FROM alpine:latest
 
