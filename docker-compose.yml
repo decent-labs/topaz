@@ -19,10 +19,10 @@ services:
       - ipfs
       - postgres
     ports:
-      - "8080:8080"
+      - "8082:8080"
     environment:
       ETH_HOST:   "host.docker.internal"
-      ETH_PORT:   "8088"
+      ETH_PORT:   "8082"
       IPFS_HOST:  "ipfs"
       IPFS_PORT:  "5001"
       PQ_HOST:    "postgres"
