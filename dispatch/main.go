@@ -30,7 +30,7 @@ func main() {
 	}
 	defer db.Close()
 
-	for range time.Tick(time.Millisecond * 500) {
+	for range time.Tick(time.Millisecond * 10000) {
 		go func() {
 			stmt := `
 				select distinct u.id
