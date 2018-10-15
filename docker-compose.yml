@@ -50,7 +50,7 @@ services:
     ports:
       - "8083:8080"
     environment:
-      CONN:    "https://ropsten.infura.io"
+      CONN:    "http://rinkeby.topaz.io:8545"
       PRIVKEY: ""
   ipfs:
     build: ./ipfs
