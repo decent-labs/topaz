@@ -32,3 +32,5 @@ staging/
 crash.log
 
 terraform.tfvars
+
+.env
