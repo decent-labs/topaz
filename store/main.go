@@ -24,6 +24,8 @@ type StoreResponse struct {
 
 // Take the request body and store it in IPFS, then store the resulting hash in the 'objects' table.
 func requestHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("starting store service handler")
+
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Fatal(err)
@@ -51,6 +53,8 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 	sr := StoreResponse{hash}
 	w.Header().Set("Content-Type", "application/vnd.api+json")
 	json.NewEncoder(w).Encode(sr)
+
+	log.Println("finished with store service handler")
 }
 
 func main() {
