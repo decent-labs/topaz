@@ -21,6 +21,8 @@ type StoreResponse struct {
 }
 
 func storeHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("starting /store handler")
+
 	// we need to buffer the body if we want to read it here and send it
 	// in the request.
 	body, err := ioutil.ReadAll(r.Body)
@@ -60,6 +62,8 @@ func storeHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/vnd.api+json")
 	json.NewEncoder(w).Encode(sr)
+
+	log.Println("finished with /store handler")
 }
 
 func verifyHandler(w http.ResponseWriter, r *http.Request) {
