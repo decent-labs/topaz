@@ -14,7 +14,7 @@ import (
 
 // Find all users who are due for a flush and call the 'flush' service for them.
 func main() {
-	time.Sleep(time.Millisecond * 5000)
+	time.Sleep(5 * time.Second)
 
 	conn := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable",
 		os.Getenv("PQ_HOST"),
@@ -30,7 +30,7 @@ func main() {
 	}
 	defer db.Close()
 
-	for range time.Tick(time.Millisecond * 10000) {
+	for range time.Tick(10 * time.Second) {
 		go func() {
 			stmt := `
 				select distinct u.id
