@@ -27,7 +27,11 @@ func storeHandler(w http.ResponseWriter, r *http.Request) {
 	// in the request.
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(
+			w,
+			fmt.Sprintf("error reading /store request body: %s", err.Error()),
+			http.StatusInternalServerError,
+		)
 		return
 	}
 
@@ -38,6 +42,14 @@ func storeHandler(w http.ResponseWriter, r *http.Request) {
 	url := fmt.Sprintf("%s://%s:%s", os.Getenv("STORE_PROXY"), os.Getenv("STORE_HOST"), os.Getenv("STORE_PORT"))
 
 	proxyReq, err := http.NewRequest(r.Method, url, bytes.NewReader(body))
+	if err != nil {
+		http.Error(
+			w,
+			fmt.Sprintf("error creating proxy /store request to store service: %s", err.Error()),
+			http.StatusInternalServerError,
+		)
+		return
+	}
 
 	// We may want to filter some headers, otherwise we could just use a shallow copy
 	// proxyReq.Header = req.Header
@@ -50,18 +62,36 @@ func storeHandler(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := httpClient.Do(proxyReq)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadGateway)
+		http.Error(
+			w,
+			fmt.Sprintf("error executing store service request: %s", err.Error()),
+			http.StatusBadGateway,
+		)
 		return
 	}
 	defer resp.Body.Close()
 
 	sr := new(StoreResponse)
-	json.NewDecoder(resp.Body).Decode(sr)
-
-	log.Printf("IPFS hash as told to api: %s", sr.Hash)
+	err = json.NewDecoder(resp.Body).Decode(sr)
+	if err != nil {
+		http.Error(
+			w,
+			fmt.Sprintf("error decoding store service json response: %s", err.Error()),
+			http.StatusInternalServerError,
+		)
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/vnd.api+json")
-	json.NewEncoder(w).Encode(sr)
+	err = json.NewEncoder(w).Encode(sr)
+	if err != nil {
+		http.Error(
+			w,
+			fmt.Sprintf("error encoding store response from api: %s", err.Error()),
+			http.StatusInternalServerError,
+		)
+		return
+	}
 
 	log.Println("finished with /store handler")
 }
