@@ -30,6 +30,8 @@ func main() {
 	}
 	defer db.Close()
 
+	log.Println("Wake up, dispatch...")
+
 	for range time.Tick(10 * time.Second) {
 		go func() {
 			stmt := `
