@@ -25,20 +25,23 @@ type TXResp struct {
 	TX string
 }
 
-// Given a specific user in our system, link any queued objects to an IPFS directory.
-func flush(userID string) {
-	dbConn := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable",
-		os.Getenv("PQ_HOST"),
-		os.Getenv("PQ_PORT"),
-		os.Getenv("PQ_USER"),
-		os.Getenv("PQ_NAME"),
-	)
+var sh *shell.Shell
+var db *sql.DB
 
-	db, err := sql.Open("postgres", dbConn)
+func requestHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("starting flush service handler")
+
+	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Fatal(err)
+		http.Error(
+			w,
+			fmt.Sprintf("error reading flush service request body: %s", err.Error()),
+			http.StatusBadRequest,
+		)
+		return
 	}
-	defer db.Close()
+
+	userID := string(b)
 
 	flushStmt := fmt.Sprintf(
 		"insert into flushes (user_id) values ('%s') returning id, created_at;",
@@ -72,9 +75,6 @@ func flush(userID string) {
 		log.Fatal(err)
 	}
 	defer objRows.Close()
-
-	shConn := fmt.Sprintf("%s:%s", os.Getenv("IPFS_HOST"), os.Getenv("IPFS_PORT"))
-	sh := shell.NewShell(shConn)
 
 	dir, err := sh.NewObject("unixfs-dir")
 	if err != nil {
@@ -147,20 +147,33 @@ func flush(userID string) {
 	txresp := new(TXResp)
 	json.NewDecoder(resp.Body).Decode(txresp)
 
-	log.Printf("ETH TX: %s", txresp.TX)
-}
-
-// Take the request body and use it to flush a user's queued objects.
-func requestHandler(w http.ResponseWriter, r *http.Request) {
-	b, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	flush(string(b))
+	log.Println("finished with flush service handler")
 }
 
 func main() {
+	shConn := fmt.Sprintf("%s:%s", os.Getenv("IPFS_HOST"), os.Getenv("IPFS_PORT"))
+	sh = shell.NewShell(shConn)
+
+	dbConn := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable",
+		os.Getenv("PQ_HOST"),
+		os.Getenv("PQ_PORT"),
+		os.Getenv("PQ_USER"),
+		os.Getenv("PQ_NAME"),
+	)
+
+	_db, err := sql.Open("postgres", dbConn)
+	if err != nil {
+		log.Fatalf("couldn't even pretend to open database connection: %s", err.Error())
+	}
+	defer _db.Close()
+
+	err = _db.Ping()
+	if err != nil {
+		log.Fatalf("couldn't ping database: %s", err.Error())
+	}
+
+	db = _db
+
 	http.HandleFunc("/", requestHandler)
 
 	log.Println("Wake up, flush...")
