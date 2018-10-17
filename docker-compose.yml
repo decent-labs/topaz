@@ -64,3 +64,12 @@ services:
     build: ./postgres
     ports:
       - "5432:5432"
+  migrate:
+    build: ./migrate
+    depends_on:
+      - postgres
+    environment:
+      PQ_HOST:    "postgres"
+      PQ_PORT:    "5432"
+      PQ_USER:    "postgres"
+      PQ_NAME:    "postgres"
