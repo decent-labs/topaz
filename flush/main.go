@@ -128,7 +128,7 @@ func flush(userID string) {
 
 	url := fmt.Sprintf("http://%s:%s/store", os.Getenv("ETH_HOST"), os.Getenv("ETH_PORT"))
 
-	m := Message{"0xd5fBBa05da18d524b5F2f0ade82f2190517b1314", dir}
+	m := Message{os.Getenv("ETH_ADDRESS"), dir}
 
 	b, err := json.Marshal(m)
 	if err != nil {
