@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -13,6 +14,32 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	multihash "github.com/multiformats/go-multihash"
 )
+
+// ConnectionHandler defines what's necessary for an ethereum tx to happen
+type ConnectionHandler struct {
+	Auth       *bind.TransactOpts
+	Blockchain *ethclient.Client
+}
+
+// Connect service to blockchain
+func (api *ConnectionHandler) Connect(connection string, privateKey string) error {
+	blockchain, err := ethclient.Dial(connection)
+	if err != nil {
+		return err
+	}
+
+	pkecdsa, err := crypto.HexToECDSA(privateKey)
+	if err != nil {
+		return err
+	}
+
+	auth := bind.NewKeyedTransactor(pkecdsa)
+
+	api.Auth = auth
+	api.Blockchain = blockchain
+
+	return nil
+}
 
 // StoreRequest defines what a valid request body looks like
 type StoreRequest struct {
@@ -27,103 +54,90 @@ type StoreResponse struct {
 
 // Store handles the api request
 func (api ConnectionHandler) Store(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case http.MethodPost:
-		decoder := json.NewDecoder(r.Body)
+	log.Println("starting ethereum store service handler")
 
-		var data StoreRequest
-		err := decoder.Decode(&data)
-		if err != nil {
-			panic(err)
-		}
+	decoder := json.NewDecoder(r.Body)
 
-		address := data.Address
-		hash := data.Hash
-
-		log.Printf("hash to store: '%s'", hash)
-		log.Printf("address to store it: '%s'\n", address)
-
-		m, err := multihash.FromB58String(hash)
-		if err != nil {
-			panic(err)
-		}
-
-		dm, err := multihash.Decode(m)
-		if err != nil {
-			panic(err)
-		}
-
-		var digest [32]byte
-		copy(digest[:], dm.Digest)
-		var code = uint8(dm.Code)
-		var length = uint8(dm.Length)
-
-		transaction := store(api, address, digest, code, length)
-		sr := StoreResponse{transaction}
-		w.Header().Set("Content-Type", "application/vnd.api+json")
-		json.NewEncoder(w).Encode(sr)
-	default:
-		http.Error(w, "only POST allowed", http.StatusInternalServerError)
-	}
-}
-
-// Store data using contract
-func store(conn ConnectionHandler, address string, digest [32]byte, hashFunction uint8, size uint8) string {
-	contract, err := contracts.NewClientCapture(common.HexToAddress(address), conn.Blockchain)
+	var data StoreRequest
+	err := decoder.Decode(&data)
 	if err != nil {
-		log.Fatalf("Unable to bind to deployed instance of contract:%v\n", err)
+		http.Error(
+			w,
+			fmt.Sprintf("error reading ethereum service request body: %s", err.Error()),
+			http.StatusBadRequest,
+		)
+		return
+	}
+
+	address := data.Address
+	hash := data.Hash
+
+	log.Printf("dir hash to store: %s", hash)
+	log.Printf("address to store it at: %s", address)
+
+	m, err := multihash.FromB58String(hash)
+	if err != nil {
+		http.Error(
+			w,
+			fmt.Sprintf("error converting base58 encoded hash to multihash format: %s", err.Error()),
+			http.StatusInternalServerError,
+		)
+		return
+	}
+
+	dm, err := multihash.Decode(m)
+	if err != nil {
+		http.Error(
+			w,
+			fmt.Sprintf("error decoding multihash to expanded digest: %s", err.Error()),
+			http.StatusInternalServerError,
+		)
+		return
+	}
+
+	var digest [32]byte
+	copy(digest[:], dm.Digest)
+	var code = uint8(dm.Code)
+	var length = uint8(dm.Length)
+
+	contract, err := contracts.NewClientCapture(common.HexToAddress(address), api.Blockchain)
+	if err != nil {
+		http.Error(
+			w,
+			fmt.Sprintf("error instantiating contract from address: %s", err.Error()),
+			http.StatusInternalServerError,
+		)
+		return
 	}
 
 	transaction, err := contract.Store(&bind.TransactOpts{
-		From:   conn.Auth.From,
-		Signer: conn.Auth.Signer,
-	}, digest, hashFunction, size)
+		From:   api.Auth.From,
+		Signer: api.Auth.Signer,
+	}, digest, code, length)
 	if err != nil {
-		log.Fatal(err)
+		http.Error(
+			w,
+			fmt.Sprintf("error creating store transaction: %s", err.Error()),
+			http.StatusInternalServerError,
+		)
+		return
 	}
 
-	return transaction.Hash().Hex()
-}
+	log.Printf("ethereum transaction: %s", transaction.Hash().Hex())
 
-// ConnectionHandler defines what's necessary for an ethereum tx to happen
-type ConnectionHandler struct {
-	Auth       *bind.TransactOpts
-	Blockchain *ethclient.Client
-}
-
-// Connect service to blockchain
-func (conn *ConnectionHandler) Connect(connection string, privateKey string) {
-	blockchain, err := ethclient.Dial(connection)
+	sr := StoreResponse{transaction.Hash().Hex()}
+	w.Header().Set("Content-Type", "application/vnd.api+json")
+	err = json.NewEncoder(w).Encode(sr)
 	if err != nil {
-		log.Fatalf("Unable to connect to network:%v\n", err)
+		http.Error(
+			w,
+			fmt.Sprintf("error encoding ethereum service tx response: %s", err.Error()),
+			http.StatusInternalServerError,
+		)
+		return
 	}
 
-	pkecdsa, err := crypto.HexToECDSA(privateKey)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	auth := bind.NewKeyedTransactor(pkecdsa)
-
-	conn.Auth = auth
-	conn.Blockchain = blockchain
-}
-
-// IndexResponse defines what get returned on index route
-type IndexResponse struct {
-	Info string
-}
-
-// Index handles the api request
-func (api ConnectionHandler) Index(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case http.MethodGet:
-		ir := IndexResponse{"topaz ethereum service"}
-		w.Header().Set("Content-Type", "application/vnd.api+json")
-		json.NewEncoder(w).Encode(ir)
-	default:
-		http.Error(w, "only GET allowed", http.StatusInternalServerError)
-	}
+	log.Println("finished with ethereum store service handler")
 }
 
 // DeployResponse defines what gets returned on deploy route
@@ -134,35 +148,43 @@ type DeployResponse struct {
 
 // Deploy handles the api request
 func (api *ConnectionHandler) Deploy(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case http.MethodPost:
-		transaction, address := deploy(api)
-		dr := DeployResponse{transaction, address}
-		w.Header().Set("Content-Type", "application/vnd.api+json")
-		json.NewEncoder(w).Encode(dr)
-	default:
-		http.Error(w, "only POST allowed", http.StatusInternalServerError)
-	}
-}
+	log.Println("starting ethereum deploy service handler")
 
-// Deploy contract
-func deploy(conn *ConnectionHandler) (string, string) {
-	address, transaction, _, err := contracts.DeployClientCapture(conn.Auth, conn.Blockchain)
+	address, transaction, _, err := contracts.DeployClientCapture(api.Auth, api.Blockchain)
 	if err != nil {
-		log.Fatal(err)
+		http.Error(
+			w,
+			fmt.Sprintf("error deploying new contract: %s", err.Error()),
+			http.StatusInternalServerError,
+		)
+		return
 	}
 
-	return transaction.Hash().Hex(), address.Hex()
+	dr := DeployResponse{transaction.Hash().Hex(), address.Hex()}
+	w.Header().Set("Content-Type", "application/vnd.api+json")
+	err = json.NewEncoder(w).Encode(dr)
+	if err != nil {
+		http.Error(
+			w,
+			fmt.Sprintf("error encoding new deployment results response: %s", err.Error()),
+			http.StatusInternalServerError,
+		)
+		return
+	}
+
+	log.Println("finished with ethereum deploy service handler")
 }
 
 func main() {
 	c := new(ConnectionHandler)
-	c.Connect(os.Getenv("CONN"), os.Getenv("PRIVKEY"))
+	err := c.Connect(os.Getenv("CONN"), os.Getenv("PRIVKEY"))
+	if err != nil {
+		log.Fatalf("could not connect to ethereum blockchain: %s", err.Error())
+	}
 
-	http.HandleFunc("/", c.Index)
 	http.HandleFunc("/deploy", c.Deploy)
 	http.HandleFunc("/store", c.Store)
 
-	log.Println("wake up, ethereum")
+	log.Println("wake up, ethereum...")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

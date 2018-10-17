@@ -32,12 +32,14 @@ services:
       - postgres
       - flush
     environment:
-      FLUSH_HOST:  "flush"
-      FLUSH_PORT:  "8080"
-      PQ_HOST:     "postgres"
-      PQ_PORT:     "5432"
-      PQ_USER:     "postgres"
-      PQ_NAME:     "postgres"
+      STARTUP_SLEEP: "5"
+      DISPATCH_RATE: "10"
+      FLUSH_HOST:    "flush"
+      FLUSH_PORT:    "8080"
+      PQ_HOST:       "postgres"
+      PQ_PORT:       "5432"
+      PQ_USER:       "postgres"
+      PQ_NAME:       "postgres"
   flush:
     build: ./flush
     depends_on:
@@ -61,8 +63,8 @@ services:
     ports:
       - "8084:8080"
     environment:
-      CONN:    "http://rinkeby.topaz.io:8545"
-      PRIVKEY: ""
+      CONN:    "${ETHEREUM_HOST}"
+      PRIVKEY: "${PRIVATE_KEY}"
   ipfs:
     build: ./ipfs
     ports:
