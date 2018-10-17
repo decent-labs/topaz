@@ -48,11 +48,14 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 		userID,
 	)
 
-	log.Printf("Beginning flush for user '%s'.", userID)
-
 	flushRows, err := db.Query(flushStmt)
 	if err != nil {
-		log.Fatal(err)
+		http.Error(
+			w,
+			fmt.Sprintf("error adding row to flushes table: %s", err.Error()),
+			http.StatusInternalServerError,
+		)
+		return
 	}
 	defer flushRows.Close()
 
@@ -62,7 +65,12 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 	for flushRows.Next() {
 		err = flushRows.Scan(&flushID, &flushCreatedAt)
 		if err != nil {
-			log.Fatal(err)
+			http.Error(
+				w,
+				fmt.Sprintf("error scanning row into flush metadata strings: %s", err.Error()),
+				http.StatusInternalServerError,
+			)
+			continue
 		}
 	}
 
@@ -72,13 +80,23 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 
 	objRows, err := db.Query(objStmt)
 	if err != nil {
-		log.Fatal(err)
+		http.Error(
+			w,
+			fmt.Sprintf("error selecting objects to flush: %s", err.Error()),
+			http.StatusInternalServerError,
+		)
+		return
 	}
 	defer objRows.Close()
 
 	dir, err := sh.NewObject("unixfs-dir")
 	if err != nil {
-		log.Fatal(err)
+		http.Error(
+			w,
+			fmt.Sprintf("error creating new ipfs emtpy directory: %s", err.Error()),
+			http.StatusInternalServerError,
+		)
+		return
 	}
 
 	for objRows.Next() {
@@ -87,21 +105,28 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 
 		err = objRows.Scan(&id, &hash)
 		if err != nil {
-			log.Fatal(err)
+			log.Printf("error scanning object data into variables: %s", err.Error())
+			continue
 		}
 
-		log.Printf("Flushing object '%s' with hash '%s'.", id, hash)
+		log.Printf("flushing object with hash: %s.", hash)
 
 		dir, err = sh.PatchLink(dir, hash, hash, true)
 		if err != nil {
-			log.Fatal(err)
+			log.Printf("error patching ipfs directory with new hash: %s", err.Error())
+			continue
 		}
+
+		log.Printf("new directory hash: %s", dir)
+
+		// TODO: update ALL of the objects AT ONCE when the process is finished
 
 		objUpdateStmt := fmt.Sprintf("update objects set flush_id = '%s' where id = '%s'", flushID, id)
 
 		_, err := db.Exec(objUpdateStmt)
 		if err != nil {
-			log.Fatal(err)
+			log.Printf("error updating object with new flush id: %s", err.Error())
+			continue
 		}
 	}
 
@@ -109,7 +134,12 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 
 	_, err = db.Exec(flushUpdateStmt)
 	if err != nil {
-		log.Fatal(err)
+		http.Error(
+			w,
+			fmt.Sprintf("error updating flush with directory hash: %s", err.Error()),
+			http.StatusInternalServerError,
+		)
+		return
 	}
 
 	userUpdateStmt := fmt.Sprintf("update users set flushed_at = '%s' where id = '%s'",
@@ -119,33 +149,52 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 
 	_, err = db.Exec(userUpdateStmt)
 	if err != nil {
-		log.Fatal(err)
+		http.Error(
+			w,
+			fmt.Sprintf("error updating user with last flushed_at time: %s", err.Error()),
+			http.StatusInternalServerError,
+		)
+		return
 	}
-
-	log.Printf("Finished flush '%s' for user '%s'.", flushID, userID)
-
-	log.Printf("Dir: %s", dir)
 
 	url := fmt.Sprintf("http://%s:%s/store", os.Getenv("ETH_HOST"), os.Getenv("ETH_PORT"))
 
 	m := Message{os.Getenv("ETH_ADDRESS"), dir}
 
-	b, err := json.Marshal(m)
+	b, err = json.Marshal(m)
 	if err != nil {
-		log.Println("could not create JSON out of Message")
-		log.Fatal(err)
+		http.Error(
+			w,
+			fmt.Sprintf("could not create JSON out of Message: %s", err.Error()),
+			http.StatusInternalServerError,
+		)
+		return
 	}
 
-	r := bytes.NewReader(b)
-	resp, err := http.Post(url, "application/octet-stream", r)
+	read := bytes.NewReader(b)
+	resp, err := http.Post(url, "application/octet-stream", read)
 	if err != nil {
-		log.Println("failed posting data to ethereum service")
-		log.Fatal(err)
+		http.Error(
+			w,
+			fmt.Sprintf("failed posting data to ethereum service: %s", err.Error()),
+			http.StatusInternalServerError,
+		)
+		return
 	}
 	defer resp.Body.Close()
 
 	txresp := new(TXResp)
-	json.NewDecoder(resp.Body).Decode(txresp)
+	err = json.NewDecoder(resp.Body).Decode(txresp)
+	if err != nil {
+		http.Error(
+			w,
+			fmt.Sprintf("error decoding ethereum service tx response: %s", err.Error()),
+			http.StatusInternalServerError,
+		)
+		return
+	}
+
+	// TODO: save tx into a database now
 
 	log.Println("finished with flush service handler")
 }
