@@ -30,10 +30,14 @@ func main() {
 
 	db, err := sql.Open("postgres", conn)
 	if err != nil {
-		log.Println("error getting into DB")
-		log.Fatal(err)
+		log.Fatalf("couldn't even pretend to open database connection: %s", err.Error())
 	}
 	defer db.Close()
+
+	err = db.Ping()
+	if err != nil {
+		log.Fatalf("couldn't ping database: %s", err.Error())
+	}
 
 	i, err = strconv.Atoi(os.Getenv("DISPATCH_RATE"))
 	if err != nil {
@@ -43,6 +47,8 @@ func main() {
 	log.Println("Wake up, dispatch...")
 
 	for range time.Tick(time.Duration(i) * time.Second) {
+		log.Println("tick")
+
 		go func() {
 			stmt := `
 				select distinct u.id
@@ -54,29 +60,30 @@ func main() {
 
 			rows, err := db.Query(stmt)
 			if err != nil {
-				log.Println("error running query to find users")
-				log.Fatal(err)
+				log.Printf("error executing user-finding query: %s", err.Error())
+				return
 			}
+			defer rows.Close()
 
 			for rows.Next() {
 				var id string
 
 				err = rows.Scan(&id)
 				if err != nil {
-					log.Println("error reading results from query")
-					log.Fatal(err)
+					log.Printf("error scanning row into user id var: %s", err.Error())
+					continue
 				}
-
-				log.Printf("handling current id: '%s'", id)
 
 				url := fmt.Sprintf("http://%s:%s", os.Getenv("FLUSH_HOST"), os.Getenv("FLUSH_PORT"))
 				sr := strings.NewReader(id)
 				_, err = http.Post(url, "application/octet-stream", sr)
 				if err != nil {
-					log.Println("error posting user id to flush service")
-					log.Fatal(err)
+					log.Printf("error dispatching user id '%s' to flush service: %s", id, err.Error())
+					continue
 				}
 			}
 		}()
+
+		log.Println("tock")
 	}
 }
