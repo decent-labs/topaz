@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -14,7 +15,11 @@ import (
 
 // Find all users who are due for a flush and call the 'flush' service for them.
 func main() {
-	time.Sleep(5 * time.Second)
+	i, err := strconv.Atoi(os.Getenv("STARTUP_SLEEP"))
+	if err != nil {
+		log.Fatalf("missing valid STARTUP_SLEEP environment variable: %s", err.Error())
+	}
+	time.Sleep(time.Duration(i) * time.Second)
 
 	conn := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable",
 		os.Getenv("PQ_HOST"),
@@ -30,9 +35,14 @@ func main() {
 	}
 	defer db.Close()
 
+	i, err = strconv.Atoi(os.Getenv("DISPATCH_RATE"))
+	if err != nil {
+		log.Fatalf("missing valid DISPATCH_RATE environment variable: %s", err.Error())
+	}
+
 	log.Println("Wake up, dispatch...")
 
-	for range time.Tick(10 * time.Second) {
+	for range time.Tick(time.Duration(i) * time.Second) {
 		go func() {
 			stmt := `
 				select distinct u.id
