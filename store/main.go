@@ -9,6 +9,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
+	"time"
 
 	shell "github.com/ipfs/go-ipfs-api"
 	_ "github.com/lib/pq"
@@ -81,6 +83,12 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	i, err := strconv.Atoi(os.Getenv("STARTUP_SLEEP"))
+	if err != nil {
+		log.Fatalf("missing valid STARTUP_SLEEP environment variable: %s", err.Error())
+	}
+	time.Sleep(time.Duration(i) * time.Second)
+
 	shConn := fmt.Sprintf("%s:%s", os.Getenv("IPFS_HOST"), os.Getenv("IPFS_PORT"))
 	sh = shell.NewShell(shConn)
 

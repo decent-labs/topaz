@@ -19,13 +19,14 @@ services:
     ports:
       - "8082:8080"
     environment:
-      IPFS_HOST:  "ipfs"
-      IPFS_PORT:  "5001"
-      PQ_HOST:    "postgres"
-      PQ_PORT:    "5432"
-      PQ_USER:    "postgres"
-      PQ_NAME:    "postgres"
-      TOPAZ_USER: "966d1035-73a1-4e57-9D1f-95920524689a"
+      STARTUP_SLEEP: "5"
+      IPFS_HOST:     "ipfs"
+      IPFS_PORT:     "5001"
+      PQ_HOST:       "postgres"
+      PQ_PORT:       "5432"
+      PQ_USER:       "postgres"
+      PQ_NAME:       "postgres"
+      TOPAZ_USER:    "966d1035-73a1-4e57-9D1f-95920524689a"
   dispatch:
     build: ./dispatch
     depends_on:
@@ -49,15 +50,16 @@ services:
     ports:
       - "8083:8080"
     environment:
-      ETH_HOST:    "ethereum"
-      ETH_PORT:    "8080"
-      ETH_ADDRESS: "0x74e596525C63393f42C76987b6A66F4e52733efa"
-      IPFS_HOST:   "ipfs"
-      IPFS_PORT:   "5001"
-      PQ_HOST:     "postgres"
-      PQ_PORT:     "5432"
-      PQ_USER:     "postgres"
-      PQ_NAME:     "postgres"
+      STARTUP_SLEEP: "5"
+      ETH_HOST:      "ethereum"
+      ETH_PORT:      "8080"
+      ETH_ADDRESS:   "0x74e596525C63393f42C76987b6A66F4e52733efa"
+      IPFS_HOST:     "ipfs"
+      IPFS_PORT:     "5001"
+      PQ_HOST:       "postgres"
+      PQ_PORT:       "5432"
+      PQ_USER:       "postgres"
+      PQ_NAME:       "postgres"
   ethereum:
     build: ./ethereum
     ports:
