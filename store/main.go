@@ -106,6 +106,6 @@ func main() {
 
 	http.HandleFunc("/", requestHandler)
 
-	log.Println("Wake up, store...")
+	log.Println("wake up, store...")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

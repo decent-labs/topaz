@@ -108,6 +108,6 @@ func main() {
 	http.HandleFunc("/verify", verifyHandler)
 	http.HandleFunc("/retrieve", retrieveHandler)
 
-	log.Println("Wake up, api...")
+	log.Println("wake up, api...")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

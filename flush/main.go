@@ -225,6 +225,6 @@ func main() {
 
 	http.HandleFunc("/", requestHandler)
 
-	log.Println("Wake up, flush...")
+	log.Println("wake up, flush...")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

@@ -44,7 +44,7 @@ func main() {
 		log.Fatalf("missing valid DISPATCH_RATE environment variable: %s", err.Error())
 	}
 
-	log.Println("Wake up, dispatch...")
+	log.Println("wake up, dispatch...")
 
 	for range time.Tick(time.Duration(i) * time.Second) {
 		log.Println("tick")
