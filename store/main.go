@@ -28,14 +28,24 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Fatal(err)
+		http.Error(
+			w,
+			fmt.Sprintf("error reading store service request body: %s", err.Error()),
+			http.StatusBadRequest,
+		)
+		return
 	}
 
 	br := bytes.NewReader(b)
 
 	hash, err := sh.Add(br)
 	if err != nil {
-		log.Fatal(err)
+		http.Error(
+			w,
+			fmt.Sprintf("error adding file to ipfs through shell: %s", err.Error()),
+			http.StatusInternalServerError,
+		)
+		return
 	}
 
 	stmt := fmt.Sprintf("insert into objects (hash, user_id) values ('%s', '%s')",
@@ -45,14 +55,27 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 
 	_, err = db.Exec(stmt)
 	if err != nil {
-		log.Fatal(err)
+		http.Error(
+			w,
+			fmt.Sprintf("error adding ipfs hash to objects table: %s", err.Error()),
+			http.StatusInternalServerError,
+		)
+		return
 	}
 
-	log.Printf("'%s' is now in the 'objects' table.", hash)
+	log.Printf("processed incoming data with hash: %s", hash)
 
 	sr := StoreResponse{hash}
 	w.Header().Set("Content-Type", "application/vnd.api+json")
-	json.NewEncoder(w).Encode(sr)
+	err = json.NewEncoder(w).Encode(sr)
+	if err != nil {
+		http.Error(
+			w,
+			fmt.Sprintf("error encoding store response from store service: %s", err.Error()),
+			http.StatusInternalServerError,
+		)
+		return
+	}
 
 	log.Println("finished with store service handler")
 }
@@ -70,8 +93,15 @@ func main() {
 
 	_db, err := sql.Open("postgres", dbConn)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("couldn't even pretend to open database connection: %s", err.Error())
 	}
+	defer _db.Close()
+
+	err = _db.Ping()
+	if err != nil {
+		log.Fatalf("couldn't ping database: %s", err.Error())
+	}
+
 	db = _db
 
 	http.HandleFunc("/", requestHandler)
