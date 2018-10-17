@@ -12,6 +12,8 @@ import (
 	_ "github.com/lib/pq"
 )
 
+var httpClient = http.Client{}
+
 func createUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
@@ -57,8 +59,6 @@ func storeHandler(w http.ResponseWriter, r *http.Request) {
 	for h, val := range r.Header {
 		proxyReq.Header[h] = val
 	}
-
-	httpClient := http.Client{}
 
 	resp, err := httpClient.Do(proxyReq)
 	if err != nil {
