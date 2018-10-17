@@ -1,6 +1,31 @@
 version: "3"
 
 services:
+  api:
+    build: ./api
+    depends_on:
+      - store
+    ports:
+      - "8081:8080"
+    environment:
+      STORE_PROXY: "http"
+      STORE_HOST:  "store"
+      STORE_PORT:  "8080"
+  store:
+    build: ./store
+    depends_on:
+      - ipfs
+      - postgres
+    ports:
+      - "8082:8080"
+    environment:
+      IPFS_HOST:  "ipfs"
+      IPFS_PORT:  "5001"
+      PQ_HOST:    "postgres"
+      PQ_PORT:    "5432"
+      PQ_USER:    "postgres"
+      PQ_NAME:    "postgres"
+      TOPAZ_USER: "966d1035-73a1-4e57-9D1f-95920524689a"
   dispatch:
     build: ./dispatch
     depends_on:
@@ -20,35 +45,21 @@ services:
       - ipfs
       - postgres
     ports:
-      - "8082:8080"
+      - "8083:8080"
     environment:
-      ETH_HOST:   "ethereum"
-      ETH_PORT:   "8080"
-      IPFS_HOST:  "ipfs"
-      IPFS_PORT:  "5001"
-      PQ_HOST:    "postgres"
-      PQ_PORT:    "5432"
-      PQ_USER:    "postgres"
-      PQ_NAME:    "postgres"
-  store:
-    build: ./store
-    depends_on:
-      - ipfs
-      - postgres
-    ports:
-      - "8081:8080"
-    environment:
-      IPFS_HOST:  "ipfs"
-      IPFS_PORT:  "5001"
-      PQ_HOST:    "postgres"
-      PQ_PORT:    "5432"
-      PQ_USER:    "postgres"
-      PQ_NAME:    "postgres"
-      TOPAZ_USER: "966d1035-73a1-4e57-9D1f-95920524689a"
+      ETH_HOST:    "ethereum"
+      ETH_PORT:    "8080"
+      ETH_ADDRESS: "0x74e596525C63393f42C76987b6A66F4e52733efa"
+      IPFS_HOST:   "ipfs"
+      IPFS_PORT:   "5001"
+      PQ_HOST:     "postgres"
+      PQ_PORT:     "5432"
+      PQ_USER:     "postgres"
+      PQ_NAME:     "postgres"
   ethereum:
     build: ./ethereum
     ports:
-      - "8083:8080"
+      - "8084:8080"
     environment:
       CONN:    "http://rinkeby.topaz.io:8545"
       PRIVKEY: ""

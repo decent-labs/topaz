@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -15,6 +16,11 @@ import (
 
 var sh *shell.Shell
 var db *sql.DB
+
+// StoreResponse defines what gets returned on store route
+type StoreResponse struct {
+	Hash string
+}
 
 // Take the request body and store it in IPFS, then store the resulting hash in the 'objects' table.
 func requestHandler(w http.ResponseWriter, r *http.Request) {
@@ -41,6 +47,10 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Printf("'%s' is now in the 'objects' table.", hash)
+
+	sr := StoreResponse{hash}
+	w.Header().Set("Content-Type", "application/vnd.api+json")
+	json.NewEncoder(w).Encode(sr)
 }
 
 func main() {
