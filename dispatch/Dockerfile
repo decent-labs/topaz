@@ -1,11 +1,10 @@
 FROM golang:1.11.1 as builder
 
 WORKDIR /go/src/github.com/decentorganization/topaz/dispatch
-
 COPY . .
 
 RUN go get -v
-RUN CGO_ENABLED=0 GOOS=linux go build  -o dispatch -a -installsuffix cgo main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o dispatch -a -installsuffix cgo main.go
 
 FROM alpine:latest
 
