@@ -88,46 +88,46 @@ func main() {
 }
 
 func setupData(db *gorm.DB) {
-	parker := User{Name: "Parker"}
-	adam := User{Name: "Adam"}
-	nate := User{Name: "Nate"}
-	db.Create(&parker)
-	db.Create(&adam)
-	db.Create(&nate)
+	// parker := User{Name: "Parker"}
+	// adam := User{Name: "Adam"}
+	// nate := User{Name: "Nate"}
+	// db.Create(&parker)
+	// db.Create(&adam)
+	// db.Create(&nate)
 
-	latestParkerFlushTime, _ := time.Parse("2006-01-02 15:04:05", "2018-10-18 09:30:30")
-	secondLatestParkerFlushTime, _ := time.Parse("2006-01-02 15:04:05", "2018-10-18 09:30:00")
-	latestNateFlushTime, _ := time.Parse("2006-01-02 15:04:05", "2018-10-18 09:30:00")
+	// latestParkerFlushTime, _ := time.Parse("2006-01-02 15:04:05", "2018-10-18 09:30:30")
+	// secondLatestParkerFlushTime, _ := time.Parse("2006-01-02 15:04:05", "2018-10-18 09:30:00")
+	// latestNateFlushTime, _ := time.Parse("2006-01-02 15:04:05", "2018-10-18 09:30:00")
 
-	appParker1 := App{Name: "parker app 1", User: parker, Interval: "30 seconds", LastFlushed: &latestParkerFlushTime}
-	appNate1 := App{Name: "nate app 1", User: nate, Interval: "25 seconds", LastFlushed: &latestNateFlushTime}
-	appAdam1 := App{Name: "adam app 1", User: adam, Interval: "35 seconds"}
-	db.Create(&appParker1)
-	db.Create(&appAdam1)
-	db.Create(&appNate1)
+	// appParker1 := App{Name: "parker app 1", User: parker, Interval: "30 seconds", LastFlushed: &latestParkerFlushTime}
+	// appNate1 := App{Name: "nate app 1", User: nate, Interval: "25 seconds", LastFlushed: &latestNateFlushTime}
+	// appAdam1 := App{Name: "adam app 1", User: adam, Interval: "35 seconds"}
+	// db.Create(&appParker1)
+	// db.Create(&appAdam1)
+	// db.Create(&appNate1)
 
-	flushParker1 := Flush{Transaction: "0x0", App: appParker1, DirectoryHash: "0x0"}
-	flushParker1.CreatedAt = latestParkerFlushTime
-	flushParker2 := Flush{Transaction: "0x0", App: appParker1, DirectoryHash: "0x0"}
-	flushParker2.CreatedAt = secondLatestParkerFlushTime
-	flushNate1 := Flush{Transaction: "0x0", App: appNate1, DirectoryHash: "0x0"}
-	flushNate1.CreatedAt = latestNateFlushTime
-	db.Create(&flushParker1)
-	db.Create(&flushParker2)
-	db.Create(&flushNate1)
+	// flushParker1 := Flush{Transaction: "0x0", App: appParker1, DirectoryHash: "0x0"}
+	// flushParker1.CreatedAt = latestParkerFlushTime
+	// flushParker2 := Flush{Transaction: "0x0", App: appParker1, DirectoryHash: "0x0"}
+	// flushParker2.CreatedAt = secondLatestParkerFlushTime
+	// flushNate1 := Flush{Transaction: "0x0", App: appNate1, DirectoryHash: "0x0"}
+	// flushNate1.CreatedAt = latestNateFlushTime
+	// db.Create(&flushParker1)
+	// db.Create(&flushParker2)
+	// db.Create(&flushNate1)
 
-	objParkerFlush1 := Object{Hash: "0x0", App: appParker1, Flush: flushParker1}
-	objParkerFlush2 := Object{Hash: "0x0", App: appParker1, Flush: flushParker2}
-	objParkerUnFlush1 := Object{Hash: "0x0", App: appParker1}
-	objParkerUnFlush2 := Object{Hash: "0x0", App: appParker1}
-	objAdamUnFlush1 := Object{Hash: "0x0", App: appAdam1}
-	objAdamUnFlush2 := Object{Hash: "0x0", App: appAdam1}
-	objNateFlush1 := Object{Hash: "0x0", App: appNate1, Flush: flushNate1}
-	db.Create(&objParkerFlush1)
-	db.Create(&objParkerFlush2)
-	db.Create(&objParkerUnFlush1)
-	db.Create(&objParkerUnFlush2)
-	db.Create(&objAdamUnFlush1)
-	db.Create(&objAdamUnFlush2)
-	db.Create(&objNateFlush1)
+	// objParkerFlush1 := Object{Hash: "0x0", App: appParker1, Flush: flushParker1}
+	// objParkerFlush2 := Object{Hash: "0x0", App: appParker1, Flush: flushParker2}
+	// objParkerUnFlush1 := Object{Hash: "0x0", App: appParker1}
+	// objParkerUnFlush2 := Object{Hash: "0x0", App: appParker1}
+	// objAdamUnFlush1 := Object{Hash: "0x0", App: appAdam1}
+	// objAdamUnFlush2 := Object{Hash: "0x0", App: appAdam1}
+	// objNateFlush1 := Object{Hash: "0x0", App: appNate1, Flush: flushNate1}
+	// db.Create(&objParkerFlush1)
+	// db.Create(&objParkerFlush2)
+	// db.Create(&objParkerUnFlush1)
+	// db.Create(&objParkerUnFlush2)
+	// db.Create(&objAdamUnFlush1)
+	// db.Create(&objAdamUnFlush2)
+	// db.Create(&objNateFlush1)
 }

@@ -1,6 +1,7 @@
 FROM golang:1.11.1 as builder
 
 WORKDIR /go/src/github.com/decentorganization/topaz/dispatch
+
 COPY ./dispatch .
 COPY ./models/main.go ./models.go
 
