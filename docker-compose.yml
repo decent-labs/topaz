@@ -11,6 +11,11 @@ services:
     ports:
       - "8081:8080"
     environment:
+      PQ_HOST:       "postgres"
+      PQ_PORT:       "5432"
+      PQ_USER:       "postgres"
+      PQ_NAME:       "postgres"
+      STARTUP_SLEEP: "5"
       STORE_PROXY: "http"
       STORE_HOST:  "store"
       STORE_PORT:  "8080"
@@ -22,7 +27,6 @@ services:
       - postgres
       - flush
     environment:
-      STARTUP_SLEEP: "5"
       DISPATCH_RATE: "2"
       FLUSH_HOST:    "flush"
       FLUSH_PORT:    "8080"
@@ -30,6 +34,7 @@ services:
       PQ_PORT:       "5432"
       PQ_USER:       "postgres"
       PQ_NAME:       "postgres"
+      STARTUP_SLEEP: "5"
   ethereum:
     build: ./ethereum
     ports:
@@ -58,8 +63,6 @@ services:
       PQ_NAME:       "postgres"
   migrate:
     build: ./migrate
-    depends_on:
-      - postgres
     environment:
       PQ_HOST:    "postgres"
       PQ_PORT:    "5432"
@@ -92,5 +95,7 @@ services:
       - "./ipfs/data:/data/ipfs"
   postgres:
     build: ./postgres
+    depends_on:
+      - migrate
     ports:
       - "5432:5432"

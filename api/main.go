@@ -8,10 +8,14 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
+	"time"
 
-	_ "github.com/lib/pq"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
+var db *gorm.DB
 var httpClient = http.Client{}
 
 type CreateUserRequest struct {
@@ -21,16 +25,45 @@ type CreateUserRequest struct {
 func createUserHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("starting /create-user handler")
 
-	var u CreateUserRequest
+	var ur CreateUserRequest
 	jd := json.NewDecoder(r.Body)
-	err := jd.Decode(&u)
+	err := jd.Decode(&ur)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println(u.Name)
+
+	u := User{Name: ur.Name}
+	db.Create(&u)
+
+	je := json.NewEncoder(w)
+	err = je.Encode(u)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+type CreateAppRequest struct {
+	Name string
 }
 
 func createAppHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("starting /create-app handler")
+
+	var ur CreateUserRequest
+	jd := json.NewDecoder(r.Body)
+	err := jd.Decode(&ur)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	u := User{Name: ur.Name}
+	db.Create(&u)
+
+	je := json.NewEncoder(w)
+	err = je.Encode(u)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 type StoreResponse struct {
@@ -117,6 +150,25 @@ func reportHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	i, err := strconv.Atoi(os.Getenv("STARTUP_SLEEP"))
+	if err != nil {
+		log.Fatalf("missing valid STARTUP_SLEEP environment variable: %s", err.Error())
+	}
+	time.Sleep(time.Duration(i) * time.Second)
+
+	dbConn := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable",
+		os.Getenv("PQ_HOST"),
+		os.Getenv("PQ_PORT"),
+		os.Getenv("PQ_USER"),
+		os.Getenv("PQ_NAME"),
+	)
+
+	db, err = gorm.Open("postgres", dbConn)
+	if err != nil {
+		log.Fatalf("couldn't even pretend to open database connection: %s", err.Error())
+	}
+	defer db.Close()
+
 	http.HandleFunc("/create-user", createUserHandler)
 	http.HandleFunc("/create-app", createAppHandler)
 	http.HandleFunc("/store", storeHandler)
