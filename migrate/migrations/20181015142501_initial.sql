@@ -15,8 +15,8 @@ CREATE TABLE apps (
     deleted_at TIMESTAMP,
     "interval" int NOT NULL,
     name CHARACTER varying(255) NOT NULL,
-    last_flushed TIMESTAMP
-    user_id INT NOT NULL,
+    last_flushed TIMESTAMP,
+    user_id INT NOT NULL
 );
 
 CREATE TABLE flushes (

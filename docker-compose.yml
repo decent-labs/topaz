@@ -1,7 +1,9 @@
 version: "3"
 
 services:
-  # go services
+  # Core Services
+
+  ## the api service allows http access to topaz
   api:
     build:
       context: .
@@ -9,39 +11,45 @@ services:
     depends_on:
       - store
     ports:
-      - "8081:8080"
+      - "8080:8080"
     environment:
       PQ_HOST:       "postgres"
+      PQ_NAME:       "postgres"
       PQ_PORT:       "5432"
       PQ_USER:       "postgres"
-      PQ_NAME:       "postgres"
       STARTUP_SLEEP: "5"
-      STORE_PROXY: "http"
-      STORE_HOST:  "store"
-      STORE_PORT:  "8080"
+      STORE_HOST:    "store"
+      STORE_PORT:    "8083"
+      STORE_PROXY:   "http"
+
+  ## the dispatch service triggers flush workers
   dispatch:
     build:
       context: .
       dockerfile: ./dispatch/Dockerfile
     depends_on:
-      - postgres
       - flush
+      - postgres
     environment:
-      DISPATCH_RATE: "2"
+      DISPATCH_RATE: "5"
       FLUSH_HOST:    "flush"
-      FLUSH_PORT:    "8080"
+      FLUSH_PORT:    "8082"
       PQ_HOST:       "postgres"
+      PQ_NAME:       "postgres"
       PQ_PORT:       "5432"
       PQ_USER:       "postgres"
-      PQ_NAME:       "postgres"
       STARTUP_SLEEP: "5"
+
+  ## the ethereum service communicates between Topaz and ethereum
   ethereum:
     build: ./ethereum
     ports:
-      - "8084:8080"
+      - "8081:8080"
     environment:
       CONN:    "${ETHEREUM_HOST}"
       PRIVKEY: "${PRIVATE_KEY}"
+
+  ## the flush service flushes all pending objects for a user into IPFS
   flush:
     build:
       context: .
@@ -51,18 +59,20 @@ services:
       - ipfs
       - postgres
     ports:
-      - "8083:8080"
+      - "8082:8080"
     environment:
-      STARTUP_SLEEP: "5"
+      ETH_ADDRESS:   "0x74e596525C63393f42C76987b6A66F4e52733efa"
       ETH_HOST:      "ethereum"
       ETH_PORT:      "8080"
-      ETH_ADDRESS:   "0x74e596525C63393f42C76987b6A66F4e52733efa"
       IPFS_HOST:     "ipfs"
       IPFS_PORT:     "5001"
       PQ_HOST:       "postgres"
+      PQ_NAME:       "postgres"
       PQ_PORT:       "5432"
       PQ_USER:       "postgres"
-      PQ_NAME:       "postgres"
+      STARTUP_SLEEP: "5"
+
+  ## the migrate service manages database migrations
   migrate:
     build: ./migrate
     environment:
@@ -70,6 +80,8 @@ services:
       PQ_PORT:    "5432"
       PQ_USER:    "postgres"
       PQ_NAME:    "postgres"
+
+  ## the store service manages the uploading of data to topaz
   store:
     build:
       context: .
@@ -78,25 +90,30 @@ services:
       - ipfs
       - postgres
     ports:
-      - "8082:8080"
+      - "8083:8080"
     environment:
-      STARTUP_SLEEP: "5"
       IPFS_HOST:     "ipfs"
       IPFS_PORT:     "5001"
       PQ_HOST:       "postgres"
+      PQ_NAME:       "postgres"
       PQ_PORT:       "5432"
       PQ_USER:       "postgres"
-      PQ_NAME:       "postgres"
-      TOPAZ_USER:    "966d1035-73a1-4e57-9D1f-95920524689a"
-  # supporting services
+      STARTUP_SLEEP: "5"
+      TOPAZ_USER:    "1"
+
+  # Supporting Services
+
+  ## the ipfs service provides dedication access to ipfs
   ipfs:
     build: ./ipfs
     ports:
-      - "4001:4001"
       - "127.0.0.1:5001:5001"
+      - "4001:4001"
     volumes:
-      - "./ipfs/staging:/export"
       - "./ipfs/data:/data/ipfs"
+      - "./ipfs/staging:/export"
+
+  ## the postgres service contains the Topaz database
   postgres:
     build: ./postgres
     depends_on:
