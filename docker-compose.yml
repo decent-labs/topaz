@@ -40,7 +40,7 @@ services:
       PQ_USER:       "${PQ_USER}"
       STARTUP_SLEEP: "${STARTUP_SLEEP}"
 
-  ## the ethereum service communicates between Topaz and ethereum
+  ## the ethereum service communicates between topaz and ethereum
   ethereum:
     build: ./ethereum
     ports:
