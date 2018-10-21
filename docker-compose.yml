@@ -1,8 +1,11 @@
 version: "3"
 
 services:
+  # go services
   api:
-    build: ./api
+    build:
+      context: .
+      dockerfile: ./api/Dockerfile
     depends_on:
       - store
     ports:
@@ -11,36 +14,29 @@ services:
       STORE_PROXY: "http"
       STORE_HOST:  "store"
       STORE_PORT:  "8080"
-  store:
-    build: ./store
-    depends_on:
-      - ipfs
-      - postgres
-    ports:
-      - "8082:8080"
-    environment:
-      STARTUP_SLEEP: "5"
-      IPFS_HOST:     "ipfs"
-      IPFS_PORT:     "5001"
-      PQ_HOST:       "postgres"
-      PQ_PORT:       "5432"
-      PQ_USER:       "postgres"
-      PQ_NAME:       "postgres"
-      TOPAZ_USER:    "966d1035-73a1-4e57-9D1f-95920524689a"
   dispatch:
-    build: ./dispatch
+    build:
+      context: .
+      dockerfile: ./dispatch/Dockerfile
     depends_on:
       - postgres
       - flush
     environment:
       STARTUP_SLEEP: "5"
-      DISPATCH_RATE: "10"
+      DISPATCH_RATE: "2"
       FLUSH_HOST:    "flush"
       FLUSH_PORT:    "8080"
       PQ_HOST:       "postgres"
       PQ_PORT:       "5432"
       PQ_USER:       "postgres"
       PQ_NAME:       "postgres"
+  ethereum:
+    build: ./ethereum
+    ports:
+      - "8084:8080"
+    environment:
+      CONN:    "${ETHEREUM_HOST}"
+      PRIVKEY: "${PRIVATE_KEY}"
   flush:
     build: ./flush
     depends_on:
@@ -60,13 +56,32 @@ services:
       PQ_PORT:       "5432"
       PQ_USER:       "postgres"
       PQ_NAME:       "postgres"
-  ethereum:
-    build: ./ethereum
-    ports:
-      - "8084:8080"
+  migrate:
+    build: ./migrate
+    depends_on:
+      - postgres
     environment:
-      CONN:    "${ETHEREUM_HOST}"
-      PRIVKEY: "${PRIVATE_KEY}"
+      PQ_HOST:    "postgres"
+      PQ_PORT:    "5432"
+      PQ_USER:    "postgres"
+      PQ_NAME:    "postgres"
+  store:
+    build: ./store
+    depends_on:
+      - ipfs
+      - postgres
+    ports:
+      - "8082:8080"
+    environment:
+      STARTUP_SLEEP: "5"
+      IPFS_HOST:     "ipfs"
+      IPFS_PORT:     "5001"
+      PQ_HOST:       "postgres"
+      PQ_PORT:       "5432"
+      PQ_USER:       "postgres"
+      PQ_NAME:       "postgres"
+      TOPAZ_USER:    "966d1035-73a1-4e57-9D1f-95920524689a"
+  # supporting services
   ipfs:
     build: ./ipfs
     ports:
@@ -79,12 +94,3 @@ services:
     build: ./postgres
     ports:
       - "5432:5432"
-  migrate:
-    build: ./migrate
-    depends_on:
-      - postgres
-    environment:
-      PQ_HOST:    "postgres"
-      PQ_PORT:    "5432"
-      PQ_USER:    "postgres"
-      PQ_NAME:    "postgres"

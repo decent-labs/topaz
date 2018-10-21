@@ -14,14 +14,14 @@ import (
 
 var httpClient = http.Client{}
 
-type User struct {
+type CreateUserRequest struct {
 	Name string
 }
 
 func createUserHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("starting /create-user handler")
 
-	var u User
+	var u CreateUserRequest
 	jd := json.NewDecoder(r.Body)
 	err := jd.Decode(&u)
 	if err != nil {
