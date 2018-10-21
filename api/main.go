@@ -17,6 +17,9 @@ var httpClient = http.Client{}
 func createUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
+func createAppHandler(w http.ResponseWriter, r *http.Request) {
+}
+
 // StoreResponse is what gets returned
 type StoreResponse struct {
 	Hash string
@@ -99,14 +102,15 @@ func storeHandler(w http.ResponseWriter, r *http.Request) {
 func verifyHandler(w http.ResponseWriter, r *http.Request) {
 }
 
-func retrieveHandler(w http.ResponseWriter, r *http.Request) {
+func reportHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/create_user", createUserHandler)
+	http.HandleFunc("/create-user", createUserHandler)
+	http.HandleFunc("/create-app", createAppHandler)
 	http.HandleFunc("/store", storeHandler)
 	http.HandleFunc("/verify", verifyHandler)
-	http.HandleFunc("/retrieve", retrieveHandler)
+	http.HandleFunc("/report", reportHandler)
 
 	log.Println("wake up, api...")
 	log.Fatal(http.ListenAndServe(":8080", nil))
