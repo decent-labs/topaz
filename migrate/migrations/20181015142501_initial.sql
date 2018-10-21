@@ -13,10 +13,10 @@ CREATE TABLE apps (
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
     deleted_at TIMESTAMP,
+    "interval" int NOT NULL,
     name CHARACTER varying(255) NOT NULL,
-    user_id INT NOT NULL,
-    "interval" INTERVAL NOT NULL,
     last_flushed TIMESTAMP
+    user_id INT NOT NULL,
 );
 
 CREATE TABLE flushes (

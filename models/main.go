@@ -13,21 +13,21 @@ type User struct {
 
 type App struct {
 	gorm.Model
+	Interval    int
 	Name        string
+	LastFlushed *time.Time
 	UserID      int
 	User        User
-	Interval    string
-	LastFlushed *time.Time
 	Flushes     []Flush
 	Objects     []Object
 }
 
 type Flush struct {
 	gorm.Model
+	DirectoryHash string
 	Transaction   string
 	AppID         int
 	App           App
-	DirectoryHash string
 	Objects       []Object
 }
 

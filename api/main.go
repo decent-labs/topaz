@@ -22,6 +22,7 @@ type CreateUserRequest struct {
 	Name string
 }
 
+// TODO: Generate user-scope key for creating apps and managing settings
 func createUserHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("starting /create-user handler")
 
@@ -43,24 +44,27 @@ func createUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 type CreateAppRequest struct {
-	Name string
+	Interval int
+	Name     string
+	UserID   int
 }
 
+// TODO: Associate with user that makes request and generate api key for app
 func createAppHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("starting /create-app handler")
 
-	var ur CreateUserRequest
+	var ar CreateAppRequest
 	jd := json.NewDecoder(r.Body)
-	err := jd.Decode(&ur)
+	err := jd.Decode(&ar)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	u := User{Name: ur.Name}
-	db.Create(&u)
+	a := App{Interval: ar.Interval, Name: ar.Name}
+	db.Create(&a)
 
 	je := json.NewEncoder(w)
-	err = je.Encode(u)
+	err = je.Encode(a)
 	if err != nil {
 		log.Fatal(err)
 	}
