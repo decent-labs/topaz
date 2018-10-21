@@ -14,13 +14,25 @@ import (
 
 var httpClient = http.Client{}
 
+type User struct {
+	Name string
+}
+
 func createUserHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("starting /create-user handler")
+
+	var u User
+	jd := json.NewDecoder(r.Body)
+	err := jd.Decode(&u)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(u.Name)
 }
 
 func createAppHandler(w http.ResponseWriter, r *http.Request) {
 }
 
-// StoreResponse is what gets returned
 type StoreResponse struct {
 	Hash string
 }
@@ -28,8 +40,7 @@ type StoreResponse struct {
 func storeHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("starting /store handler")
 
-	// we need to buffer the body if we want to read it here and send it
-	// in the request.
+	// we need to buffer the body if we want to read it here and send it in the request
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		http.Error(
