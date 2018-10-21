@@ -43,7 +43,9 @@ services:
       CONN:    "${ETHEREUM_HOST}"
       PRIVKEY: "${PRIVATE_KEY}"
   flush:
-    build: ./flush
+    build:
+      context: .
+      dockerfile: ./flush/Dockerfile
     depends_on:
       - ethereum
       - ipfs
