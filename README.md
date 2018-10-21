@@ -7,48 +7,8 @@ $ docker-compose up
 ```
 
 ```sh
-$ curl --request POST -d "your-data-here" http://localhost:8081
+$ curl --request POST -d "your-data-here" http://localhost:8080/store
 ```
-
-## todo
-
-### big stuff
-
-* replace HTTP wherever possible
-* project-wide best practices such as error handling
-
-### deployments
-
-* terraform
-* k8s
-
-### dispatch
-
-* decide on long term timing (cron) solution
-* deal with postgres race condition (ask Parker about this)
-* activate 'flush' service asynchronously via worker pool
-
-### ethereum
-
-* add 'ethereum' service to `docker-compose.yml`
-* integrate in stack
-
-### flush
-
-* deploy as worker
-
-### ipfs
-
-* add cluster / resilience infrastructure
-
-### postgres
-
-* decide on migrations system (ask Parker about this)
-* hold connections between requests and reuse them - there's no reason to continually open and close connections between server and database
-
-### store
-
-* add authentication
 
 ## where you at?
 

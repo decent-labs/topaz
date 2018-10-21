@@ -175,6 +175,7 @@ func main() {
 
 	http.HandleFunc("/create-user", createUserHandler)
 	http.HandleFunc("/create-app", createAppHandler)
+
 	http.HandleFunc("/store", storeHandler)
 	http.HandleFunc("/verify", verifyHandler)
 	http.HandleFunc("/report", reportHandler)
