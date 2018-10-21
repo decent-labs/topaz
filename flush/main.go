@@ -159,9 +159,9 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	url := fmt.Sprintf("http://%s:%s/store", os.Getenv("ETH_HOST"), os.Getenv("ETH_PORT"))
+	url := fmt.Sprintf("http://%s:%s/store", os.Getenv("ETHEREUM_HOST"), os.Getenv("ETHEREUM_PORT"))
 
-	m := Message{os.Getenv("ETH_ADDRESS"), dir}
+	m := Message{os.Getenv("ETHEREUM_ADDRESS"), dir}
 
 	b, err = json.Marshal(m)
 	if err != nil {

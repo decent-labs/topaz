@@ -177,7 +177,7 @@ func (api *ConnectionHandler) Deploy(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	c := new(ConnectionHandler)
-	err := c.Connect(os.Getenv("CONN"), os.Getenv("PRIVKEY"))
+	err := c.Connect(os.Getenv("GETH_HOST"), os.Getenv("GETH_PRIVATE_KEY"))
 	if err != nil {
 		log.Fatalf("could not connect to ethereum blockchain: %s", err.Error())
 	}
