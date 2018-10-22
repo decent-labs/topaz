@@ -48,6 +48,7 @@ services:
     environment:
       GETH_HOST:        "${GETH_HOST}"
       GETH_PRIVATE_KEY: "${GETH_PRIVATE_KEY}"
+      STARTUP_SLEEP:    "${STARTUP_SLEEP}"
 
   ## the flush service flushes all pending objects for a user into IPFS
   flush:

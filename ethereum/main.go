@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
+	"time"
 
 	"github.com/decentorganization/topaz/ethereum/contracts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -176,8 +178,14 @@ func (api *ConnectionHandler) Deploy(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	i, err := strconv.Atoi(os.Getenv("STARTUP_SLEEP"))
+	if err != nil {
+		log.Fatalf("missing valid STARTUP_SLEEP environment variable: %s", err.Error())
+	}
+	time.Sleep(time.Duration(i) * time.Second)
+
 	c := new(ConnectionHandler)
-	err := c.Connect(os.Getenv("GETH_HOST"), os.Getenv("GETH_PRIVATE_KEY"))
+	err = c.Connect(os.Getenv("GETH_HOST"), os.Getenv("GETH_PRIVATE_KEY"))
 	if err != nil {
 		log.Fatalf("could not connect to ethereum blockchain: %s", err.Error())
 	}
