@@ -13,6 +13,8 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+
+	"github.com/dgrijalva/jwt-go"
 )
 
 var db *gorm.DB
@@ -179,6 +181,63 @@ func verifyHandler(w http.ResponseWriter, r *http.Request) {
 func reportHandler(w http.ResponseWriter, r *http.Request) {
 }
 
+type CreateTokenRequest struct {
+	Email    string
+	Password string
+}
+
+func createTokenHandler(w http.ResponseWriter, req *http.Request) {
+	log.Println("starting /authenticate (create token) handler")
+
+	var ctr CreateTokenRequest
+	err := json.NewDecoder(req.Body).Decode(&ctr)
+	if err != nil {
+		http.Error(
+			w,
+			fmt.Sprintf("error decoding create token request: %s", err.Error()),
+			http.StatusBadRequest,
+		)
+		return
+	}
+
+	var user User
+	if err := db.Where("email = ?", ctr.Email).First(&user).Error; err != nil {
+		http.Error(
+			w,
+			fmt.Sprintf("error finding user: %s", err.Error()),
+			http.StatusNotFound,
+		)
+		return
+	}
+
+	match := CheckPasswordHash(ctr.Password, user.Password)
+	if match == false {
+		http.Error(
+			w,
+			fmt.Sprintf("error authenticating, bad password"),
+			http.StatusUnauthorized,
+		)
+		return
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"username": user.Email,
+		"password": user.Password,
+	})
+	tokenString, err := token.SignedString([]byte(os.Getenv("API_JWT_KEY")))
+	if err != nil {
+		http.Error(
+			w,
+			fmt.Sprintf("error creating jwt signature: %s", err.Error()),
+			http.StatusInternalServerError,
+		)
+		return
+	}
+	json.NewEncoder(w).Encode(JwtToken{Token: tokenString})
+
+	log.Println("finished with /authenticate (create token) handler")
+}
+
 func main() {
 	i, err := strconv.Atoi(os.Getenv("STARTUP_SLEEP"))
 	if err != nil {
@@ -201,6 +260,7 @@ func main() {
 
 	http.HandleFunc("/create-user", createUserHandler)
 	http.HandleFunc("/create-app", createAppHandler)
+	http.HandleFunc("/authenticate", createTokenHandler)
 
 	http.HandleFunc("/store", storeHandler)
 	http.HandleFunc("/verify", verifyHandler)

@@ -13,6 +13,10 @@ type User struct {
 	Password string `json:"password"`
 }
 
+type JwtToken struct {
+	Token string `json:"token"`
+}
+
 type App struct {
 	gorm.Model
 	Interval    int
