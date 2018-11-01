@@ -118,13 +118,6 @@ func storeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// We may want to filter some headers, otherwise we could just use a shallow copy
-	// proxyReq.Header = req.Header
-	proxyReq.Header = make(http.Header)
-	for h, val := range r.Header {
-		proxyReq.Header[h] = val
-	}
-
 	resp, err := httpClient.Do(proxyReq)
 	if err != nil {
 		http.Error(
