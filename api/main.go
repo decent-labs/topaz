@@ -41,6 +41,8 @@ func createUserHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	log.Println("finished with /create-user handler")
 }
 
 type CreateAppRequest struct {
@@ -68,6 +70,8 @@ func createAppHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	log.Println("finished with /create-app handler")
 }
 
 type StoreResponse struct {
