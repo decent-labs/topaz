@@ -30,7 +30,12 @@ func createUserHandler(w http.ResponseWriter, r *http.Request) {
 	jd := json.NewDecoder(r.Body)
 	err := jd.Decode(&ur)
 	if err != nil {
-		log.Fatal(err)
+		http.Error(
+			w,
+			fmt.Sprintf("error executing create new user request: %s", err.Error()),
+			http.StatusBadRequest,
+		)
+		return
 	}
 
 	u := User{Name: ur.Name}
@@ -39,7 +44,12 @@ func createUserHandler(w http.ResponseWriter, r *http.Request) {
 	je := json.NewEncoder(w)
 	err = je.Encode(u)
 	if err != nil {
-		log.Fatal(err)
+		http.Error(
+			w,
+			fmt.Sprintf("error encoding new user: %s", err.Error()),
+			http.StatusInternalServerError,
+		)
+		return
 	}
 
 	log.Println("finished with /create-user handler")
