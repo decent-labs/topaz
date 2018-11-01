@@ -20,7 +20,6 @@ services:
       STARTUP_SLEEP: "${STARTUP_SLEEP}"
       STORE_HOST:    "${STORE_HOST}"
       STORE_PORT:    "${STORE_PORT}"
-      STORE_PROXY:   "${STORE_PROXY}"
 
   ## the dispatch service triggers flush workers
   dispatch:
