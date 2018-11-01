@@ -18,11 +18,13 @@ import (
 var db *gorm.DB
 var httpClient = http.Client{}
 
+// CreateUserRequest is body of incoming request
 type CreateUserRequest struct {
-	Name string
+	Name     string
+	Email    string
+	Password string
 }
 
-// TODO: Generate user-scope key for creating apps and managing settings
 func createUserHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("starting /create-user handler")
 
@@ -38,8 +40,25 @@ func createUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	u := User{Name: ur.Name}
-	db.Create(&u)
+	hp, err := HashPassword(ur.Password)
+	if err != nil {
+		http.Error(
+			w,
+			fmt.Sprintf("error hashing password: %s", err.Error()),
+			http.StatusInternalServerError,
+		)
+		return
+	}
+
+	u := User{Name: ur.Name, Email: ur.Email, Password: hp}
+	if err := db.Create(&u).Error; err != nil {
+		http.Error(
+			w,
+			fmt.Sprintf("error saving new user: %s", err.Error()),
+			http.StatusInternalServerError,
+		)
+		return
+	}
 
 	je := json.NewEncoder(w)
 	err = je.Encode(u)
