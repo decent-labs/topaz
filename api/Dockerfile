@@ -6,7 +6,7 @@ COPY ./api .
 COPY ./models/main.go ./models.go
 
 RUN go get -v
-RUN CGO_ENABLED=0 GOOS=linux go build  -o api -a -installsuffix cgo main.go models.go
+RUN CGO_ENABLED=0 GOOS=linux go build  -o api -a -installsuffix cgo main.go models.go passwords.go
 
 FROM alpine:latest
 
