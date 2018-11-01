@@ -290,12 +290,12 @@ func main() {
 	defer db.Close()
 
 	http.HandleFunc("/create-user", createUserHandler)
-	http.HandleFunc("/create-app", createAppHandler)
 	http.HandleFunc("/authenticate", createTokenHandler)
 
-	http.HandleFunc("/store", storeHandler)
-	http.HandleFunc("/verify", verifyHandler)
-	http.HandleFunc("/report", reportHandler)
+	http.HandleFunc("/create-app", Authenticate(createAppHandler))
+	http.HandleFunc("/store", Authenticate(storeHandler))
+	http.HandleFunc("/verify", Authenticate(verifyHandler))
+	http.HandleFunc("/report", Authenticate(reportHandler))
 
 	log.Println("wake up, api...")
 	log.Fatal(http.ListenAndServe(":8080", nil))
