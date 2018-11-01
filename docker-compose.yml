@@ -58,8 +58,6 @@ services:
       - ethereum
       - ipfs
       - postgres
-    ports:
-      - "${FLUSH_PORT}:8080"
     environment:
       ETHEREUM_ADDRESS: "${ETHEREUM_ADDRESS}"
       ETHEREUM_HOST:    "${ETHEREUM_HOST}"
@@ -89,8 +87,6 @@ services:
     depends_on:
       - ipfs
       - postgres
-    ports:
-      - "${STORE_PORT}:8080"
     environment:
       IPFS_HOST:     "${IPFS_HOST}"
       IPFS_PORT:     "${IPFS_PORT}"
