@@ -17,6 +17,10 @@ type JwtToken struct {
 	Token string `json:"token"`
 }
 
+type Exception struct {
+	Message string `json:"message"`
+}
+
 type App struct {
 	gorm.Model
 	Interval    int
