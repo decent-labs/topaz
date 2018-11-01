@@ -106,7 +106,7 @@ func storeHandler(w http.ResponseWriter, r *http.Request) {
 	r.Body = ioutil.NopCloser(bytes.NewReader(body))
 
 	// create a new url from the raw RequestURI sent by the client
-	url := fmt.Sprintf("http://%s:%s", os.Getenv("STORE_HOST"), os.Getenv("STORE_PORT"))
+	url := fmt.Sprintf("http://%s:8080", os.Getenv("STORE_HOST"))
 
 	proxyReq, err := http.NewRequest(r.Method, url, bytes.NewReader(body))
 	if err != nil {
