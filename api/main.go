@@ -13,159 +13,193 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
+
+	"github.com/decentorganization/topaz/api/auth"
+	m "github.com/decentorganization/topaz/models"
 )
 
 var db *gorm.DB
 var httpClient = http.Client{}
 
-// CreateUserRequest is body of incoming request
-type CreateUserRequest struct {
-	Name     string
-	Email    string
-	Password string
-}
-
-// CreateTokenRequest is the body of incoming request
-type CreateTokenRequest struct {
-	Email    string
-	Password string
-}
-
-// CreateAppRequest is the body of incoming request
-type CreateAppRequest struct {
-	Interval int
-	Name     string
-}
-
-// StoreResponse is the response of store request
-type StoreResponse struct {
-	Hash string
-	App  int
-}
-
 // CreateUserHandler creates a new user
 func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("starting /create-user handler")
 
-	var ur CreateUserRequest
+	var ur m.CreateUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&ur); err != nil {
-		json.NewEncoder(w).Encode(Exception{Message: "error executing create new user request: %s" + err.Error()})
+		json.NewEncoder(w).Encode(m.Exception{Message: "error executing create new user request: %s" + err.Error()})
 		return
 	}
 
-	if hp, err := HashPassword(ur.Password); err != nil {
-		json.NewEncoder(w).Encode(Exception{Message: "error hashing password: %s" + err.Error()})
+	hp, err := auth.HashPassword(ur.Password)
+	if err != nil {
+		json.NewEncoder(w).Encode(m.Exception{Message: "error hashing password: %s" + err.Error()})
 		return
 	}
 
-	u := User{Name: ur.Name, Email: ur.Email, Password: hp}
+	u := m.User{Name: ur.Name, Email: ur.Email, Password: hp}
 	if err := db.Create(&u).Error; err != nil {
-		json.NewEncoder(w).Encode(Exception{Message: "error saving new user: %s" + err.Error()})
+		json.NewEncoder(w).Encode(m.Exception{Message: "error saving new user: %s" + err.Error()})
 		return
 	}
 
 	if err := json.NewEncoder(w).Encode(u); err != nil {
-		json.NewEncoder(w).Encode(Exception{Message: "error encoding new user: %s" + err.Error()})
+		json.NewEncoder(w).Encode(m.Exception{Message: "error encoding new user: %s" + err.Error()})
 		return
 	}
 
 	log.Println("finished with /create-user handler")
 }
 
-// CreateTokenHandler creates a new JWT for a user
-func CreateTokenHandler(w http.ResponseWriter, req *http.Request) {
-	log.Println("starting /authenticate (create token) handler")
+// CreateAdminTokenHandler creates a new JWT admin for a user
+func CreateAdminTokenHandler(w http.ResponseWriter, req *http.Request) {
+	log.Println("starting /auth-admin (create admin token) handler")
 
-	var ctr CreateTokenRequest
+	var ctr m.CreateAdminTokenRequest
 	if err := json.NewDecoder(req.Body).Decode(&ctr); err != nil {
-		json.NewEncoder(w).Encode(Exception{Message: "error decoding create token request: %s" + err.Error()})
+		json.NewEncoder(w).Encode(m.Exception{Message: "error decoding create token request: %s" + err.Error()})
 		return
 	}
 
-	var u User
+	var u m.User
 	if err := db.Where("email = ?", ctr.Email).First(&u).Error; err != nil {
-		json.NewEncoder(w).Encode(Exception{Message: "error finding user: %s" + err.Error()})
+		json.NewEncoder(w).Encode(m.Exception{Message: "error finding user: %s" + err.Error()})
 		return
 	}
 
-	if match := CheckPasswordHash(ctr.Password, user.Password); match == false {
-		json.NewEncoder(w).Encode(Exception{Message: "error authenticating, bad password"})
+	if match := auth.CheckPasswordHash(ctr.Password, u.Password); match == false {
+		json.NewEncoder(w).Encode(m.Exception{Message: "error authenticating, bad password"})
 		return
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"username": user.Email,
-		"password": user.Password,
-	})
+	claims := m.AuthAdminClaims{
+		string(u.ID),
+		jwt.StandardClaims{
+			ExpiresAt: 15000,
+			Issuer:    "topaz-test",
+		},
+	}
 
-	if tokenString, err := token.SignedString([]byte(os.Getenv("API_JWT_KEY"))); err != nil {
-		json.NewEncoder(w).Encode(Exception{Message: "error creating jwt signature: %s", err.Error()})
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	tokenString, err := token.SignedString([]byte(os.Getenv("API_JWT_KEY")))
+	if err != nil {
+		json.NewEncoder(w).Encode(m.Exception{Message: "error creating jwt signature: %s" + err.Error()})
 		return
 	}
 
-	if err := json.NewEncoder(w).Encode(JwtToken{Token: tokenString}); err != nil {
-		json.NewEncoder(w).Encode(Exception{Message: "error encoding jwt: %s", err.Error()})
+	if err := json.NewEncoder(w).Encode(m.JwtToken{Token: tokenString}); err != nil {
+		json.NewEncoder(w).Encode(m.Exception{Message: "error encoding jwt: %s" + err.Error()})
 		return
 	}
 
-	log.Println("finished with /authenticate (create token) handler")
+	log.Println("finished with /auth-admin (create admin token) handler")
 }
 
 // CreateAppHandler creates a new app for a user
 func CreateAppHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("starting /create-app handler")
 
-	var ar CreateAppRequest
-	if err := json.NewDecoder(r.Body).Decode(&ar); err != nil {
-		json.NewEncoder(w).Encode(Exception{Message: "error decoding parameters: %s", err.Error()})
-		return
-	}
+	// decoded := context.Get(r, "decoded")
+	// if decoded.Get("type") != AuthAdmin {
+	// 	json.NewEncoder(w).Encode(m.Exception{Message: "error unauthorized jwt"})
+	// 	return
+	// }
 
-	a := App{Interval: ar.Interval, Name: ar.Name}
-	if err := db.Create(&a).Error; err != nil {
-		json.NewEncoder(w).Encode(Exception{Message: "error saving new app: %s", err.Error()})
-		return
-	}
+	// var ar m.CreateAppRequest
+	// if err := json.NewDecoder(r.Body).Decode(&ar); err != nil {
+	// 	json.NewEncoder(w).Encode(m.Exception{Message: "error decoding parameters: %s" + err.Error()})
+	// 	return
+	// }
 
-	if err := json.NewEncoder(w).Encode(a); err != nil {
-		json.NewEncoder(w).Encode(Exception{Message: "error encoding new app: %s", err.Error()})
-		return
-	}
+	// a := m.App{Interval: ar.Interval, Name: ar.Name, UserID: decoded["uid"]}
+	// if err := db.Create(&a).Error; err != nil {
+	// 	json.NewEncoder(w).Encode(m.Exception{Message: "error saving new app: %s" + err.Error()})
+	// 	return
+	// }
+
+	// if err := json.NewEncoder(w).Encode(a); err != nil {
+	// 	json.NewEncoder(w).Encode(m.Exception{Message: "error encoding new app: %s" + err.Error()})
+	// 	return
+	// }
 
 	log.Println("finished with /create-app handler")
+}
+
+// CreateAppTokenHandler creates a new JWT login for a user
+func CreateAppTokenHandler(w http.ResponseWriter, req *http.Request) {
+	log.Println("starting /create-app (create app token) handler")
+
+	var ctr m.CreateAppTokenRequest
+	if err := json.NewDecoder(req.Body).Decode(&ctr); err != nil {
+		json.NewEncoder(w).Encode(m.Exception{Message: "error decoding create token request: %s" + err.Error()})
+		return
+	}
+
+	var a m.App
+	if err := db.Where("id = ?", ctr.AppId).First(&a).Error; err != nil {
+		json.NewEncoder(w).Encode(m.Exception{Message: "error finding app: %s" + err.Error()})
+		return
+	}
+
+	claims := m.AuthAppClaims{
+		string(a.ID),
+		jwt.StandardClaims{
+			ExpiresAt: 15000,
+			Issuer:    "topaz-test",
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	tokenString, err := token.SignedString([]byte(os.Getenv("API_JWT_KEY")))
+	if err != nil {
+		json.NewEncoder(w).Encode(m.Exception{Message: "error creating jwt signature: %s" + err.Error()})
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(m.JwtToken{Token: tokenString}); err != nil {
+		json.NewEncoder(w).Encode(m.Exception{Message: "error encoding jwt: %s" + err.Error()})
+		return
+	}
+
+	log.Println("finished with /create-app (create app token) handler")
 }
 
 // StoreHandler takes data and does the thing
 func StoreHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("starting /store handler")
 
-	if body, err := ioutil.ReadAll(r.Body); err != nil {
-		json.NewEncoder(w).Encode(Exception{Message: "error reading /store request body: %s", err.Error()})
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		json.NewEncoder(w).Encode(m.Exception{Message: "error reading /store request body: %s" + err.Error()})
 		return
 	}
 
 	r.Body = ioutil.NopCloser(bytes.NewReader(body))
 
 	url := fmt.Sprintf("http://%s:8080", os.Getenv("STORE_HOST"))
-	if proxyReq, err := http.NewRequest(r.Method, url, bytes.NewReader(body)); err != nil {
-		json.NewEncoder(w).Encode(Exception{Message: "error creating proxy /store request to store service: %s", err.Error()})
+	proxyReq, err := http.NewRequest(r.Method, url, bytes.NewReader(body))
+	if err != nil {
+		json.NewEncoder(w).Encode(m.Exception{Message: "error creating proxy /store request to store service: %s" + err.Error()})
 		return
 	}
 
-	if resp, err := httpClient.Do(proxyReq); err != nil {
-		json.NewEncoder(w).Encode(Exception{Message: "error executing store service request: %s", err.Error()})
+	resp, err := httpClient.Do(proxyReq)
+	if err != nil {
+		json.NewEncoder(w).Encode(m.Exception{Message: "error executing store service request: %s" + err.Error()})
 		return
 	}
 	defer resp.Body.Close()
 
-	sr := new(StoreResponse)
-	if err = json.NewDecoder(resp.Body).Decode(sr); err != nil {
-		json.NewEncoder(w).Encode(Exception{Message: "error decoding store service json response: %s", err.Error()})
+	sr := new(m.StoreResponse)
+	if err := json.NewDecoder(resp.Body).Decode(sr); err != nil {
+		json.NewEncoder(w).Encode(m.Exception{Message: "error decoding store service json response: %s" + err.Error()})
 		return
 	}
 
-	if err = json.NewEncoder(w).Encode(sr); err != nil {
-		json.NewEncoder(w).Encode(Exception{Message: "error encoding store response from api: %s", err.Error()})
+	if err := json.NewEncoder(w).Encode(sr); err != nil {
+		json.NewEncoder(w).Encode(m.Exception{Message: "error encoding store response from api: %s" + err.Error()})
 		return
 	}
 
@@ -181,25 +215,29 @@ func ReportHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	if i, err := strconv.Atoi(os.Getenv("STARTUP_SLEEP")); err != nil {
+	i, err := strconv.Atoi(os.Getenv("STARTUP_SLEEP"))
+	if err != nil {
 		log.Fatalf("missing valid STARTUP_SLEEP environment variable: %s", err.Error())
 	}
 	time.Sleep(time.Duration(i) * time.Second)
 
 	dbConn := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable", os.Getenv("PQ_HOST"), os.Getenv("PQ_PORT"), os.Getenv("PQ_USER"), os.Getenv("PQ_NAME"))
 
-	if db, err = gorm.Open("postgres", dbConn); err != nil {
+	db, err := gorm.Open("postgres", dbConn)
+	if err != nil {
 		log.Fatalf("couldn't even pretend to open database connection: %s", err.Error())
 	}
 	defer db.Close()
 
-	http.HandleFunc("/create-user", CreateUserHandler)
-	http.HandleFunc("/log-in", CreateTokenHandler)
+	http.HandleFunc("/create-admin", CreateUserHandler)
+	http.HandleFunc("/auth-admin", CreateAdminTokenHandler)
 
-	http.HandleFunc("/create-app", Authenticate(CreateAppHandler))
-	http.HandleFunc("/store", Authenticate(StoreHandler))
-	http.HandleFunc("/verify", Authenticate(VerifyHandler))
-	http.HandleFunc("/report", Authenticate(ReportHandler))
+	http.HandleFunc("/create-app", auth.AuthAdmin(CreateAppHandler))
+	http.HandleFunc("/auth-app", auth.AuthAdmin(CreateAppTokenHandler))
+
+	http.HandleFunc("/store", auth.AuthApp(StoreHandler))
+	http.HandleFunc("/verify", auth.AuthApp(VerifyHandler))
+	http.HandleFunc("/report", auth.AuthApp(ReportHandler))
 
 	log.Println("wake up, api...")
 	log.Fatal(http.ListenAndServe(":8080", nil))
