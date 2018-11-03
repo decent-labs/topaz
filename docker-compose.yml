@@ -101,7 +101,7 @@ services:
 
   ## the ipfs service provides dedication access to ipfs
   ipfs:
-    build: ./ipfs
+    image: ipfs/go-ipfs:v0.4.17
     ports:
       - "${IPFS_PORT}:5001"
       - "4001:4001"
