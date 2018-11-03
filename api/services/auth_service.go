@@ -32,17 +32,20 @@ func Login(requestUser *models.User, db *gorm.DB) (int, []byte) {
 	return http.StatusUnauthorized, []byte("")
 }
 
-func RefreshToken(requestUser *models.User) []byte {
+func RefreshToken(requestUser *models.User) (int, []byte) {
 	authBackend := authentication.InitJWTAuthenticationBackend()
-	token, err := authBackend.GenerateToken(requestUser.UUID)
+
+	token, err := authBackend.GenerateToken(string(requestUser.ID))
 	if err != nil {
-		panic(err)
+		return http.StatusInternalServerError, []byte("")
 	}
+
 	response, err := json.Marshal(parameters.TokenAuthentication{Token: token})
 	if err != nil {
-		panic(err)
+		return http.StatusInternalServerError, []byte("")
 	}
-	return response
+
+	return http.StatusOK, response
 }
 
 func Logout(req *http.Request) error {
