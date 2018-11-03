@@ -6,7 +6,7 @@ import (
 
 	"github.com/decentorganization/topaz/api/api/parameters"
 	"github.com/decentorganization/topaz/api/core/authentication"
-	"github.com/decentorganization/topaz/api/services/models"
+	"github.com/decentorganization/topaz/models"
 	jwt "github.com/dgrijalva/jwt-go"
 	request "github.com/dgrijalva/jwt-go/request"
 )

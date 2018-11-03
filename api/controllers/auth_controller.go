@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/decentorganization/topaz/api/services"
-	"github.com/decentorganization/topaz/api/services/models"
+	"github.com/decentorganization/topaz/models"
 )
 
 func Login(w http.ResponseWriter, r *http.Request) {
