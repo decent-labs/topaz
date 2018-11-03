@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/decentorganization/topaz/api/auth"
@@ -20,12 +21,12 @@ type JWTAuthenticationBackend struct {
 	PublicKey  *rsa.PublicKey
 }
 
-const (
-	tokenDuration = 72
-	expireOffset  = 3600
+var (
+	tokenDuration, _ = strconv.Atoi(os.Getenv("TOKEN_DURATION_HOURS"))
+	expireOffset, _  = strconv.Atoi(os.Getenv("TOKEN_EXPIRE_OFFSET"))
 )
 
-var authBackendInstance *JWTAuthenticationBackend = nil
+var authBackendInstance *JWTAuthenticationBackend
 
 func InitJWTAuthenticationBackend() *JWTAuthenticationBackend {
 	if authBackendInstance == nil {
@@ -68,7 +69,7 @@ func (backend *JWTAuthenticationBackend) getTokenRemainingValidity(timestamp int
 		tm := time.Unix(int64(validity), 0)
 		remainer := tm.Sub(time.Now())
 		if remainer > 0 {
-			return int(remainer.Seconds() + expireOffset)
+			return int(remainer.Seconds()) + expireOffset
 		}
 	}
 	return expireOffset
