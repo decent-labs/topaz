@@ -10,17 +10,21 @@ services:
       dockerfile: ./api/Dockerfile
     depends_on:
       - store
+      - redis
     ports:
       - "${API_PORT}:8080"
     environment:
-      API_JWT_KEY:   "${API_JWT_KEY}"
-      PQ_HOST:       "${PQ_HOST}"
-      PQ_NAME:       "${PQ_NAME}"
-      PQ_PORT:       "${PQ_PORT}"
-      PQ_USER:       "${PQ_USER}"
-      STARTUP_SLEEP: "${STARTUP_SLEEP}"
-      STORE_HOST:    "${STORE_HOST}"
-      STORE_PORT:    "${STORE_PORT}"
+      API_JWT_KEY:    "${API_JWT_KEY}"
+      PQ_HOST:        "${PQ_HOST}"
+      PQ_NAME:        "${PQ_NAME}"
+      PQ_PORT:        "${PQ_PORT}"
+      PQ_USER:        "${PQ_USER}"
+      REDIS_HOST:     "${REDIS_HOST}"
+      REDIS_PORT:     "${REDIS_PORT}"
+      REDIS_PASSWORD: "${REDIS_PASSWORD}"
+      STARTUP_SLEEP:  "${STARTUP_SLEEP}"
+      STORE_HOST:     "${STORE_HOST}"
+      STORE_PORT:     "${STORE_PORT}"
 
   ## the dispatch service triggers flush workers
   dispatch:
@@ -100,6 +104,13 @@ services:
 
   # Supporting Services
 
+  ## a redis store used to track blacklisted or expired JWTs
+  redis:
+    image: 'redis:5.0-alpine'
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - 'redis:/data'
+
   ## the ipfs service provides dedication access to ipfs
   ipfs:
     image: ipfs/go-ipfs:v0.4.17
@@ -117,3 +128,6 @@ services:
       - migrate
     ports:
       - "${PQ_PORT}:5432"
+
+volumes:
+  redis:
