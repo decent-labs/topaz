@@ -8,12 +8,11 @@ import (
 	"os"
 	"time"
 
+	"github.com/decentorganization/topaz/api/auth"
 	"github.com/decentorganization/topaz/api/core/redis"
 	"github.com/decentorganization/topaz/api/settings"
 	"github.com/decentorganization/topaz/models"
 	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/pborman/uuid"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type JWTAuthenticationBackend struct {
@@ -39,31 +38,29 @@ func InitJWTAuthenticationBackend() *JWTAuthenticationBackend {
 	return authBackendInstance
 }
 
-func (backend *JWTAuthenticationBackend) GenerateToken(userUUID string) (string, error) {
-	token := jwt.New(jwt.SigningMethodRS512)
-	token.Claims = jwt.MapClaims{
-		"exp": time.Now().Add(time.Hour * time.Duration(settings.Get().JWTExpirationDelta)).Unix(),
-		"iat": time.Now().Unix(),
-		"sub": userUUID,
+func (backend *JWTAuthenticationBackend) GenerateToken(userID string) (string, error) {
+	claims := models.AuthAdminClaims{
+		UserID: string(userID),
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Hour * time.Duration(settings.Get().JWTExpirationDelta)).Unix(),
+			IssuedAt:  time.Now().Unix(),
+			Subject:   userID,
+		},
 	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodRS512, claims)
+
 	tokenString, err := token.SignedString(backend.privateKey)
 	if err != nil {
-		panic(err)
 		return "", err
 	}
+
 	return tokenString, nil
 }
 
-func (backend *JWTAuthenticationBackend) Authenticate(user *models.User) bool {
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("testing"), 10)
-
-	testUser := models.User{
-		UUID:     uuid.New(),
-		Username: "haku",
-		Password: string(hashedPassword),
-	}
-
-	return user.Username == testUser.Username && bcrypt.CompareHashAndPassword([]byte(testUser.Password), []byte(user.Password)) == nil
+func (backend *JWTAuthenticationBackend) Authenticate(suppliedPassword string, dbHash string) bool {
+	valid := auth.CheckPasswordHash(suppliedPassword, dbHash)
+	return valid
 }
 
 func (backend *JWTAuthenticationBackend) getTokenRemainingValidity(timestamp interface{}) int {
