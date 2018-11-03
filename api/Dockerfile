@@ -9,14 +9,20 @@ WORKDIR ${topaz_root}/api
 COPY ./api .
 
 RUN go get -v
-RUN CGO_ENABLED=0 GOOS=linux go build  -o api -a -installsuffix cgo
+RUN CGO_ENABLED=0 GOOS=linux go build -o topazapi -a -installsuffix cgo
 
 FROM alpine:latest
 
 RUN apk --no-cache add ca-certificates
 
-RUN mkdir /app
 WORKDIR /app
-COPY --from=builder /go/src/github.com/decentorganization/topaz/api/api .
+COPY --from=builder /go/src/github.com/decentorganization/topaz/api/topazapi .
 
-CMD ["./api"]
+WORKDIR /app/settings
+COPY ./api/settings/pre.json .
+COPY ./api/settings/prod.json .
+COPY ./api/settings/tests.json .
+COPY ./api/settings/keys ./keys
+
+WORKDIR /app
+CMD ["./topazapi"]

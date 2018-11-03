@@ -11,12 +11,17 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/urfave/negroni"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 
 	"github.com/decentorganization/topaz/api/auth"
 	m "github.com/decentorganization/topaz/models"
+
+	"github.com/decentorganization/topaz/api/routers"
+	"github.com/decentorganization/topaz/api/settings"
 )
 
 var db *gorm.DB
@@ -229,16 +234,21 @@ func main() {
 	}
 	defer db.Close()
 
-	http.HandleFunc("/create-admin", CreateUserHandler)
-	http.HandleFunc("/auth-admin", CreateAdminTokenHandler)
+	settings.Init()
+	router := routers.InitRoutes()
+	n := negroni.Classic()
+	n.UseHandler(router)
 
-	http.HandleFunc("/create-app", auth.AuthAdmin(CreateAppHandler))
-	http.HandleFunc("/auth-app", auth.AuthAdmin(CreateAppTokenHandler))
+	// http.HandleFunc("/create-admin", CreateUserHandler)
+	// http.HandleFunc("/auth-admin", CreateAdminTokenHandler)
 
-	http.HandleFunc("/store", auth.AuthApp(StoreHandler))
-	http.HandleFunc("/verify", auth.AuthApp(VerifyHandler))
-	http.HandleFunc("/report", auth.AuthApp(ReportHandler))
+	// http.HandleFunc("/create-app", auth.AuthAdmin(CreateAppHandler))
+	// http.HandleFunc("/auth-app", auth.AuthAdmin(CreateAppTokenHandler))
+
+	// http.HandleFunc("/store", auth.AuthApp(StoreHandler))
+	// http.HandleFunc("/verify", auth.AuthApp(VerifyHandler))
+	// http.HandleFunc("/report", auth.AuthApp(ReportHandler))
 
 	log.Println("wake up, api...")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":8080", n))
 }
