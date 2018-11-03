@@ -9,13 +9,19 @@ import (
 	"github.com/decentorganization/topaz/models"
 	jwt "github.com/dgrijalva/jwt-go"
 	request "github.com/dgrijalva/jwt-go/request"
+	"github.com/jinzhu/gorm"
 )
 
-func Login(requestUser *models.User) (int, []byte) {
+func Login(requestUser *models.User, db *gorm.DB) (int, []byte) {
 	authBackend := authentication.InitJWTAuthenticationBackend()
 
-	if authBackend.Authenticate(requestUser) {
-		token, err := authBackend.GenerateToken(requestUser.UUID)
+	var u *models.User
+	if err := db.Where("email = ?", requestUser.Email).First(&u).Error; err != nil {
+		return http.StatusNotFound, []byte("")
+	}
+
+	if authBackend.Authenticate(requestUser.Password, u.Password) {
+		token, err := authBackend.GenerateToken(string(u.ID))
 		if err != nil {
 			return http.StatusInternalServerError, []byte("")
 		}
