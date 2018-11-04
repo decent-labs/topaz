@@ -6,7 +6,7 @@ CREATE TABLE users (
     updated_at TIMESTAMP NOT NULL,
     deleted_at TIMESTAMP,
     name CHARACTER varying(255) NOT NULL,
-    email CHARACTER varying(255) NOT NULL,
+    email CHARACTER varying(255) UNIQUE NOT NULL,
     password CHARACTER varying(255) NOT NULL
 );
 
