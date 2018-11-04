@@ -15,7 +15,7 @@ import (
 func Login(requestUser *models.User, db *gorm.DB) (int, []byte) {
 	authBackend := authentication.InitJWTAuthenticationBackend()
 
-	var u *models.User
+	u := new(models.User)
 	if err := db.Where("email = ?", requestUser.Email).First(&u).Error; err != nil {
 		return http.StatusNotFound, []byte("")
 	}
@@ -23,7 +23,7 @@ func Login(requestUser *models.User, db *gorm.DB) (int, []byte) {
 	if authBackend.Authenticate(requestUser.Password, u.Password) {
 		token, err := authBackend.GenerateToken(string(u.ID))
 		if err != nil {
-			return http.StatusInternalServerError, []byte("")
+			return http.StatusInternalServerError, []byte(err.Error())
 		}
 		response, _ := json.Marshal(parameters.TokenAuthentication{Token: token})
 		return http.StatusOK, response
