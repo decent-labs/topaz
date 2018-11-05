@@ -13,20 +13,15 @@ import (
 )
 
 func Login(requestUser *models.User, db *gorm.DB) (int, []byte) {
-	authBackend := authentication.InitJWTAuthenticationBackend()
-
 	u := new(models.User)
 	if err := db.Where("email = ?", requestUser.Email).First(&u).Error; err != nil {
 		return http.StatusNotFound, []byte("")
 	}
 
+	authBackend := authentication.InitJWTAuthenticationBackend()
+
 	if authBackend.Authenticate(requestUser.Password, u.Password) {
-		token, err := authBackend.GenerateToken(string(u.ID))
-		if err != nil {
-			return http.StatusInternalServerError, []byte(err.Error())
-		}
-		response, _ := json.Marshal(parameters.TokenAuthentication{Token: token})
-		return http.StatusOK, response
+		return makeToken(authBackend, string(u.ID))
 	}
 
 	return http.StatusUnauthorized, []byte("")
@@ -34,18 +29,7 @@ func Login(requestUser *models.User, db *gorm.DB) (int, []byte) {
 
 func RefreshToken(requestUser *models.User) (int, []byte) {
 	authBackend := authentication.InitJWTAuthenticationBackend()
-
-	token, err := authBackend.GenerateToken(string(requestUser.ID))
-	if err != nil {
-		return http.StatusInternalServerError, []byte("")
-	}
-
-	response, err := json.Marshal(parameters.TokenAuthentication{Token: token})
-	if err != nil {
-		return http.StatusInternalServerError, []byte("")
-	}
-
-	return http.StatusOK, response
+	return makeToken(authBackend, string(requestUser.ID))
 }
 
 func Logout(req *http.Request) error {
@@ -58,4 +42,18 @@ func Logout(req *http.Request) error {
 	}
 	tokenString := req.Header.Get("Authorization")
 	return authBackend.Logout(tokenString, tokenRequest)
+}
+
+func makeToken(authBackend *authentication.JWTAuthenticationBackend, id string) (int, []byte) {
+	token, err := authBackend.GenerateToken(id)
+	if err != nil {
+		return http.StatusInternalServerError, []byte("")
+	}
+
+	response, err := json.Marshal(parameters.TokenAuthentication{Token: token})
+	if err != nil {
+		return http.StatusInternalServerError, []byte("")
+	}
+
+	return http.StatusOK, response
 }
