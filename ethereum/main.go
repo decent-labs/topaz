@@ -154,23 +154,20 @@ func (api *ConnectionHandler) Deploy(w http.ResponseWriter, r *http.Request) {
 
 	address, transaction, _, err := contracts.DeployClientCapture(api.Auth, api.Blockchain)
 	if err != nil {
-		http.Error(
-			w,
-			fmt.Sprintf("error deploying new contract: %s", err.Error()),
-			http.StatusInternalServerError,
-		)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
 		return
 	}
 
 	dr := DeployResponse{transaction.Hash().Hex(), address.Hex()}
+
 	w.Header().Set("Content-Type", "application/vnd.api+json")
 	err = json.NewEncoder(w).Encode(dr)
 	if err != nil {
-		http.Error(
-			w,
-			fmt.Sprintf("error encoding new deployment results response: %s", err.Error()),
-			http.StatusInternalServerError,
-		)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
 		return
 	}
 
