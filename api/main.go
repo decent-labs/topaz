@@ -18,7 +18,6 @@ import (
 
 	m "github.com/decentorganization/topaz/models"
 
-	"github.com/decentorganization/topaz/api/auth"
 	"github.com/decentorganization/topaz/api/routers"
 	"github.com/decentorganization/topaz/api/settings"
 )
@@ -93,10 +92,6 @@ func main() {
 	router := routers.InitRoutes()
 	n := negroni.Classic()
 	n.UseHandler(router)
-
-	http.HandleFunc("/store", auth.AuthApp(StoreHandler))
-	http.HandleFunc("/verify", auth.AuthApp(VerifyHandler))
-	http.HandleFunc("/report", auth.AuthApp(ReportHandler))
 
 	log.Println("wake up, api...")
 	log.Fatal(http.ListenAndServe(":8080", n))
