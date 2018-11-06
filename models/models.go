@@ -69,6 +69,7 @@ type App struct {
 	User        User       `json:"user"`
 	Flushes     []Flush    `json:"flushes"`
 	Objects     []Object   `json:"objects"`
+	EthAddress  string     `json:"ethAddress"`
 }
 
 type Flush struct {
