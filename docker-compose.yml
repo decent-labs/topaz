@@ -80,11 +80,14 @@ services:
   ## the migrate service manages database migrations
   migrate:
     build: ./migrate
+    depends_on:
+      - postgres
     environment:
-      PQ_HOST: "${PQ_HOST}"
-      PQ_NAME: "${PQ_NAME}"
-      PQ_PORT: "${PQ_PORT}"
-      PQ_USER: "${PQ_USER}"
+      PQ_HOST:       "${PQ_HOST}"
+      PQ_NAME:       "${PQ_NAME}"
+      PQ_PORT:       "${PQ_PORT}"
+      PQ_USER:       "${PQ_USER}"
+      STARTUP_SLEEP: "${STARTUP_SLEEP}"
 
   ## the store service manages the uploading of data to topaz
   store:
@@ -126,8 +129,6 @@ services:
   ## the postgres service contains the topaz database
   postgres:
     build: ./postgres
-    depends_on:
-      - migrate
     ports:
       - "${PQ_PORT}:5432"
 

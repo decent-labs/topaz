@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -12,7 +13,11 @@ import (
 )
 
 func main() {
-	time.Sleep(5 * time.Second)
+	i, err := strconv.Atoi(os.Getenv("STARTUP_SLEEP"))
+	if err != nil {
+		log.Fatalf("missing valid STARTUP_SLEEP environment variable: %s", err.Error())
+	}
+	time.Sleep(time.Duration(i) * time.Second)
 
 	migrations := &migrate.FileMigrationSource{
 		Dir: "migrations",
