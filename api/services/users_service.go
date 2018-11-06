@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/decentorganization/topaz/api/auth"
+	auth "github.com/decentorganization/topaz/api/core/authentication"
 	"github.com/decentorganization/topaz/models"
 	"github.com/jinzhu/gorm"
 )

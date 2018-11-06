@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/decentorganization/topaz/api/auth"
 	"github.com/decentorganization/topaz/api/core/redis"
 	"github.com/decentorganization/topaz/api/settings"
 	"github.com/decentorganization/topaz/models"
@@ -60,7 +59,7 @@ func (backend *JWTAuthenticationBackend) GenerateToken(userID string) (string, e
 }
 
 func (backend *JWTAuthenticationBackend) Authenticate(suppliedPassword string, dbHash string) bool {
-	valid := auth.CheckPasswordHash(suppliedPassword, dbHash)
+	valid := CheckPasswordHash(suppliedPassword, dbHash)
 	return valid
 }
 
