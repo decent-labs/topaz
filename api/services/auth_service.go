@@ -15,7 +15,7 @@ import (
 func Login(requestUser *models.User, db *gorm.DB) (int, []byte) {
 	u := new(models.User)
 	if err := db.Where("email = ?", requestUser.Email).First(&u).Error; err != nil {
-		return http.StatusNotFound, []byte("")
+		return http.StatusUnauthorized, []byte("")
 	}
 
 	authBackend := authentication.InitJWTAuthenticationBackend()
