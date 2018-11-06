@@ -46,6 +46,11 @@ type JwtToken struct {
 	Token string `json:"token"`
 }
 
+type DeployResponse struct {
+	Tx   string
+	Addr string
+}
+
 type StoreResponse struct {
 	Hash  string `json:"hash"`
 	AppID string `json:"appId"`
