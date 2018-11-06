@@ -3,6 +3,7 @@ package services
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/decentorganization/topaz/api/api/parameters"
 	"github.com/decentorganization/topaz/api/core/authentication"
@@ -21,7 +22,8 @@ func Login(requestUser *models.User, db *gorm.DB) (int, []byte) {
 	authBackend := authentication.InitJWTAuthenticationBackend()
 
 	if authBackend.Authenticate(requestUser.Password, u.Password) {
-		return makeToken(authBackend, string(u.ID))
+		uid := strconv.FormatUint(uint64(u.ID), 10)
+		return makeToken(authBackend, uid)
 	}
 
 	return http.StatusUnauthorized, []byte("")

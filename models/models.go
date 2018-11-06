@@ -62,13 +62,13 @@ type User struct {
 
 type App struct {
 	gorm.Model
-	Interval    int
-	Name        string
-	LastFlushed *time.Time
-	UserID      int
-	User        User
-	Flushes     []Flush
-	Objects     []Object
+	Interval    int        `json:"interval"`
+	Name        string     `json:"name"`
+	LastFlushed *time.Time `json:"lastFlushed"`
+	UserID      int        `json:"userID"`
+	User        User       `json:"user"`
+	Flushes     []Flush    `json:"flushes"`
+	Objects     []Object   `json:"objects"`
 }
 
 type Flush struct {
