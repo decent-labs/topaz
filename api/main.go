@@ -13,16 +13,12 @@ import (
 
 	"github.com/urfave/negroni"
 
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
-
 	m "github.com/decentorganization/topaz/models"
 
 	"github.com/decentorganization/topaz/api/routers"
 	"github.com/decentorganization/topaz/api/settings"
 )
 
-var db *gorm.DB
 var httpClient = http.Client{}
 
 // StoreHandler takes data and does the thing
@@ -79,14 +75,6 @@ func main() {
 		log.Fatalf("missing valid STARTUP_SLEEP environment variable: %s", err.Error())
 	}
 	time.Sleep(time.Duration(i) * time.Second)
-
-	dbConn := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable", os.Getenv("PQ_HOST"), os.Getenv("PQ_PORT"), os.Getenv("PQ_USER"), os.Getenv("PQ_NAME"))
-
-	db, err := gorm.Open("postgres", dbConn)
-	if err != nil {
-		log.Fatalf("couldn't even pretend to open database connection: %s", err.Error())
-	}
-	defer db.Close()
 
 	settings.Init()
 	router := routers.InitRoutes()

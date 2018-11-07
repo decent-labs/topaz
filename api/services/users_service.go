@@ -5,11 +5,11 @@ import (
 	"net/http"
 
 	auth "github.com/decentorganization/topaz/api/core/authentication"
+	"github.com/decentorganization/topaz/api/core/database"
 	"github.com/decentorganization/topaz/models"
-	"github.com/jinzhu/gorm"
 )
 
-func NewUser(newUser *models.User, db *gorm.DB) (int, []byte) {
+func NewUser(newUser *models.User) (int, []byte) {
 	if len(newUser.Email) == 0 || len(newUser.Password) == 0 || len(newUser.Name) == 0 {
 		return http.StatusBadRequest, []byte("bad email, password, or name")
 	}
@@ -20,7 +20,7 @@ func NewUser(newUser *models.User, db *gorm.DB) (int, []byte) {
 	}
 
 	u := models.User{Name: newUser.Name, Email: newUser.Email, Password: hp}
-	if err := db.Create(&u).Error; err != nil {
+	if err := database.Manager.Create(&u).Error; err != nil {
 		return http.StatusInternalServerError, []byte(err.Error())
 	}
 

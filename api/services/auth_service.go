@@ -7,15 +7,15 @@ import (
 
 	"github.com/decentorganization/topaz/api/api/parameters"
 	"github.com/decentorganization/topaz/api/core/authentication"
+	"github.com/decentorganization/topaz/api/core/database"
 	"github.com/decentorganization/topaz/models"
 	jwt "github.com/dgrijalva/jwt-go"
 	request "github.com/dgrijalva/jwt-go/request"
-	"github.com/jinzhu/gorm"
 )
 
-func Login(requestUser *models.User, db *gorm.DB) (int, []byte) {
+func Login(requestUser *models.User) (int, []byte) {
 	u := new(models.User)
-	if err := db.Where("email = ?", requestUser.Email).First(&u).Error; err != nil {
+	if err := database.Manager.Where("email = ?", requestUser.Email).First(&u).Error; err != nil {
 		return http.StatusUnauthorized, []byte("")
 	}
 
