@@ -68,7 +68,7 @@ func (suite *AuthenticationServicesTestSuite) TestAdminLoginEmptyCredentials(c *
 	assert.Empty(t, token)
 }
 
-func (suite *AuthenticationServicesTestSuite) TestRefreshToken(c *C) {
+func (suite *AuthenticationServicesTestSuite) TestAdminRefreshToken(c *C) {
 	user := models.User{
 		Username: "haku",
 		Password: "testing",
@@ -80,13 +80,13 @@ func (suite *AuthenticationServicesTestSuite) TestRefreshToken(c *C) {
 	})
 	assert.Nil(t, err)
 
-	newToken := services.RefreshToken(token)
+	newToken := services.AdminRefreshToken(token)
 	assert.NotEmpty(t, newToken)
 }
 
-func (suite *AuthenticationServicesTestSuite) TestRefreshTokenInvalidToken(c *C) {
+func (suite *AuthenticationServicesTestSuite) TestAdminRefreshTokenInvalidToken(c *C) {
 	token := jwt.New(jwt.GetSigningMethod("RS256"))
-	newToken := services.RefreshToken(token)
+	newToken := services.AdminRefreshToken(token)
 	assert.Empty(t, newToken)
 }
 

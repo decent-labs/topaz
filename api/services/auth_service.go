@@ -28,9 +28,8 @@ func AdminLogin(requestUser *models.User) (int, []byte) {
 	return http.StatusUnauthorized, []byte("")
 }
 
-func RefreshToken(requestUser *models.User) (int, []byte) {
-	authBackend := authentication.InitJWTAuthenticationBackend()
-	return makeAdminToken(authBackend, string(requestUser.ID))
+func AdminRefreshToken(requestUser *models.User) (int, []byte) {
+	return makeAdminToken(authentication.InitJWTAuthenticationBackend(), strconv.FormatUint(uint64(requestUser.ID), 10))
 }
 
 func AdminLogout(req *http.Request) error {

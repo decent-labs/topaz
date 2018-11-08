@@ -19,12 +19,12 @@ func AdminLogin(w http.ResponseWriter, r *http.Request) {
 	w.Write(token)
 }
 
-func RefreshToken(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+func AdminRefreshToken(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	requestUser := new(models.User)
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&requestUser)
 
-	responseStatus, token := services.RefreshToken(requestUser)
+	responseStatus, token := services.AdminRefreshToken(requestUser)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(responseStatus)
 	w.Write(token)
