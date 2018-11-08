@@ -21,5 +21,14 @@ func SetAuthenticationRoutes(router *mux.Router) *mux.Router {
 			negroni.HandlerFunc(authentication.Admin),
 			negroni.HandlerFunc(controllers.AdminLogout),
 		)).Methods("GET")
+
+	sapp := router.PathPrefix("/auth/app").Subrouter()
+
+	sapp.Handle("/token",
+		negroni.New(
+			negroni.HandlerFunc(authentication.Admin),
+			negroni.HandlerFunc(controllers.AppLogin),
+		)).Methods("POST")
+
 	return router
 }
