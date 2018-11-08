@@ -51,3 +51,7 @@ func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, id s
 func Admin(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	auth(rw, req, next, "userId")
 }
+
+func App(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	auth(rw, req, next, "appId")
+}
