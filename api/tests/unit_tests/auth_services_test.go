@@ -28,42 +28,42 @@ func (s *AuthenticationServicesTestSuite) SetUpSuite(c *C) {
 	settings.Init()
 }
 
-func (suite *AuthenticationServicesTestSuite) TestLogin(c *C) {
+func (suite *AuthenticationServicesTestSuite) TestAdminLogin(c *C) {
 	user := models.User{
 		Username: "haku",
 		Password: "testing",
 	}
-	response, token := services.Login(&user)
+	response, token := services.AdminLogin(&user)
 	assert.Equal(t, http.StatusOK, response)
 	assert.NotEmpty(t, token)
 }
 
-func (suite *AuthenticationServicesTestSuite) TestLoginIncorrectPassword(c *C) {
+func (suite *AuthenticationServicesTestSuite) TestAdminLoginIncorrectPassword(c *C) {
 	user := models.User{
 		Username: "haku",
 		Password: "Password",
 	}
-	response, token := services.Login(&user)
+	response, token := services.AdminLogin(&user)
 	assert.Equal(t, http.StatusUnauthorized, response)
 	assert.Empty(t, token)
 }
 
-func (suite *AuthenticationServicesTestSuite) TestLoginIncorrectUsername(c *C) {
+func (suite *AuthenticationServicesTestSuite) TestAdminLoginIncorrectUsername(c *C) {
 	user := models.User{
 		Username: "Username",
 		Password: "testing",
 	}
-	response, token := services.Login(&user)
+	response, token := services.AdminLogin(&user)
 	assert.Equal(t, http.StatusUnauthorized, response)
 	assert.Empty(t, token)
 }
 
-func (suite *AuthenticationServicesTestSuite) TestLoginEmptyCredentials(c *C) {
+func (suite *AuthenticationServicesTestSuite) TestAdminLoginEmptyCredentials(c *C) {
 	user := models.User{
 		Username: "",
 		Password: "",
 	}
-	response, token := services.Login(&user)
+	response, token := services.AdminLogin(&user)
 	assert.Equal(t, http.StatusUnauthorized, response)
 	assert.Empty(t, token)
 }

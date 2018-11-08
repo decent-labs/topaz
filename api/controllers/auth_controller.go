@@ -8,12 +8,12 @@ import (
 	"github.com/decentorganization/topaz/models"
 )
 
-func Login(w http.ResponseWriter, r *http.Request) {
+func AdminLogin(w http.ResponseWriter, r *http.Request) {
 	requestUser := new(models.User)
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&requestUser)
 
-	responseStatus, token := services.Login(requestUser)
+	responseStatus, token := services.AdminLogin(requestUser)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(responseStatus)
 	w.Write(token)

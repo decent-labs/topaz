@@ -13,7 +13,7 @@ import (
 	request "github.com/dgrijalva/jwt-go/request"
 )
 
-func Login(requestUser *models.User) (int, []byte) {
+func AdminLogin(requestUser *models.User) (int, []byte) {
 	u := new(models.User)
 	if err := database.Manager.Where("email = ?", requestUser.Email).First(&u).Error; err != nil {
 		return http.StatusUnauthorized, []byte("")
@@ -22,8 +22,7 @@ func Login(requestUser *models.User) (int, []byte) {
 	authBackend := authentication.InitJWTAuthenticationBackend()
 
 	if authBackend.Authenticate(requestUser.Password, u.Password) {
-		uid := strconv.FormatUint(uint64(u.ID), 10)
-		return makeAdminToken(authBackend, uid)
+		return makeAdminToken(authBackend, strconv.FormatUint(uint64(u.ID), 10))
 	}
 
 	return http.StatusUnauthorized, []byte("")
