@@ -1,6 +1,8 @@
 package models
 
-import "github.com/jinzhu/gorm"
+import (
+	"github.com/jinzhu/gorm"
+)
 
 type User struct {
 	gorm.Model
@@ -9,3 +11,16 @@ type User struct {
 	Password string `json:"password"`
 }
 
+func (u *User) CreateUser(db *gorm.DB) error {
+	if err := db.Create(&u).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *User) GetUser(db *gorm.DB) error {
+	if err := db.Where("email = ?", u.Email).First(&u).Error; err != nil {
+		return err
+	}
+	return nil
+}
