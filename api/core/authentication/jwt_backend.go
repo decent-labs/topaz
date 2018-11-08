@@ -47,6 +47,15 @@ func (backend *JWTAuthenticationBackend) GenerateAdminToken(userID string) (stri
 	return backend.generateToken(claims)
 }
 
+func (backend *JWTAuthenticationBackend) GenerateAppToken(appID string) (string, error) {
+	claims := models.AuthAppClaims{
+		AppID:          appID,
+		StandardClaims: generateStandardClaims(appID),
+	}
+
+	return backend.generateToken(claims)
+}
+
 func generateStandardClaims(resourceID string) jwt.StandardClaims {
 	return jwt.StandardClaims{
 		ExpiresAt: time.Now().Add(time.Hour * time.Duration(settings.Get().JWTExpirationDelta)).Unix(),
