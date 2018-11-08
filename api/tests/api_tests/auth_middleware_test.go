@@ -42,7 +42,7 @@ func (s *MiddlewaresTestSuite) SetUpTest(c *C) {
 	server.UseHandler(router)
 }
 
-func (s *MiddlewaresTestSuite) TestRequireTokenAuthentication(c *C) {
+func (s *MiddlewaresTestSuite) TestAdmin(c *C) {
 	resource := "/test/hello"
 
 	response := httptest.NewRecorder()
@@ -53,7 +53,7 @@ func (s *MiddlewaresTestSuite) TestRequireTokenAuthentication(c *C) {
 	assert.Equal(t, response.Code, http.StatusOK)
 }
 
-func (s *MiddlewaresTestSuite) TestRequireTokenAuthenticationInvalidToken(c *C) {
+func (s *MiddlewaresTestSuite) TestAdminInvalidToken(c *C) {
 	resource := "/test/hello"
 
 	response := httptest.NewRecorder()
@@ -64,7 +64,7 @@ func (s *MiddlewaresTestSuite) TestRequireTokenAuthenticationInvalidToken(c *C) 
 	assert.Equal(t, response.Code, http.StatusUnauthorized)
 }
 
-func (s *MiddlewaresTestSuite) TestRequireTokenAuthenticationEmptyToken(c *C) {
+func (s *MiddlewaresTestSuite) TestAdminEmptyToken(c *C) {
 	resource := "/test/hello"
 
 	response := httptest.NewRecorder()
@@ -75,7 +75,7 @@ func (s *MiddlewaresTestSuite) TestRequireTokenAuthenticationEmptyToken(c *C) {
 	assert.Equal(t, response.Code, http.StatusUnauthorized)
 }
 
-func (s *MiddlewaresTestSuite) TestRequireTokenAuthenticationWithoutToken(c *C) {
+func (s *MiddlewaresTestSuite) TestAdminWithoutToken(c *C) {
 	resource := "/test/hello"
 
 	response := httptest.NewRecorder()
@@ -85,7 +85,7 @@ func (s *MiddlewaresTestSuite) TestRequireTokenAuthenticationWithoutToken(c *C) 
 	assert.Equal(t, response.Code, http.StatusUnauthorized)
 }
 
-func (suite *MiddlewaresTestSuite) TestRequireTokenAuthenticationAfterLogout(c *C) {
+func (suite *MiddlewaresTestSuite) TestAdminAfterLogout(c *C) {
 	resource := "/test/hello"
 
 	requestLogout, _ := http.NewRequest("GET", resource, nil)
