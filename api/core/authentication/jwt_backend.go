@@ -38,9 +38,9 @@ func InitJWTAuthenticationBackend() *JWTAuthenticationBackend {
 	return authBackendInstance
 }
 
-func (backend *JWTAuthenticationBackend) GenerateToken(userID string) (string, error) {
+func (backend *JWTAuthenticationBackend) GenerateAdminToken(userID string) (string, error) {
 	claims := models.AuthAdminClaims{
-		UserID: string(userID),
+		UserID: userID,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * time.Duration(settings.Get().JWTExpirationDelta)).Unix(),
 			IssuedAt:  time.Now().Unix(),

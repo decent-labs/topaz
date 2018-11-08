@@ -33,9 +33,9 @@ func (s *AuthenticationBackendTestSuite) TestInitJWTAuthenticationBackend(c *C) 
 	c.Assert(authBackend.PublicKey, NotNil)
 }
 
-func (s *AuthenticationBackendTestSuite) TestGenerateToken(c *C) {
+func (s *AuthenticationBackendTestSuite) TestGenerateAdminToken(c *C) {
 	authBackend := authentication.InitJWTAuthenticationBackend()
-	tokenString, err := authBackend.GenerateToken("1234")
+	tokenString, err := authBackend.GenerateAdminToken("1234")
 
 	assert.Nil(t, err)
 	assert.NotEmpty(t, tokenString)
@@ -77,7 +77,7 @@ func (s *AuthenticationBackendTestSuite) TestAuthenticateIncorrectUsername(c *C)
 
 func (s *AuthenticationBackendTestSuite) TestLogout(c *C) {
 	authBackend := authentication.InitJWTAuthenticationBackend()
-	tokenString, err := authBackend.GenerateToken("1234")
+	tokenString, err := authBackend.GenerateAdminToken("1234")
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return authBackend.PublicKey, nil
 	})
@@ -92,7 +92,7 @@ func (s *AuthenticationBackendTestSuite) TestLogout(c *C) {
 
 func (s *AuthenticationBackendTestSuite) TestIsInBlacklist(c *C) {
 	authBackend := authentication.InitJWTAuthenticationBackend()
-	tokenString, err := authBackend.GenerateToken("1234")
+	tokenString, err := authBackend.GenerateAdminToken("1234")
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return authBackend.PublicKey, nil
 	})

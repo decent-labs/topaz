@@ -35,7 +35,7 @@ func (s *MiddlewaresTestSuite) SetUpSuite(c *C) {
 func (s *MiddlewaresTestSuite) SetUpTest(c *C) {
 	authBackend := authentication.InitJWTAuthenticationBackend()
 	assert.NotNil(t, authBackend)
-	token, _ = authBackend.GenerateToken("1234")
+	token, _ = authBackend.GenerateAdminToken("1234")
 
 	router := routers.InitRoutes()
 	server = negroni.Classic()

@@ -47,7 +47,7 @@ func Logout(req *http.Request) error {
 }
 
 func makeToken(authBackend *authentication.JWTAuthenticationBackend, id string) (int, []byte) {
-	token, err := authBackend.GenerateToken(id)
+	token, err := authBackend.GenerateAdminToken(id)
 	if err != nil {
 		return http.StatusInternalServerError, []byte("")
 	}
