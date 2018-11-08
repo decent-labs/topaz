@@ -19,8 +19,13 @@ func NewUser(newUser *models.User) (int, []byte) {
 		return http.StatusInternalServerError, []byte(err.Error())
 	}
 
-	u := models.User{Name: newUser.Name, Email: newUser.Email, Password: hp}
-	if err := database.Manager.Create(&u).Error; err != nil {
+	u := models.User{
+		Name:     newUser.Name,
+		Email:    newUser.Email,
+		Password: hp,
+	}
+
+	if err := u.CreateUser(database.Manager); err != nil {
 		return http.StatusInternalServerError, []byte(err.Error())
 	}
 
