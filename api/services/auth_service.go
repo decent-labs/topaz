@@ -23,7 +23,7 @@ func Login(requestUser *models.User) (int, []byte) {
 
 	if authBackend.Authenticate(requestUser.Password, u.Password) {
 		uid := strconv.FormatUint(uint64(u.ID), 10)
-		return makeToken(authBackend, uid)
+		return makeAdminToken(authBackend, uid)
 	}
 
 	return http.StatusUnauthorized, []byte("")
@@ -31,7 +31,7 @@ func Login(requestUser *models.User) (int, []byte) {
 
 func RefreshToken(requestUser *models.User) (int, []byte) {
 	authBackend := authentication.InitJWTAuthenticationBackend()
-	return makeToken(authBackend, string(requestUser.ID))
+	return makeAdminToken(authBackend, string(requestUser.ID))
 }
 
 func Logout(req *http.Request) error {
@@ -46,8 +46,11 @@ func Logout(req *http.Request) error {
 	return authBackend.Logout(tokenString, tokenRequest)
 }
 
-func makeToken(authBackend *authentication.JWTAuthenticationBackend, id string) (int, []byte) {
-	token, err := authBackend.GenerateAdminToken(id)
+func makeAdminToken(authBackend *authentication.JWTAuthenticationBackend, id string) (int, []byte) {
+	return makeToken(authBackend.GenerateAdminToken(id))
+}
+
+func makeToken(token string, err error) (int, []byte) {
 	if err != nil {
 		return http.StatusInternalServerError, []byte("")
 	}
