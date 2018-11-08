@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/decentorganization/topaz/api/api/parameters"
 	auth "github.com/decentorganization/topaz/api/core/authentication"
 	"github.com/decentorganization/topaz/api/core/database"
 	"github.com/decentorganization/topaz/models"
@@ -62,7 +61,7 @@ func okToken(token string, err error) (int, []byte) {
 		return http.StatusInternalServerError, []byte("")
 	}
 
-	response, err := json.Marshal(parameters.TokenAuthentication{Token: token})
+	response, err := json.Marshal(models.TokenAuthentication{Token: token})
 	if err != nil {
 		return http.StatusInternalServerError, []byte("")
 	}

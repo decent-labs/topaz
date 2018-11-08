@@ -6,8 +6,8 @@ type Exception struct {
 	Message string `json:"message"`
 }
 
-type JwtToken struct {
-	Token string `json:"token"`
+type TokenAuthentication struct {
+	Token string `json:"token" form:"token"`
 }
 
 type CreateAdminTokenRequest struct {
