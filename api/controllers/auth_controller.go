@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/decentorganization/topaz/api/services"
 	"github.com/decentorganization/topaz/models"
@@ -38,4 +39,16 @@ func AdminLogout(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) 
 	} else {
 		w.WriteHeader(http.StatusOK)
 	}
+}
+
+func AppLogin(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	requestApp := new(models.App)
+	decoder := json.NewDecoder(r.Body)
+	decoder.Decode(&requestApp)
+
+	requestApp.UserID, _ = strconv.Atoi(r.Header.Get("userId"))
+	responseStatus, token := services.AppLogin(requestApp)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(responseStatus)
+	w.Write(token)
 }
