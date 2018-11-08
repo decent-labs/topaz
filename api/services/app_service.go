@@ -2,36 +2,30 @@ package services
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/decentorganization/topaz/api/core/database"
 	"github.com/decentorganization/topaz/models"
 )
 
 func NewApp(newApp *models.App) (int, []byte) {
-	if len(newApp.Name) == 0 {
-		return http.StatusBadRequest, []byte("bad name")
+	if len(newApp.Name) == 0 || newApp.Interval < 30 {
+		return http.StatusBadRequest, []byte("bad name or interval")
 	}
 
-	a := models.App{Name: newApp.Name, Interval: newApp.Interval, UserID: newApp.UserID}
-
-	url := fmt.Sprintf("http://%s:8080/deploy", os.Getenv("ETHEREUM_HOST"))
-	resp, err := http.Get(url)
+	addr, err := deploy()
 	if err != nil {
 		return http.StatusInternalServerError, []byte(err.Error())
 	}
-	defer resp.Body.Close()
 
-	deployResponse := new(models.DeployResponse)
-	if err := json.NewDecoder(resp.Body).Decode(deployResponse); err != nil {
-		return http.StatusInternalServerError, []byte(err.Error())
+	a := models.App{
+		UserID:     newApp.UserID,
+		Name:       newApp.Name,
+		Interval:   newApp.Interval,
+		EthAddress: addr,
 	}
 
-	a.EthAddress = deployResponse.Addr
-
-	if err := database.Manager.Create(&a).Error; err != nil {
+	if err := a.CreateApp(database.Manager); err != nil {
 		return http.StatusInternalServerError, []byte(err.Error())
 	}
 
