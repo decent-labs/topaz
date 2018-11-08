@@ -14,6 +14,11 @@ type AuthAdminClaims struct {
 	jwt.StandardClaims
 }
 
+type AuthAppClaims struct {
+	AppID string `json:"appId"`
+	jwt.StandardClaims
+}
+
 // API Request structures
 
 type CreateUserRequest struct {
