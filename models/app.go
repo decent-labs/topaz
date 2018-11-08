@@ -17,13 +17,3 @@ type App struct {
 	Objects     []Object   `json:"objects"`
 	EthAddress  string     `json:"ethAddress"`
 }
-
-type CreateAppRequest struct {
-	Interval int    `json:"interval"`
-	Name     string `json:"name"`
-}
-
-type DeployResponse struct {
-	Tx   string
-	Addr string
-}

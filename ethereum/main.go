@@ -44,24 +44,13 @@ func (api *ConnectionHandler) Connect(connection string, privateKey string) erro
 	return nil
 }
 
-// StoreRequest defines what a valid request body looks like
-type StoreRequest struct {
-	Address string
-	Hash    string
-}
-
-// StoreResponse defines what gets returned on store route
-type StoreResponse struct {
-	Tx string
-}
-
 // Store handles the api request
 func (api ConnectionHandler) Store(w http.ResponseWriter, r *http.Request) {
 	log.Println("starting ethereum store service handler")
 
 	decoder := json.NewDecoder(r.Body)
 
-	var data StoreRequest
+	var data models.StoreRequest
 	err := decoder.Decode(&data)
 	if err != nil {
 		http.Error(
@@ -128,7 +117,7 @@ func (api ConnectionHandler) Store(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("ethereum transaction: %s", transaction.Hash().Hex())
 
-	sr := StoreResponse{transaction.Hash().Hex()}
+	sr := models.StoreResponse{transaction.Hash().Hex()}
 	w.Header().Set("Content-Type", "application/vnd.api+json")
 	err = json.NewEncoder(w).Encode(sr)
 	if err != nil {

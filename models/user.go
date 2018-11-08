@@ -9,8 +9,3 @@ type User struct {
 	Password string `json:"password"`
 }
 
-type CreateUserRequest struct {
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}

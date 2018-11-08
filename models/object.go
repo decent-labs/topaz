@@ -10,8 +10,3 @@ type Object struct {
 	FlushID *int
 	Flush   Flush
 }
-
-type StoreResponse struct {
-	Hash  string `json:"hash"`
-	AppID string `json:"appId"`
-}
