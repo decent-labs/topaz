@@ -17,7 +17,7 @@ func SetAuthenticationRoutes(router *mux.Router) *mux.Router {
 	router.Handle("/logout",
 		negroni.New(
 			negroni.HandlerFunc(authentication.Admin),
-			negroni.HandlerFunc(controllers.Logout),
+			negroni.HandlerFunc(controllers.AdminLogout),
 		)).Methods("GET")
 	return router
 }

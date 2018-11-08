@@ -30,8 +30,8 @@ func RefreshToken(w http.ResponseWriter, r *http.Request, next http.HandlerFunc)
 	w.Write(token)
 }
 
-func Logout(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	err := services.Logout(r)
+func AdminLogout(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	err := services.AdminLogout(r)
 	w.Header().Set("Content-Type", "application/json")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

@@ -33,7 +33,7 @@ func RefreshToken(requestUser *models.User) (int, []byte) {
 	return makeAdminToken(authBackend, string(requestUser.ID))
 }
 
-func Logout(req *http.Request) error {
+func AdminLogout(req *http.Request) error {
 	authBackend := authentication.InitJWTAuthenticationBackend()
 	tokenRequest, err := request.ParseFromRequest(req, request.OAuth2Extractor, func(token *jwt.Token) (interface{}, error) {
 		return authBackend.PublicKey, nil

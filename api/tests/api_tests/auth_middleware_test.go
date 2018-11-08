@@ -85,12 +85,12 @@ func (s *MiddlewaresTestSuite) TestAdminWithoutToken(c *C) {
 	assert.Equal(t, response.Code, http.StatusUnauthorized)
 }
 
-func (suite *MiddlewaresTestSuite) TestAdminAfterLogout(c *C) {
+func (suite *MiddlewaresTestSuite) TestAdminAfterAdminLogout(c *C) {
 	resource := "/test/hello"
 
 	requestLogout, _ := http.NewRequest("GET", resource, nil)
 	requestLogout.Header.Set("Authorization", fmt.Sprintf("Bearer %v", token))
-	services.Logout(requestLogout)
+	services.AdminLogout(requestLogout)
 
 	response := httptest.NewRecorder()
 	request, _ := http.NewRequest("GET", resource, nil)
