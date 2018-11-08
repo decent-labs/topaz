@@ -35,7 +35,7 @@ func RequireTokenAuthentication(rw http.ResponseWriter, req *http.Request, next 
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok {
 		req.Header.Del("userId")
-		req.Header.Add("userId", claims["user_id"].(string))
+		req.Header.Add("userId", claims["userId"].(string))
 		next(rw, req)
 	} else {
 		rw.WriteHeader(http.StatusUnauthorized)
