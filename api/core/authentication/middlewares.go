@@ -34,8 +34,14 @@ func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, id s
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok {
+		var resource interface{}
+		if resource = claims[id]; resource == nil {
+			rw.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+
 		req.Header.Del(id)
-		req.Header.Add(id, claims[id].(string))
+		req.Header.Add(id, resource.(string))
 		next(rw, req)
 	} else {
 		rw.WriteHeader(http.StatusUnauthorized)
