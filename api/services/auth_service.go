@@ -28,6 +28,15 @@ func AdminLogin(requestUser *models.User) (int, []byte) {
 	return http.StatusUnauthorized, []byte("")
 }
 
+func AppLogin(requestApp *models.App) (int, []byte) {
+	a := new(models.App)
+	if err := database.Manager.Where("id = ? AND user_id = ?", requestApp.ID, requestApp.UserID).First(&a).Error; err != nil {
+		return http.StatusUnauthorized, []byte("")
+	}
+
+	return makeAppToken(authentication.InitJWTAuthenticationBackend(), strconv.FormatUint(uint64(a.ID), 10))
+}
+
 func AdminRefreshToken(requestUser *models.User) (int, []byte) {
 	return makeAdminToken(authentication.InitJWTAuthenticationBackend(), strconv.FormatUint(uint64(requestUser.ID), 10))
 }
@@ -46,6 +55,10 @@ func AdminLogout(req *http.Request) error {
 
 func makeAdminToken(authBackend *authentication.JWTAuthenticationBackend, id string) (int, []byte) {
 	return makeToken(authBackend.GenerateAdminToken(id))
+}
+
+func makeAppToken(authBackend *authentication.JWTAuthenticationBackend, id string) (int, []byte) {
+	return makeToken(authBackend.GenerateAppToken(id))
 }
 
 func makeToken(token string, err error) (int, []byte) {
