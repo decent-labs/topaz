@@ -4,9 +4,10 @@ import "github.com/jinzhu/gorm"
 
 type Object struct {
 	gorm.Model
-	Hash    string
-	AppID   int
-	App     App
-	FlushID *int
-	Flush   Flush
+	DataBlob []byte `json:"dataBlob"`
+	Hash     string `json:"hash"`
+	AppID    int    `json:"appId"`
+	App      App    `json:"app"`
+	FlushID  *int   `json:"flushId"`
+	Flush    Flush  `json:"flush"`
 }

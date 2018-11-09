@@ -15,7 +15,7 @@ CREATE TABLE apps (
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
     deleted_at TIMESTAMP,
-    "interval" INTEGER NOT NULL,
+    interval INTEGER NOT NULL,
     name CHARACTER varying(255) NOT NULL,
     last_flushed TIMESTAMP,
     user_id INTEGER REFERENCES users(id),
@@ -29,7 +29,7 @@ CREATE TABLE flushes (
     deleted_at TIMESTAMP,
     app_id INT REFERENCES apps(id),
     directory_hash CHARACTER varying(255) NOT NULL,
-    "eth_transaction" CHARACTER varying(255) NOT NULL
+    eth_transaction CHARACTER varying(255) NOT NULL
 );
 
 CREATE TABLE objects (
@@ -37,6 +37,7 @@ CREATE TABLE objects (
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
     deleted_at TIMESTAMP,
+    data_blob BYTEA NOT NULL,
     hash CHARACTER varying(255) NOT NULL,
     app_id INT REFERENCES apps(id),
     flush_id INT
