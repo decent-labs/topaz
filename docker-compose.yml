@@ -100,16 +100,10 @@ services:
       dockerfile: ./store/Dockerfile
     depends_on:
       - ipfs
-      - postgres
     environment:
       IPFS_HOST:     "${IPFS_HOST}"
       IPFS_PORT:     "${IPFS_PORT}"
-      PQ_HOST:       "${PQ_HOST}"
-      PQ_NAME:       "${PQ_NAME}"
-      PQ_PORT:       "${PQ_PORT}"
-      PQ_USER:       "${PQ_USER}"
       STARTUP_SLEEP: "${STARTUP_SLEEP}"
-      TOPAZ_USER:    "1"
 
   # Supporting Services
 
