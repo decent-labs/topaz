@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/decentorganization/topaz/api/core/database"
+	"github.com/decentorganization/topaz/api/core/ethereum"
 	"github.com/decentorganization/topaz/models"
 )
 
@@ -13,7 +14,7 @@ func NewApp(newApp *models.App) (int, []byte) {
 		return http.StatusBadRequest, []byte("bad name or interval")
 	}
 
-	addr, err := deploy()
+	addr, err := ethereum.Deploy()
 	if err != nil {
 		return http.StatusInternalServerError, []byte(err.Error())
 	}
