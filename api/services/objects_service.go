@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/decentorganization/topaz/api/core/database"
+	"github.com/decentorganization/topaz/api/core/ipfs"
 	"github.com/decentorganization/topaz/models"
 )
 
@@ -13,7 +14,7 @@ func Trust(newObject *models.Object) (int, []byte) {
 		return http.StatusBadRequest, []byte("no data")
 	}
 
-	hash, err := store(newObject.DataBlob)
+	hash, err := ipfs.Add(newObject.DataBlob)
 	if err != nil {
 		return http.StatusInternalServerError, []byte(err.Error())
 	}
