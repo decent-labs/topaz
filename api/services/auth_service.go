@@ -8,8 +8,6 @@ import (
 	auth "github.com/decentorganization/topaz/api/core/authentication"
 	"github.com/decentorganization/topaz/api/core/database"
 	"github.com/decentorganization/topaz/api/models"
-	jwt "github.com/dgrijalva/jwt-go"
-	request "github.com/dgrijalva/jwt-go/request"
 )
 
 func AdminLogin(u *models.User) (int, []byte) {
@@ -19,13 +17,27 @@ func AdminLogin(u *models.User) (int, []byte) {
 		return http.StatusUnauthorized, []byte("")
 	}
 
-	if auth.InitJWTAuthenticationBackend().Authenticate(suppliedPassword, u.Password) {
-		return okToken(
-			auth.InitJWTAuthenticationBackend().GenerateAdminToken(
-				strconv.FormatUint(uint64(u.ID), 10)))
+	if auth := auth.InitJWTAuthenticationBackend().Authenticate(suppliedPassword, u.Password); auth == false {
+		return http.StatusUnauthorized, []byte("")
 	}
 
-	return http.StatusUnauthorized, []byte("")
+	return AdminRefreshToken(u)
+}
+
+func AdminRefreshToken(u *models.User) (int, []byte) {
+	return okToken(
+		auth.InitJWTAuthenticationBackend().GenerateAdminToken(
+			strconv.FormatUint(uint64(u.ID), 10)))
+}
+
+func AdminLogout(r *http.Request) error {
+	token, err := auth.InitJWTAuthenticationBackend().GetToken(r)
+	if err != nil {
+		return err
+	}
+
+	tokenString := r.Header.Get("Authorization")
+	return auth.InitJWTAuthenticationBackend().Logout(tokenString, token)
 }
 
 func AppLogin(a *models.App) (int, []byte) {
@@ -33,27 +45,13 @@ func AppLogin(a *models.App) (int, []byte) {
 		return http.StatusUnauthorized, []byte("")
 	}
 
+	return AppRefreshToken(a)
+}
+
+func AppRefreshToken(a *models.App) (int, []byte) {
 	return okToken(
 		auth.InitJWTAuthenticationBackend().GenerateAppToken(
 			strconv.FormatUint(uint64(a.ID), 10)))
-}
-
-func AdminRefreshToken(requestUser *models.User) (int, []byte) {
-	return okToken(
-		auth.InitJWTAuthenticationBackend().GenerateAdminToken(
-			strconv.FormatUint(uint64(requestUser.ID), 10)))
-}
-
-func AdminLogout(req *http.Request) error {
-	authBackend := auth.InitJWTAuthenticationBackend()
-	tokenRequest, err := request.ParseFromRequest(req, request.OAuth2Extractor, func(token *jwt.Token) (interface{}, error) {
-		return authBackend.PublicKey, nil
-	})
-	if err != nil {
-		return err
-	}
-	tokenString := req.Header.Get("Authorization")
-	return authBackend.Logout(tokenString, tokenRequest)
 }
 
 func okToken(token string, err error) (int, []byte) {

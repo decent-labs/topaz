@@ -29,6 +29,11 @@ func SetAuthenticationRoutes(router *mux.Router) *mux.Router {
 			negroni.HandlerFunc(authentication.Admin),
 			negroni.HandlerFunc(controllers.AppLogin),
 		)).Methods("POST")
+	sapp.Handle("/refresh-token",
+		negroni.New(
+			negroni.HandlerFunc(authentication.App),
+			negroni.HandlerFunc(controllers.AppRefreshToken),
+		)).Methods("GET")
 
 	return router
 }

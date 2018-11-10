@@ -5,6 +5,8 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
+	"fmt"
+	"net/http"
 	"os"
 	"strconv"
 	"time"
@@ -13,6 +15,7 @@ import (
 	"github.com/decentorganization/topaz/api/models"
 	"github.com/decentorganization/topaz/api/settings"
 	jwt "github.com/dgrijalva/jwt-go"
+	request "github.com/dgrijalva/jwt-go/request"
 )
 
 type JWTAuthenticationBackend struct {
@@ -78,6 +81,17 @@ func (backend *JWTAuthenticationBackend) generateToken(claims jwt.Claims) (strin
 func (backend *JWTAuthenticationBackend) Authenticate(suppliedPassword string, dbHash string) bool {
 	valid := CheckPasswordHash(suppliedPassword, dbHash)
 	return valid
+}
+
+func (backend *JWTAuthenticationBackend) GetToken(req *http.Request) (*jwt.Token, error) {
+	token, err := request.ParseFromRequest(req, request.OAuth2Extractor, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
+		return backend.PublicKey, nil
+	})
+
+	return token, err
 }
 
 func (backend *JWTAuthenticationBackend) getTokenRemainingValidity(timestamp interface{}) int {
