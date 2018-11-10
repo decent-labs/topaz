@@ -6,7 +6,7 @@ CREATE TABLE users (
     updated_at TIMESTAMP NOT NULL,
     deleted_at TIMESTAMP,
     name CHARACTER varying(255) NOT NULL,
-    email CHARACTER varying(255) NOT NULL,
+    email CHARACTER varying(255) UNIQUE NOT NULL,
     password CHARACTER varying(255) NOT NULL
 );
 
@@ -15,10 +15,11 @@ CREATE TABLE apps (
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
     deleted_at TIMESTAMP,
-    "interval" int NOT NULL,
+    "interval" INTEGER NOT NULL,
     name CHARACTER varying(255) NOT NULL,
     last_flushed TIMESTAMP,
-    user_id INT NOT NULL
+    user_id INTEGER REFERENCES users(id),
+    eth_address CHARACTER varying(255) NOT NULL
 );
 
 CREATE TABLE flushes (
@@ -26,9 +27,9 @@ CREATE TABLE flushes (
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
     deleted_at TIMESTAMP,
-    app_id INT NOT NULL,
+    app_id INT REFERENCES apps(id),
     directory_hash CHARACTER varying(255) NOT NULL,
-    "transaction" CHARACTER varying(255) NOT NULL
+    "eth_transaction" CHARACTER varying(255) NOT NULL
 );
 
 CREATE TABLE objects (
@@ -37,7 +38,7 @@ CREATE TABLE objects (
     updated_at TIMESTAMP NOT NULL,
     deleted_at TIMESTAMP,
     hash CHARACTER varying(255) NOT NULL,
-    app_id INT NOT NULL,
+    app_id INT REFERENCES apps(id),
     flush_id INT
 );
 

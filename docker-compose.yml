@@ -10,17 +10,24 @@ services:
       dockerfile: ./api/Dockerfile
     depends_on:
       - store
+      - redis
     ports:
       - "${API_PORT}:8080"
     environment:
-      API_JWT_KEY:   "${API_JWT_KEY}"
-      PQ_HOST:       "${PQ_HOST}"
-      PQ_NAME:       "${PQ_NAME}"
-      PQ_PORT:       "${PQ_PORT}"
-      PQ_USER:       "${PQ_USER}"
-      STARTUP_SLEEP: "${STARTUP_SLEEP}"
-      STORE_HOST:    "${STORE_HOST}"
-      STORE_PORT:    "${STORE_PORT}"
+      API_JWT_KEY:          "${API_JWT_KEY}"
+      ETHEREUM_HOST:        "${ETHEREUM_HOST}"
+      PQ_HOST:              "${PQ_HOST}"
+      PQ_NAME:              "${PQ_NAME}"
+      PQ_PORT:              "${PQ_PORT}"
+      PQ_USER:              "${PQ_USER}"
+      REDIS_HOST:           "${REDIS_HOST}"
+      REDIS_PORT:           "${REDIS_PORT}"
+      REDIS_PASSWORD:       "${REDIS_PASSWORD}"
+      STARTUP_SLEEP:        "${STARTUP_SLEEP}"
+      STORE_HOST:           "${STORE_HOST}"
+      STORE_PORT:           "${STORE_PORT}"
+      TOKEN_DURATION_HOURS: "${TOKEN_DURATION_HOURS}"
+      TOKEN_EXPIRE_OFFSET:  "${TOKEN_EXPIRE_OFFSET}"
 
   ## the dispatch service triggers flush workers
   dispatch:
@@ -42,7 +49,9 @@ services:
 
   ## the ethereum service communicates between topaz and ethereum
   ethereum:
-    build: ./ethereum
+    build:
+      context: .
+      dockerfile: ./ethereum/Dockerfile
     ports:
       - "${ETHEREUM_PORT}:8080"
     environment:
@@ -74,11 +83,14 @@ services:
   ## the migrate service manages database migrations
   migrate:
     build: ./migrate
+    depends_on:
+      - postgres
     environment:
-      PQ_HOST: "${PQ_HOST}"
-      PQ_NAME: "${PQ_NAME}"
-      PQ_PORT: "${PQ_PORT}"
-      PQ_USER: "${PQ_USER}"
+      PQ_HOST:       "${PQ_HOST}"
+      PQ_NAME:       "${PQ_NAME}"
+      PQ_PORT:       "${PQ_PORT}"
+      PQ_USER:       "${PQ_USER}"
+      STARTUP_SLEEP: "${STARTUP_SLEEP}"
 
   ## the store service manages the uploading of data to topaz
   store:
@@ -100,6 +112,13 @@ services:
 
   # Supporting Services
 
+  ## a redis store used to track blacklisted or expired JWTs
+  redis:
+    image: 'redis:5.0-alpine'
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - 'redis:/data'
+
   ## the ipfs service provides dedication access to ipfs
   ipfs:
     image: ipfs/go-ipfs:v0.4.17
@@ -113,7 +132,8 @@ services:
   ## the postgres service contains the topaz database
   postgres:
     build: ./postgres
-    depends_on:
-      - migrate
     ports:
       - "${PQ_PORT}:5432"
+
+volumes:
+  redis:

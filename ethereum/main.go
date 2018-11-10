@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/decentorganization/topaz/ethereum/contracts"
+	"github.com/decentorganization/topaz/models"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -142,35 +143,26 @@ func (api ConnectionHandler) Store(w http.ResponseWriter, r *http.Request) {
 	log.Println("finished with ethereum store service handler")
 }
 
-// DeployResponse defines what gets returned on deploy route
-type DeployResponse struct {
-	Tx   string
-	Addr string
-}
-
 // Deploy handles the api request
 func (api *ConnectionHandler) Deploy(w http.ResponseWriter, r *http.Request) {
 	log.Println("starting ethereum deploy service handler")
 
 	address, transaction, _, err := contracts.DeployClientCapture(api.Auth, api.Blockchain)
 	if err != nil {
-		http.Error(
-			w,
-			fmt.Sprintf("error deploying new contract: %s", err.Error()),
-			http.StatusInternalServerError,
-		)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
 		return
 	}
 
-	dr := DeployResponse{transaction.Hash().Hex(), address.Hex()}
+	dr := models.DeployResponse{Tx: transaction.Hash().Hex(), Addr: address.Hex()}
+
 	w.Header().Set("Content-Type", "application/vnd.api+json")
 	err = json.NewEncoder(w).Encode(dr)
 	if err != nil {
-		http.Error(
-			w,
-			fmt.Sprintf("error encoding new deployment results response: %s", err.Error()),
-			http.StatusInternalServerError,
-		)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
 		return
 	}
 

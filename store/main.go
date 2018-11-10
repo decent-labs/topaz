@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -12,17 +11,14 @@ import (
 	"strconv"
 	"time"
 
+	m "github.com/decentorganization/topaz/models"
 	shell "github.com/ipfs/go-ipfs-api"
+	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
 )
 
 var sh *shell.Shell
-var db *sql.DB
-
-// StoreResponse defines what gets returned on store route
-type StoreResponse struct {
-	Hash string
-}
+var db *gorm.DB
 
 // Take the request body and store it in IPFS, then store the resulting hash in the 'objects' table.
 func requestHandler(w http.ResponseWriter, r *http.Request) {
@@ -50,24 +46,34 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	stmt := fmt.Sprintf("insert into objects (hash, user_id) values ('%s', '%s')",
-		hash,
-		os.Getenv("TOPAZ_USER"),
-	)
+	// stmt := fmt.Sprintf("insert into objects (hash, user_id) values ('%s', '%s')",
+	// 	hash,
+	// 	os.Getenv("TOPAZ_USER"),
+	// )
 
-	_, err = db.Exec(stmt)
-	if err != nil {
+	o := m.Object{Hash: hash}
+	if err := db.Create(&o).Error; err != nil {
 		http.Error(
 			w,
-			fmt.Sprintf("error adding ipfs hash to objects table: %s", err.Error()),
+			fmt.Sprintf("error saving new object: %s", err.Error()),
 			http.StatusInternalServerError,
 		)
 		return
 	}
 
+	// _, err = db.Exec(stmt)
+	// if err != nil {
+	// 	http.Error(
+	// 		w,
+	// 		fmt.Sprintf("error adding ipfs hash to objects table: %s", err.Error()),
+	// 		http.StatusInternalServerError,
+	// 	)
+	// 	return
+	// }
+
 	log.Printf("processed incoming data with hash: %s", hash)
 
-	sr := StoreResponse{hash}
+	sr := m.StoreResponse{Hash: hash}
 	w.Header().Set("Content-Type", "application/vnd.api+json")
 	err = json.NewEncoder(w).Encode(sr)
 	if err != nil {
@@ -99,18 +105,11 @@ func main() {
 		os.Getenv("PQ_NAME"),
 	)
 
-	_db, err := sql.Open("postgres", dbConn)
+	db, err = gorm.Open("postgres", dbConn)
 	if err != nil {
 		log.Fatalf("couldn't even pretend to open database connection: %s", err.Error())
 	}
-	defer _db.Close()
-
-	err = _db.Ping()
-	if err != nil {
-		log.Fatalf("couldn't ping database: %s", err.Error())
-	}
-
-	db = _db
+	defer db.Close()
 
 	http.HandleFunc("/", requestHandler)
 
