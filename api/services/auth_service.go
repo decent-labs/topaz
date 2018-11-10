@@ -24,24 +24,10 @@ func AdminLogin(u *models.User) (int, []byte) {
 	return AdminRefreshToken(u)
 }
 
-func AppLogin(a *models.App) (int, []byte) {
-	if err := a.GetApp(database.Manager); err != nil {
-		return http.StatusUnauthorized, []byte("")
-	}
-
-	return AppRefreshToken(a)
-}
-
 func AdminRefreshToken(requestUser *models.User) (int, []byte) {
 	return okToken(
 		auth.InitJWTAuthenticationBackend().GenerateAdminToken(
 			strconv.FormatUint(uint64(requestUser.ID), 10)))
-}
-
-func AppRefreshToken(requestApp *models.App) (int, []byte) {
-	return okToken(
-		auth.InitJWTAuthenticationBackend().GenerateAppToken(
-			strconv.FormatUint(uint64(requestApp.ID), 10)))
 }
 
 func AdminLogout(req *http.Request) error {
@@ -52,6 +38,20 @@ func AdminLogout(req *http.Request) error {
 
 	tokenString := req.Header.Get("Authorization")
 	return auth.InitJWTAuthenticationBackend().Logout(tokenString, token)
+}
+
+func AppLogin(a *models.App) (int, []byte) {
+	if err := a.GetApp(database.Manager); err != nil {
+		return http.StatusUnauthorized, []byte("")
+	}
+
+	return AppRefreshToken(a)
+}
+
+func AppRefreshToken(requestApp *models.App) (int, []byte) {
+	return okToken(
+		auth.InitJWTAuthenticationBackend().GenerateAppToken(
+			strconv.FormatUint(uint64(requestApp.ID), 10)))
 }
 
 func okToken(token string, err error) (int, []byte) {
