@@ -44,6 +44,12 @@ func AdminRefreshToken(requestUser *models.User) (int, []byte) {
 			strconv.FormatUint(uint64(requestUser.ID), 10)))
 }
 
+func AppRefreshToken(requestApp *models.App) (int, []byte) {
+	return okToken(
+		auth.InitJWTAuthenticationBackend().GenerateAppToken(
+			strconv.FormatUint(uint64(requestApp.ID), 10)))
+}
+
 func AdminLogout(req *http.Request) error {
 	authBackend := auth.InitJWTAuthenticationBackend()
 	tokenRequest, err := request.ParseFromRequest(req, request.OAuth2Extractor, func(token *jwt.Token) (interface{}, error) {
