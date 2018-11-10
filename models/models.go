@@ -10,7 +10,12 @@ import (
 // Auth structures
 
 type AuthAdminClaims struct {
-	UserID string `json:"user_id"`
+	UserID string `json:"userId"`
+	jwt.StandardClaims
+}
+
+type AuthAppClaims struct {
+	AppID string `json:"appId"`
 	jwt.StandardClaims
 }
 

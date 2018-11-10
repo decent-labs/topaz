@@ -10,7 +10,7 @@ import (
 func SetHelloRoutes(router *mux.Router) *mux.Router {
 	router.Handle("/test/hello",
 		negroni.New(
-			negroni.HandlerFunc(authentication.RequireTokenAuthentication),
+			negroni.HandlerFunc(authentication.Admin),
 			negroni.HandlerFunc(controllers.HelloController),
 		)).Methods("GET")
 

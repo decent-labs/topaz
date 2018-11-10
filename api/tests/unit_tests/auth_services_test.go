@@ -28,65 +28,65 @@ func (s *AuthenticationServicesTestSuite) SetUpSuite(c *C) {
 	settings.Init()
 }
 
-func (suite *AuthenticationServicesTestSuite) TestLogin(c *C) {
+func (suite *AuthenticationServicesTestSuite) TestAdminLogin(c *C) {
 	user := models.User{
 		Username: "haku",
 		Password: "testing",
 	}
-	response, token := services.Login(&user)
+	response, token := services.AdminLogin(&user)
 	assert.Equal(t, http.StatusOK, response)
 	assert.NotEmpty(t, token)
 }
 
-func (suite *AuthenticationServicesTestSuite) TestLoginIncorrectPassword(c *C) {
+func (suite *AuthenticationServicesTestSuite) TestAdminLoginIncorrectPassword(c *C) {
 	user := models.User{
 		Username: "haku",
 		Password: "Password",
 	}
-	response, token := services.Login(&user)
+	response, token := services.AdminLogin(&user)
 	assert.Equal(t, http.StatusUnauthorized, response)
 	assert.Empty(t, token)
 }
 
-func (suite *AuthenticationServicesTestSuite) TestLoginIncorrectUsername(c *C) {
+func (suite *AuthenticationServicesTestSuite) TestAdminLoginIncorrectUsername(c *C) {
 	user := models.User{
 		Username: "Username",
 		Password: "testing",
 	}
-	response, token := services.Login(&user)
+	response, token := services.AdminLogin(&user)
 	assert.Equal(t, http.StatusUnauthorized, response)
 	assert.Empty(t, token)
 }
 
-func (suite *AuthenticationServicesTestSuite) TestLoginEmptyCredentials(c *C) {
+func (suite *AuthenticationServicesTestSuite) TestAdminLoginEmptyCredentials(c *C) {
 	user := models.User{
 		Username: "",
 		Password: "",
 	}
-	response, token := services.Login(&user)
+	response, token := services.AdminLogin(&user)
 	assert.Equal(t, http.StatusUnauthorized, response)
 	assert.Empty(t, token)
 }
 
-func (suite *AuthenticationServicesTestSuite) TestRefreshToken(c *C) {
+func (suite *AuthenticationServicesTestSuite) TestAdminRefreshToken(c *C) {
 	user := models.User{
 		Username: "haku",
 		Password: "testing",
 	}
 	authBackend := authentication.InitJWTAuthenticationBackend()
-	tokenString, err := authBackend.GenerateToken(user.UUID)
+	tokenString, err := authBackend.GenerateAdminToken(user.UUID)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return authBackend.PublicKey, nil
 	})
 	assert.Nil(t, err)
 
-	newToken := services.RefreshToken(token)
+	newToken := services.AdminRefreshToken(token)
 	assert.NotEmpty(t, newToken)
 }
 
-func (suite *AuthenticationServicesTestSuite) TestRefreshTokenInvalidToken(c *C) {
+func (suite *AuthenticationServicesTestSuite) TestAdminRefreshTokenInvalidToken(c *C) {
 	token := jwt.New(jwt.GetSigningMethod("RS256"))
-	newToken := services.RefreshToken(token)
+	newToken := services.AdminRefreshToken(token)
 	assert.Empty(t, newToken)
 }
 
@@ -96,7 +96,7 @@ func (suite *AuthenticationServicesTestSuite) TestLogout(c *C) {
 		Password: "testing",
 	}
 	authBackend := auth.InitJWTAuthenticationBackend()
-	tokenString, err := authentication.GenerateToken(user.UUID)
+	tokenString, err := authentication.GenerateAdminToken(user.UUID)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return authBackend.PublicKey, nil
 	})

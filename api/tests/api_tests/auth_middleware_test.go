@@ -35,14 +35,14 @@ func (s *MiddlewaresTestSuite) SetUpSuite(c *C) {
 func (s *MiddlewaresTestSuite) SetUpTest(c *C) {
 	authBackend := authentication.InitJWTAuthenticationBackend()
 	assert.NotNil(t, authBackend)
-	token, _ = authBackend.GenerateToken("1234")
+	token, _ = authBackend.GenerateAdminToken("1234")
 
 	router := routers.InitRoutes()
 	server = negroni.Classic()
 	server.UseHandler(router)
 }
 
-func (s *MiddlewaresTestSuite) TestRequireTokenAuthentication(c *C) {
+func (s *MiddlewaresTestSuite) TestAdmin(c *C) {
 	resource := "/test/hello"
 
 	response := httptest.NewRecorder()
@@ -53,7 +53,7 @@ func (s *MiddlewaresTestSuite) TestRequireTokenAuthentication(c *C) {
 	assert.Equal(t, response.Code, http.StatusOK)
 }
 
-func (s *MiddlewaresTestSuite) TestRequireTokenAuthenticationInvalidToken(c *C) {
+func (s *MiddlewaresTestSuite) TestAdminInvalidToken(c *C) {
 	resource := "/test/hello"
 
 	response := httptest.NewRecorder()
@@ -64,7 +64,7 @@ func (s *MiddlewaresTestSuite) TestRequireTokenAuthenticationInvalidToken(c *C) 
 	assert.Equal(t, response.Code, http.StatusUnauthorized)
 }
 
-func (s *MiddlewaresTestSuite) TestRequireTokenAuthenticationEmptyToken(c *C) {
+func (s *MiddlewaresTestSuite) TestAdminEmptyToken(c *C) {
 	resource := "/test/hello"
 
 	response := httptest.NewRecorder()
@@ -75,7 +75,7 @@ func (s *MiddlewaresTestSuite) TestRequireTokenAuthenticationEmptyToken(c *C) {
 	assert.Equal(t, response.Code, http.StatusUnauthorized)
 }
 
-func (s *MiddlewaresTestSuite) TestRequireTokenAuthenticationWithoutToken(c *C) {
+func (s *MiddlewaresTestSuite) TestAdminWithoutToken(c *C) {
 	resource := "/test/hello"
 
 	response := httptest.NewRecorder()
@@ -85,12 +85,12 @@ func (s *MiddlewaresTestSuite) TestRequireTokenAuthenticationWithoutToken(c *C) 
 	assert.Equal(t, response.Code, http.StatusUnauthorized)
 }
 
-func (suite *MiddlewaresTestSuite) TestRequireTokenAuthenticationAfterLogout(c *C) {
+func (suite *MiddlewaresTestSuite) TestAdminAfterAdminLogout(c *C) {
 	resource := "/test/hello"
 
 	requestLogout, _ := http.NewRequest("GET", resource, nil)
 	requestLogout.Header.Set("Authorization", fmt.Sprintf("Bearer %v", token))
-	services.Logout(requestLogout)
+	services.AdminLogout(requestLogout)
 
 	response := httptest.NewRecorder()
 	request, _ := http.NewRequest("GET", resource, nil)

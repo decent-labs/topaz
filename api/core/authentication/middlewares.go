@@ -8,7 +8,7 @@ import (
 	request "github.com/dgrijalva/jwt-go/request"
 )
 
-func RequireTokenAuthentication(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, id string) {
 	authBackend := InitJWTAuthenticationBackend()
 
 	token, err := request.ParseFromRequest(req, request.OAuth2Extractor, func(token *jwt.Token) (interface{}, error) {
@@ -34,10 +34,24 @@ func RequireTokenAuthentication(rw http.ResponseWriter, req *http.Request, next 
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok {
-		req.Header.Del("userId")
-		req.Header.Add("userId", claims["user_id"].(string))
+		var resource interface{}
+		if resource = claims[id]; resource == nil {
+			rw.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+
+		req.Header.Del(id)
+		req.Header.Add(id, resource.(string))
 		next(rw, req)
 	} else {
 		rw.WriteHeader(http.StatusUnauthorized)
 	}
+}
+
+func Admin(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	auth(rw, req, next, "userId")
+}
+
+func App(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	auth(rw, req, next, "appId")
 }
