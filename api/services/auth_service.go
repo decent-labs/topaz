@@ -5,44 +5,47 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/decentorganization/topaz/api/api/parameters"
-	"github.com/decentorganization/topaz/api/core/authentication"
+	auth "github.com/decentorganization/topaz/api/core/authentication"
 	"github.com/decentorganization/topaz/api/core/database"
 	"github.com/decentorganization/topaz/models"
 	jwt "github.com/dgrijalva/jwt-go"
 	request "github.com/dgrijalva/jwt-go/request"
 )
 
-func AdminLogin(requestUser *models.User) (int, []byte) {
-	u := new(models.User)
-	if err := database.Manager.Where("email = ?", requestUser.Email).First(&u).Error; err != nil {
+func AdminLogin(u *models.User) (int, []byte) {
+	suppliedPassword := u.Password
+
+	if err := u.GetUser(database.Manager); err != nil {
 		return http.StatusUnauthorized, []byte("")
 	}
 
-	authBackend := authentication.InitJWTAuthenticationBackend()
-
-	if authBackend.Authenticate(requestUser.Password, u.Password) {
-		return makeAdminToken(authBackend, strconv.FormatUint(uint64(u.ID), 10))
+	if auth.InitJWTAuthenticationBackend().Authenticate(suppliedPassword, u.Password) {
+		return okToken(
+			auth.InitJWTAuthenticationBackend().GenerateAdminToken(
+				strconv.FormatUint(uint64(u.ID), 10)))
 	}
 
 	return http.StatusUnauthorized, []byte("")
 }
 
-func AppLogin(requestApp *models.App) (int, []byte) {
-	a := new(models.App)
-	if err := database.Manager.Where("id = ? AND user_id = ?", requestApp.ID, requestApp.UserID).First(&a).Error; err != nil {
+func AppLogin(a *models.App) (int, []byte) {
+	if err := a.GetApp(database.Manager); err != nil {
 		return http.StatusUnauthorized, []byte("")
 	}
 
-	return makeAppToken(authentication.InitJWTAuthenticationBackend(), strconv.FormatUint(uint64(a.ID), 10))
+	return okToken(
+		auth.InitJWTAuthenticationBackend().GenerateAppToken(
+			strconv.FormatUint(uint64(a.ID), 10)))
 }
 
 func AdminRefreshToken(requestUser *models.User) (int, []byte) {
-	return makeAdminToken(authentication.InitJWTAuthenticationBackend(), strconv.FormatUint(uint64(requestUser.ID), 10))
+	return okToken(
+		auth.InitJWTAuthenticationBackend().GenerateAdminToken(
+			strconv.FormatUint(uint64(requestUser.ID), 10)))
 }
 
 func AdminLogout(req *http.Request) error {
-	authBackend := authentication.InitJWTAuthenticationBackend()
+	authBackend := auth.InitJWTAuthenticationBackend()
 	tokenRequest, err := request.ParseFromRequest(req, request.OAuth2Extractor, func(token *jwt.Token) (interface{}, error) {
 		return authBackend.PublicKey, nil
 	})
@@ -53,20 +56,12 @@ func AdminLogout(req *http.Request) error {
 	return authBackend.Logout(tokenString, tokenRequest)
 }
 
-func makeAdminToken(authBackend *authentication.JWTAuthenticationBackend, id string) (int, []byte) {
-	return makeToken(authBackend.GenerateAdminToken(id))
-}
-
-func makeAppToken(authBackend *authentication.JWTAuthenticationBackend, id string) (int, []byte) {
-	return makeToken(authBackend.GenerateAppToken(id))
-}
-
-func makeToken(token string, err error) (int, []byte) {
+func okToken(token string, err error) (int, []byte) {
 	if err != nil {
 		return http.StatusInternalServerError, []byte("")
 	}
 
-	response, err := json.Marshal(parameters.TokenAuthentication{Token: token})
+	response, err := json.Marshal(models.TokenAuthentication{Token: token})
 	if err != nil {
 		return http.StatusInternalServerError, []byte("")
 	}
