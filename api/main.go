@@ -30,7 +30,12 @@ func createUserHandler(w http.ResponseWriter, r *http.Request) {
 	jd := json.NewDecoder(r.Body)
 	err := jd.Decode(&ur)
 	if err != nil {
-		log.Fatal(err)
+		http.Error(
+			w,
+			fmt.Sprintf("error executing create new user request: %s", err.Error()),
+			http.StatusBadRequest,
+		)
+		return
 	}
 
 	u := User{Name: ur.Name}
@@ -39,8 +44,15 @@ func createUserHandler(w http.ResponseWriter, r *http.Request) {
 	je := json.NewEncoder(w)
 	err = je.Encode(u)
 	if err != nil {
-		log.Fatal(err)
+		http.Error(
+			w,
+			fmt.Sprintf("error encoding new user: %s", err.Error()),
+			http.StatusInternalServerError,
+		)
+		return
 	}
+
+	log.Println("finished with /create-user handler")
 }
 
 type CreateAppRequest struct {
@@ -68,6 +80,8 @@ func createAppHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	log.Println("finished with /create-app handler")
 }
 
 type StoreResponse struct {
@@ -92,7 +106,7 @@ func storeHandler(w http.ResponseWriter, r *http.Request) {
 	r.Body = ioutil.NopCloser(bytes.NewReader(body))
 
 	// create a new url from the raw RequestURI sent by the client
-	url := fmt.Sprintf("%s://%s:%s", os.Getenv("STORE_PROXY"), os.Getenv("STORE_HOST"), os.Getenv("STORE_PORT"))
+	url := fmt.Sprintf("http://%s:8080", os.Getenv("STORE_HOST"))
 
 	proxyReq, err := http.NewRequest(r.Method, url, bytes.NewReader(body))
 	if err != nil {
@@ -102,13 +116,6 @@ func storeHandler(w http.ResponseWriter, r *http.Request) {
 			http.StatusInternalServerError,
 		)
 		return
-	}
-
-	// We may want to filter some headers, otherwise we could just use a shallow copy
-	// proxyReq.Header = req.Header
-	proxyReq.Header = make(http.Header)
-	for h, val := range r.Header {
-		proxyReq.Header[h] = val
 	}
 
 	resp, err := httpClient.Do(proxyReq)

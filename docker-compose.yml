@@ -20,7 +20,6 @@ services:
       STARTUP_SLEEP: "${STARTUP_SLEEP}"
       STORE_HOST:    "${STORE_HOST}"
       STORE_PORT:    "${STORE_PORT}"
-      STORE_PROXY:   "${STORE_PROXY}"
 
   ## the dispatch service triggers flush workers
   dispatch:
@@ -48,6 +47,7 @@ services:
     environment:
       GETH_HOST:        "${GETH_HOST}"
       GETH_PRIVATE_KEY: "${GETH_PRIVATE_KEY}"
+      STARTUP_SLEEP:    "${STARTUP_SLEEP}"
 
   ## the flush service flushes all pending objects for a user into IPFS
   flush:
@@ -58,8 +58,6 @@ services:
       - ethereum
       - ipfs
       - postgres
-    ports:
-      - "${FLUSH_PORT}:8080"
     environment:
       ETHEREUM_ADDRESS: "${ETHEREUM_ADDRESS}"
       ETHEREUM_HOST:    "${ETHEREUM_HOST}"
@@ -89,8 +87,6 @@ services:
     depends_on:
       - ipfs
       - postgres
-    ports:
-      - "${STORE_PORT}:8080"
     environment:
       IPFS_HOST:     "${IPFS_HOST}"
       IPFS_PORT:     "${IPFS_PORT}"
@@ -105,7 +101,7 @@ services:
 
   ## the ipfs service provides dedication access to ipfs
   ipfs:
-    build: ./ipfs
+    image: ipfs/go-ipfs:v0.4.17
     ports:
       - "${IPFS_PORT}:5001"
       - "4001:4001"

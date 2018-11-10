@@ -42,8 +42,6 @@ func main() {
 	setupData(db)
 
 	for range time.Tick(time.Duration(i) * time.Second) {
-		log.Println("tick")
-
 		// stmt := `
 		// 	select distinct u.id
 		// 	from users u
@@ -82,8 +80,6 @@ func main() {
 		// 		continue
 		// 	}
 		// }
-
-		log.Println("tock")
 	}
 }
 
