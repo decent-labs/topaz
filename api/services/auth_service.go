@@ -8,8 +8,6 @@ import (
 	auth "github.com/decentorganization/topaz/api/core/authentication"
 	"github.com/decentorganization/topaz/api/core/database"
 	"github.com/decentorganization/topaz/api/models"
-	jwt "github.com/dgrijalva/jwt-go"
-	request "github.com/dgrijalva/jwt-go/request"
 )
 
 func AdminLogin(u *models.User) (int, []byte) {
@@ -51,15 +49,13 @@ func AppRefreshToken(requestApp *models.App) (int, []byte) {
 }
 
 func AdminLogout(req *http.Request) error {
-	authBackend := auth.InitJWTAuthenticationBackend()
-	tokenRequest, err := request.ParseFromRequest(req, request.OAuth2Extractor, func(token *jwt.Token) (interface{}, error) {
-		return authBackend.PublicKey, nil
-	})
+	token, err := auth.InitJWTAuthenticationBackend().GetToken(req)
 	if err != nil {
 		return err
 	}
+
 	tokenString := req.Header.Get("Authorization")
-	return authBackend.Logout(tokenString, tokenRequest)
+	return auth.InitJWTAuthenticationBackend().Logout(tokenString, token)
 }
 
 func okToken(token string, err error) (int, []byte) {
