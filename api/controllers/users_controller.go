@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/decentorganization/topaz/api/models"
 	"github.com/decentorganization/topaz/api/services"
-	"github.com/decentorganization/topaz/models"
 )
 
 func NewUser(w http.ResponseWriter, r *http.Request) {

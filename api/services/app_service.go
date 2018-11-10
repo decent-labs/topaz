@@ -6,7 +6,7 @@ import (
 
 	"github.com/decentorganization/topaz/api/core/database"
 	"github.com/decentorganization/topaz/api/core/ethereum"
-	"github.com/decentorganization/topaz/models"
+	"github.com/decentorganization/topaz/api/models"
 )
 
 func NewApp(newApp *models.App) (int, []byte) {
