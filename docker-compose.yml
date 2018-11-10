@@ -17,6 +17,8 @@ services:
     environment:
       API_JWT_KEY:          "${API_JWT_KEY}"
       ETHEREUM_HOST:        "${ETHEREUM_HOST}"
+      GETH_HOST:            "${GETH_HOST}"
+      GETH_PRIVATE_KEY:     "${GETH_PRIVATE_KEY}"
       IPFS_HOST:            "${IPFS_HOST}"
       IPFS_PORT:            "${IPFS_PORT}"
       PQ_HOST:              "${PQ_HOST}"
@@ -48,25 +50,12 @@ services:
       PQ_USER:       "${PQ_USER}"
       STARTUP_SLEEP: "${STARTUP_SLEEP}"
 
-  ## the ethereum service communicates between topaz and ethereum
-  ethereum:
-    build:
-      context: .
-      dockerfile: ./ethereum/Dockerfile
-    ports:
-      - "${ETHEREUM_PORT}:8080"
-    environment:
-      GETH_HOST:        "${GETH_HOST}"
-      GETH_PRIVATE_KEY: "${GETH_PRIVATE_KEY}"
-      STARTUP_SLEEP:    "${STARTUP_SLEEP}"
-
   ## the flush service flushes all pending objects for a user into IPFS
   flush:
     build:
       context: .
       dockerfile: ./flush/Dockerfile
     depends_on:
-      - ethereum
       - ipfs
       - postgres
     environment:
