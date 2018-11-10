@@ -1,11 +1,6 @@
 FROM golang:1.11.1 as builder
 
-ENV topaz_root=/go/src/github.com/decentorganization/topaz
-
-WORKDIR ${topaz_root}/models
-COPY ./models .
-
-WORKDIR ${topaz_root}/dispatch
+WORKDIR /go/src/github.com/decentorganization/topaz/dispatch
 COPY ./dispatch .
 
 RUN go get -v
