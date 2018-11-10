@@ -52,3 +52,16 @@ func AppLogin(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	w.WriteHeader(responseStatus)
 	w.Write(token)
 }
+
+func AppRefreshToken(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	requestApp := new(models.App)
+	decoder := json.NewDecoder(r.Body)
+	decoder.Decode(&requestApp)
+
+	s, _ := strconv.ParseUint(r.Header.Get("appId"), 10, 32)
+	requestApp.ID = uint(s)
+	responseStatus, token := services.AppRefreshToken(requestApp)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(responseStatus)
+	w.Write(token)
+}
