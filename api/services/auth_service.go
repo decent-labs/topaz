@@ -24,19 +24,19 @@ func AdminLogin(u *models.User) (int, []byte) {
 	return AdminRefreshToken(u)
 }
 
-func AdminRefreshToken(requestUser *models.User) (int, []byte) {
+func AdminRefreshToken(u *models.User) (int, []byte) {
 	return okToken(
 		auth.InitJWTAuthenticationBackend().GenerateAdminToken(
-			strconv.FormatUint(uint64(requestUser.ID), 10)))
+			strconv.FormatUint(uint64(u.ID), 10)))
 }
 
-func AdminLogout(req *http.Request) error {
-	token, err := auth.InitJWTAuthenticationBackend().GetToken(req)
+func AdminLogout(r *http.Request) error {
+	token, err := auth.InitJWTAuthenticationBackend().GetToken(r)
 	if err != nil {
 		return err
 	}
 
-	tokenString := req.Header.Get("Authorization")
+	tokenString := r.Header.Get("Authorization")
 	return auth.InitJWTAuthenticationBackend().Logout(tokenString, token)
 }
 
@@ -48,10 +48,10 @@ func AppLogin(a *models.App) (int, []byte) {
 	return AppRefreshToken(a)
 }
 
-func AppRefreshToken(requestApp *models.App) (int, []byte) {
+func AppRefreshToken(a *models.App) (int, []byte) {
 	return okToken(
 		auth.InitJWTAuthenticationBackend().GenerateAppToken(
-			strconv.FormatUint(uint64(requestApp.ID), 10)))
+			strconv.FormatUint(uint64(a.ID), 10)))
 }
 
 func okToken(token string, err error) (int, []byte) {
