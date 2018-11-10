@@ -17,11 +17,11 @@ func AdminLogin(u *models.User) (int, []byte) {
 		return http.StatusUnauthorized, []byte("")
 	}
 
-	if auth.InitJWTAuthenticationBackend().Authenticate(suppliedPassword, u.Password) {
-		return AdminRefreshToken(u)
+	if auth := auth.InitJWTAuthenticationBackend().Authenticate(suppliedPassword, u.Password); auth == false {
+		return http.StatusUnauthorized, []byte("")
 	}
 
-	return http.StatusUnauthorized, []byte("")
+	return AdminRefreshToken(u)
 }
 
 func AppLogin(a *models.App) (int, []byte) {
