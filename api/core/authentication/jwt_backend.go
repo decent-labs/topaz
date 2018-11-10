@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/decentorganization/topaz/api/core/redis"
+	"github.com/decentorganization/topaz/api/models"
 	"github.com/decentorganization/topaz/api/settings"
-	"github.com/decentorganization/topaz/models"
 	jwt "github.com/dgrijalva/jwt-go"
 )
 

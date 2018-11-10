@@ -6,7 +6,7 @@ import (
 
 	"github.com/decentorganization/topaz/api/core/database"
 	"github.com/decentorganization/topaz/api/core/ipfs"
-	"github.com/decentorganization/topaz/models"
+	"github.com/decentorganization/topaz/api/models"
 )
 
 func Trust(newObject *models.Object) (int, []byte) {
