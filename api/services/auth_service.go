@@ -18,9 +18,7 @@ func AdminLogin(u *models.User) (int, []byte) {
 	}
 
 	if auth.InitJWTAuthenticationBackend().Authenticate(suppliedPassword, u.Password) {
-		return okToken(
-			auth.InitJWTAuthenticationBackend().GenerateAdminToken(
-				strconv.FormatUint(uint64(u.ID), 10)))
+		return AdminRefreshToken(u)
 	}
 
 	return http.StatusUnauthorized, []byte("")
@@ -31,9 +29,7 @@ func AppLogin(a *models.App) (int, []byte) {
 		return http.StatusUnauthorized, []byte("")
 	}
 
-	return okToken(
-		auth.InitJWTAuthenticationBackend().GenerateAppToken(
-			strconv.FormatUint(uint64(a.ID), 10)))
+	return AppRefreshToken(a)
 }
 
 func AdminRefreshToken(requestUser *models.User) (int, []byte) {
