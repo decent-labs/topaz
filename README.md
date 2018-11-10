@@ -22,3 +22,5 @@ Made with :heart: in:
 * Copenhagen, Denmark
 * Prague, Czech Republic
 * Stockholm, Sweden
+* Berlin, Germany
+* Amsterdam, Netherlands
