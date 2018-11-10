@@ -15,6 +15,10 @@ $ curl --request POST -d "your-data-here" http://localhost:8080/store
 Made with :heart: in:
 * British Airways Flight 1575
 * Miami, FL
-* Positano, IT
+* Positano, Italy
 * Santa Cruz, CA
 * Cleveland, OH
+* Boston, MA
+* Copenhagen, Denmark
+* Prague, Czech Republic
+* Stockholm, Sweden
