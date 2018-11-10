@@ -1,6 +1,6 @@
 FROM golang:1.11.1 as builder
 
-WORKDIR /go/src/github.com/decentorganization/topaz/flush
+WORKDIR /go/src/github.com/decentorganization/topaz/core/batcher
 COPY ./flush .
 
 RUN go get -v

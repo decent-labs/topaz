@@ -12,7 +12,12 @@ import (
 var Manager *gorm.DB
 
 func init() {
-	dbConn := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable", os.Getenv("PQ_HOST"), os.Getenv("PQ_PORT"), os.Getenv("PQ_USER"), os.Getenv("PQ_NAME"))
+	dbConn := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable",
+		os.Getenv("PQ_HOST"),
+		os.Getenv("PQ_PORT"),
+		os.Getenv("PQ_USER"),
+		os.Getenv("PQ_NAME"),
+	)
 
 	var err error
 	Manager, err = gorm.Open("postgres", dbConn)

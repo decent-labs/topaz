@@ -31,3 +31,10 @@ func (a *App) GetApp(db *gorm.DB) error {
 	}
 	return nil
 }
+
+func (a *App) GetApps(db *gorm.DB) error {
+	if err := db.Where("id = ? AND user_id = ?", a.ID, a.UserID).First(&a).Error; err != nil {
+		return err
+	}
+	return nil
+}

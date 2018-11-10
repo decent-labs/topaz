@@ -1,4 +1,4 @@
-package main
+package dispatch
 
 import (
 	"fmt"
@@ -42,44 +42,44 @@ func main() {
 	setupData(db)
 
 	for range time.Tick(time.Duration(i) * time.Second) {
-		// stmt := `
-		// 	select distinct u.id
-		// 	from users u
-		// 		inner join objects o on o.user_id = u.id
-		// 	where ((u.flushed_at is null) or (now() - u.flushed_at >= u.interval))
-		// 		and (o.flush_id is null)
-		// `
+		stmt := `
+			select distinct u.id
+			from users u
+				inner join objects o on o.user_id = u.id
+			where ((u.flushed_at is null) or (now() - u.flushed_at >= u.interval))
+				and (o.flush_id is null)
+		`
 
-		// rows, err := db.Query(stmt)
-		// if err != nil {
-		// 	log.Printf("error executing user-finding query: %s", err.Error())
-		// 	return
-		// }
-		// defer rows.Close()
+		rows, err := db.Query(stmt)
+		if err != nil {
+			log.Printf("error executing user-finding query: %s", err.Error())
+			return
+		}
+		defer rows.Close()
 
-		// var apps []App
-		// var users []User
-		// var flushes []Flush
-		// db.Find(&apps)
-		// log.Println(apps)
+		var apps []App
+		var users []User
+		var flushes []Flush
+		db.Find(&apps)
+		log.Println(apps)
 
-		// for rows.Next() {
-		// 	var id string
+		for rows.Next() {
+			var id string
 
-		// 	err = rows.Scan(&id)
-		// 	if err != nil {
-		// 		log.Printf("error scanning row into user id var: %s", err.Error())
-		// 		continue
-		// 	}
+			err = rows.Scan(&id)
+			if err != nil {
+				log.Printf("error scanning row into user id var: %s", err.Error())
+				continue
+			}
 
-		// 	url := fmt.Sprintf("http://%s:%s", os.Getenv("FLUSH_HOST"), os.Getenv("FLUSH_PORT"))
-		// 	sr := strings.NewReader(id)
-		// 	_, err = http.Post(url, "application/octet-stream", sr)
-		// 	if err != nil {
-		// 		log.Printf("error dispatching user id '%s' to flush service: %s", id, err.Error())
-		// 		continue
-		// 	}
-		// }
+			url := fmt.Sprintf("http://%s:%s", os.Getenv("FLUSH_HOST"), os.Getenv("FLUSH_PORT"))
+			sr := strings.NewReader(id)
+			_, err = http.Post(url, "application/octet-stream", sr)
+			if err != nil {
+				log.Printf("error dispatching user id '%s' to flush service: %s", id, err.Error())
+				continue
+			}
+		}
 	}
 }
 

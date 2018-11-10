@@ -1,4 +1,4 @@
-package main
+package flush
 
 import (
 	"bytes"
@@ -16,13 +16,13 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// Message is what gest posted to ethereum service
+// Message is posted to the ethereum service
 type Message struct {
 	Address string
 	Hash    string
 }
 
-// TXResp is what gets returned
+// TXResp is returned from the ethereum service
 type TXResp struct {
 	TX string
 }

@@ -33,42 +33,19 @@ services:
       TOKEN_EXPIRE_OFFSET:  "${TOKEN_EXPIRE_OFFSET}"
 
   ## the dispatch service triggers flush workers
-  dispatch:
+  batcher:
     build:
       context: .
-      dockerfile: ./dispatch/Dockerfile
+      dockerfile: ./api/core/batcher/Dockerfile
     depends_on:
-      - flush
       - postgres
     environment:
       DISPATCH_RATE: "${DISPATCH_RATE}"
-      FLUSH_HOST:    "${FLUSH_HOST}"
-      FLUSH_PORT:    "${FLUSH_PORT}"
       PQ_HOST:       "${PQ_HOST}"
       PQ_NAME:       "${PQ_NAME}"
       PQ_PORT:       "${PQ_PORT}"
       PQ_USER:       "${PQ_USER}"
       STARTUP_SLEEP: "${STARTUP_SLEEP}"
-
-  ## the flush service flushes all pending objects for a user into IPFS
-  flush:
-    build:
-      context: .
-      dockerfile: ./flush/Dockerfile
-    depends_on:
-      - ipfs
-      - postgres
-    environment:
-      ETHEREUM_ADDRESS: "${ETHEREUM_ADDRESS}"
-      ETHEREUM_HOST:    "${ETHEREUM_HOST}"
-      ETHEREUM_PORT:    "${ETHEREUM_PORT}"
-      IPFS_HOST:        "${IPFS_HOST}"
-      IPFS_PORT:        "${IPFS_PORT}"
-      PQ_HOST:          "${PQ_HOST}"
-      PQ_NAME:          "${PQ_NAME}"
-      PQ_PORT:          "${PQ_PORT}"
-      PQ_USER:          "${PQ_USER}"
-      STARTUP_SLEEP:    "${STARTUP_SLEEP}"
 
   ## the migrate service manages database migrations
   migrate:
