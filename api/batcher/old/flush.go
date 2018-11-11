@@ -31,19 +31,19 @@ var sh *shell.Shell
 var db *sql.DB
 
 func requestHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("starting flush service handler")
+	// log.Println("starting flush service handler")
 
-	b, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		http.Error(
-			w,
-			fmt.Sprintf("error reading flush service request body: %s", err.Error()),
-			http.StatusBadRequest,
-		)
-		return
-	}
+	// b, err := ioutil.ReadAll(r.Body)
+	// if err != nil {
+	// 	http.Error(
+	// 		w,
+	// 		fmt.Sprintf("error reading flush service request body: %s", err.Error()),
+	// 		http.StatusBadRequest,
+	// 	)
+	// 	return
+	// }
 
-	userID := string(b)
+	// userID := string(b)
 
 	flushStmt := fmt.Sprintf(
 		"insert into flushes (user_id) values ('%s') returning id, created_at;",

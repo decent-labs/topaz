@@ -32,11 +32,11 @@ services:
       TOKEN_DURATION_HOURS: "${TOKEN_DURATION_HOURS}"
       TOKEN_EXPIRE_OFFSET:  "${TOKEN_EXPIRE_OFFSET}"
 
-  ## the dispatch service triggers flush workers
+  ## the batcher service triggers flushes
   batcher:
     build:
       context: .
-      dockerfile: ./api/core/batcher/Dockerfile
+      dockerfile: ./api/batcher/Dockerfile
     depends_on:
       - postgres
     environment:
