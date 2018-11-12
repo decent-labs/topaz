@@ -6,9 +6,11 @@ import (
 	"os"
 
 	"github.com/jinzhu/gorm"
+	// gorm requires a "dialect" is imported to communicate with postgres
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
+// Manager is used to access our database across the application
 var Manager *gorm.DB
 
 func init() {

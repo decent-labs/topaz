@@ -10,14 +10,17 @@ import (
 
 var sh *shell.Shell
 
+// Add takes a bytearray and adds it to IPFS
 func Add(data []byte) (string, error) {
 	return sh.Add(bytes.NewReader(data))
 }
 
+// NewObject creates a new IPFS object based on the object template provided i.e. "unixfs-dir"
 func NewObject(template string) (string, error) {
 	return sh.NewObject(template)
 }
 
+// PatchLink takes a root hash, a path, childhash, and boolean, returning the resulting root
 func PatchLink(root string, path string, childhash string, create bool) (string, error) {
 	return sh.PatchLink(root, path, childhash, create)
 }
