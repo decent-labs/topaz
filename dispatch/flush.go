@@ -45,6 +45,38 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 
 	// userID := string(b)
 
+	// f := new(models.Flush)
+
+	// if err := f.CreateFlush(database.Manager); err != nil {
+	// 	log.Printf("couldn't create new flush: %s", err.Error())
+	// 	return
+	// }
+
+	// defer db.Close()
+
+	// log.Println("BATCH: BEGINNING 'flush()'.")
+
+	// stmt := fmt.Sprintf("insert into flushes (app_id, created_at) values ('%d', now()) returning id;", id)
+
+	// rows, err := db.Query(stmt)
+	// if err != nil {
+	// 	log.Printf("couldn't execute new flush statement: %s", err.Error())
+	// 	return
+	// }
+	// defer rows.Close()
+
+	// for rows.Next() {
+	// 	var id int
+
+	// 	err = rows.Scan(&id)
+	// 	if err != nil {
+	// 		log.Printf("couldn't scan flush id: %s", err.Error())
+	// 		continue
+	// 	}
+
+	// 	log.Printf("created flush id: %d", id)
+	// }
+
 	flushStmt := fmt.Sprintf(
 		"insert into flushes (user_id) values ('%s') returning id, created_at;",
 		userID,

@@ -5,6 +5,7 @@ COPY ./api/batcher .
 
 # Temporary
 COPY ./api/core/database ./database
+COPY ./api/core/ipfs ./ipfs
 COPY ./api/models ./models
 
 RUN ls -a
