@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/decentorganization/topaz/api/batcher/database"
-	"github.com/decentorganization/topaz/api/batcher/ipfs"
-	"github.com/decentorganization/topaz/api/batcher/models"
+	"github.com/decentorganization/topaz/api/core/database"
+	"github.com/decentorganization/topaz/api/core/ipfs"
+	"github.com/decentorganization/topaz/api/models"
 )
 
 func getAppsToFlush() models.Apps {
