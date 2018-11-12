@@ -8,8 +8,8 @@ services:
       - "${IPFS_PORT}:5001"
       - "4001:4001"
     volumes:
-      - "./ipfs/data:/data/ipfs"
-      - "./ipfs/staging:/export"
+      - "./data:/data/ipfs"
+      - "./staging:/export"
   ## the postgres service contains the topaz database
   postgres:
     build: ./postgres
