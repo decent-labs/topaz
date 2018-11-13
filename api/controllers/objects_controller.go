@@ -13,7 +13,8 @@ func Trust(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	bytes, _ := ioutil.ReadAll(r.Body)
 
 	requestObject := new(models.Object)
-	requestObject.AppID, _ = strconv.Atoi(r.Header.Get("appId"))
+	appID, _ := strconv.Atoi(r.Header.Get("appId"))
+	requestObject.AppID = uint(appID)
 	requestObject.DataBlob = bytes
 
 	responseStatus, app := services.Trust(requestObject)

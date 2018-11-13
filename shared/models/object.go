@@ -6,9 +6,9 @@ type Object struct {
 	gorm.Model
 	DataBlob []byte `json:"dataBlob"`
 	Hash     string `json:"hash"`
-	AppID    int    `json:"appId"`
+	AppID    uint   `json:"appId"`
 	App      App    `json:"app"`
-	FlushID  *int   `json:"flushId"`
+	FlushID  *uint  `json:"flushId"`
 	Flush    Flush  `json:"flush"`
 }
 
