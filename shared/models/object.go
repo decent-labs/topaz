@@ -29,3 +29,7 @@ func (os *Objects) GetObjectsByAppID(db *gorm.DB, id uint) error {
 	}
 	return nil
 }
+
+func (os *Objects) GetObjectsByHash(db *gorm.DB, o *Object) error {
+	return db.Where(&Object{Hash: o.Hash, AppID: o.AppID}).Find(&os).Error
+}
