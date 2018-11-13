@@ -4,15 +4,15 @@ import (
 	"log"
 
 	"github.com/decentorganization/topaz/shared/database"
+	"github.com/decentorganization/topaz/shared/ethereum"
 	"github.com/decentorganization/topaz/shared/ipfs"
 	"github.com/decentorganization/topaz/shared/models"
 )
 
 func getAppsToBatch() models.Apps {
 	apps := new(models.Apps)
-
 	if err := apps.GetAppsToBatch(database.Manager); err != nil {
-		log.Printf("couldn't get apps to batch: %s", err.Error())
+		log.Fatalf("couldn't get apps to batch: %s", err.Error())
 	}
 
 	return *apps
@@ -20,35 +20,69 @@ func getAppsToBatch() models.Apps {
 
 func getObjectsToBatch(app models.App) models.Objects {
 	objects := new(models.Objects)
-
 	if err := objects.GetObjectsByAppID(database.Manager, app.ID); err != nil {
-		log.Printf("couldn't get objects to batch: %s", err.Error())
+		log.Fatalf("couldn't get objects to batch: %s", err.Error())
 	}
 
 	return *objects
 }
 
-func main() {
-	var apps models.Apps
-	var objects models.Objects
+func createTree(objs models.Objects) string {
+	root, err := ipfs.NewObject("unixfs-dir")
+	if err != nil {
+		log.Fatalf("couldn't create new ipfs object: %s", err.Error())
+	}
 
-	apps = getAppsToBatch()
-
-	for _, app := range apps {
-		root, err := ipfs.NewObject("unixfs-dir")
+	for _, obj := range objs {
+		root, err = ipfs.PatchLink(root, obj.Hash, obj.Hash, true)
 		if err != nil {
-			log.Printf("couldn't create new ipfs object: %s", err.Error())
+			log.Fatalf("couldn't patchlink ipfs object: %s", err.Error())
 		}
+	}
 
-		objects = getObjectsToBatch(app)
+	return root
+}
 
-		for _, object := range objects {
-			root, err = ipfs.PatchLink(root, object.Hash, object.Hash, true)
-			if err != nil {
-				log.Printf("couldn't patchlink ipfs object: %s", err.Error())
-			}
+func storeInCaptureContract(ethAddress string, root string) string {
+	tx, err := ethereum.Store(ethAddress, root)
+	if err != nil {
+		log.Fatalf("couldn't store hash in Capture contract: %s", err.Error())
+	}
+
+	return tx
+}
+
+func batch(a models.App, objs models.Objects, root string, tx string) {
+	b := models.Batch{
+		DirectoryHash:  root,
+		EthTransaction: tx,
+		App:            a,
+	}
+
+	if err := b.CreateBatch(database.Manager); err != nil {
+		log.Fatalf("couln't create batch in database: %s", err.Error())
+	}
+
+	for _, obj := range objs {
+		obj.BatchID = &b.ID
+
+		if err := obj.UpdateObject(database.Manager); err != nil {
+			log.Printf("couldn't update object in database: %s", err.Error())
 		}
+	}
 
-		log.Printf("Batch complete. App: %d, Root: %s", app.ID, root)
+	a.LastBatched = &b.CreatedAt
+	if err := a.UpdateApp(database.Manager); err != nil {
+		log.Printf("couldn't update app in database: %s", err.Error())
+	}
+}
+
+func main() {
+	for _, a := range getAppsToBatch() {
+		objs := getObjectsToBatch(a)
+		root := createTree(objs)
+		tx := storeInCaptureContract(a.EthAddress, root)
+
+		batch(a, objs, root, tx)
 	}
 }

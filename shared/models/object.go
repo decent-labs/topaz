@@ -26,3 +26,10 @@ func (os *Objects) GetObjectsByAppID(db *gorm.DB, id uint) error {
 func (os *Objects) GetObjectsByHash(db *gorm.DB, o *Object) error {
 	return db.Where(&Object{Hash: o.Hash, AppID: o.AppID}).Find(&os).Error
 }
+
+func (o *Object) UpdateObject(db *gorm.DB) error {
+	if err := db.Save(&o).Error; err != nil {
+		return err
+	}
+	return nil
+}
