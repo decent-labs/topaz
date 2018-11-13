@@ -33,3 +33,19 @@ func Trust(newObject *models.Object) (int, []byte) {
 	response, _ := json.Marshal(o)
 	return http.StatusOK, response
 }
+
+func Verify(o *models.Object) (int, []byte) {
+	hash, err := ipfs.Hash(o.DataBlob)
+	if err != nil {
+		return http.StatusInternalServerError, []byte(err.Error())
+	}
+	o.Hash = hash
+
+	os := new(models.Objects)
+	if err := os.GetObjectsByHash(database.Manager, o); err != nil {
+		return http.StatusInternalServerError, []byte(err.Error())
+	}
+
+	response, _ := json.Marshal(os)
+	return http.StatusOK, response
+}

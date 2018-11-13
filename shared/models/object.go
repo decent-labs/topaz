@@ -6,26 +6,22 @@ type Object struct {
 	gorm.Model
 	DataBlob []byte `json:"dataBlob"`
 	Hash     string `json:"hash"`
-	AppID    int    `json:"appId"`
+	AppID    uint   `json:"appId"`
 	App      App    `json:"app"`
-	FlushID  *int   `json:"flushId"`
+	FlushID  *uint  `json:"flushId"`
 	Flush    Flush  `json:"flush"`
 }
 
 type Objects []Object
 
 func (o *Object) CreateObject(db *gorm.DB) error {
-	if err := db.Create(&o).Error; err != nil {
-		return err
-	}
-	return nil
+	return db.Create(&o).Error
 }
 
 func (os *Objects) GetObjectsByAppID(db *gorm.DB, id uint) error {
-	clause := "flush_id IS NULL AND app_id = ?"
+	return db.Where(&Object{FlushID: nil, AppID: id}).Find(&os).Error
+}
 
-	if err := db.Where(clause, id).Find(&os).Error; err != nil {
-		return err
-	}
-	return nil
+func (os *Objects) GetObjectsByHash(db *gorm.DB, o *Object) error {
+	return db.Where(&Object{Hash: o.Hash, AppID: o.AppID}).Find(&os).Error
 }

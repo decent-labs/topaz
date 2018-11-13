@@ -11,7 +11,7 @@ type App struct {
 	Interval    int        `json:"interval"`
 	Name        string     `json:"name"`
 	LastFlushed *time.Time `json:"lastFlushed"`
-	UserID      int        `json:"userID"`
+	UserID      uint       `json:"userID"`
 	User        User       `json:"user"`
 	Flushes     []Flush    `json:"flushes"`
 	Objects     []Object   `json:"objects"`
