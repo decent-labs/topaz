@@ -15,19 +15,12 @@ type Object struct {
 type Objects []Object
 
 func (o *Object) CreateObject(db *gorm.DB) error {
-	if err := db.Create(&o).Error; err != nil {
-		return err
-	}
-	return nil
+	return db.Create(&o).Error
 }
 
 func (os *Objects) GetObjectsByAppID(db *gorm.DB, id uint) error {
 	clause := "flush_id IS NULL AND app_id = ?"
-
-	if err := db.Where(clause, id).Find(&os).Error; err != nil {
-		return err
-	}
-	return nil
+	return db.Where(clause, id).Find(&os).Error
 }
 
 func (os *Objects) GetObjectsByHash(db *gorm.DB, o *Object) error {
