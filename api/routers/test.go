@@ -7,12 +7,13 @@ import (
 	"github.com/urfave/negroni"
 )
 
-// SetAppsRoutes provisions routes for 'apps'
-func SetAppsRoutes(router *mux.Router) *mux.Router {
-	router.Handle("/apps",
+// SetTestRoutes provisions routes for our tests
+func SetTestRoutes(router *mux.Router) *mux.Router {
+	router.Handle("/test/hello",
 		negroni.New(
 			negroni.HandlerFunc(auth.Admin),
-			negroni.HandlerFunc(controllers.NewApp),
-		)).Methods("POST")
+			negroni.HandlerFunc(controllers.TestController),
+		)).Methods("GET")
+
 	return router
 }

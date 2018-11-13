@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/decentorganization/topaz/api/core/ethereum/contracts"
+	"github.com/decentorganization/topaz/shared/ethereum/contracts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -15,6 +15,7 @@ import (
 var auth *bind.TransactOpts
 var blockchain *ethclient.Client
 
+// Store takes a Capture Contract address and a hash to store on it
 func Store(address, hash string) (string, error) {
 	m, err := multihash.FromB58String(hash)
 	if err != nil {
@@ -47,6 +48,7 @@ func Store(address, hash string) (string, error) {
 	return transaction.Hash().Hex(), nil
 }
 
+// Deploy creates a new Capture Contract
 func Deploy() (string, error) {
 	address, _, _, err := contracts.DeployClientCapture(auth, blockchain)
 	return address.Hex(), err

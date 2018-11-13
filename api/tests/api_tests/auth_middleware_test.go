@@ -1,4 +1,4 @@
-package api_tests
+package tests
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/decentorganization/topaz/api/core/authentication"
+	"github.com/decentorganization/topaz/api/auth"
 	"github.com/decentorganization/topaz/api/routers"
 	"github.com/decentorganization/topaz/api/services"
 	"github.com/decentorganization/topaz/api/settings"
@@ -33,7 +33,7 @@ func (s *MiddlewaresTestSuite) SetUpSuite(c *C) {
 }
 
 func (s *MiddlewaresTestSuite) SetUpTest(c *C) {
-	authBackend := authentication.InitJWTAuthenticationBackend()
+	authBackend := auth.InitJWTAuthenticationBackend()
 	assert.NotNil(t, authBackend)
 	token, _ = authBackend.GenerateAdminToken("1234")
 
@@ -85,7 +85,7 @@ func (s *MiddlewaresTestSuite) TestAdminWithoutToken(c *C) {
 	assert.Equal(t, response.Code, http.StatusUnauthorized)
 }
 
-func (suite *MiddlewaresTestSuite) TestAdminAfterAdminLogout(c *C) {
+func (s *MiddlewaresTestSuite) TestAdminAfterAdminLogout(c *C) {
 	resource := "/test/hello"
 
 	requestLogout, _ := http.NewRequest("GET", resource, nil)

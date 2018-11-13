@@ -5,10 +5,11 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/decentorganization/topaz/api/models"
 	"github.com/decentorganization/topaz/api/services"
+	"github.com/decentorganization/topaz/shared/models"
 )
 
+// AdminLogin returns the result of an attempted login by an admin user
 func AdminLogin(w http.ResponseWriter, r *http.Request) {
 	requestUser := new(models.User)
 	decoder := json.NewDecoder(r.Body)
@@ -20,6 +21,7 @@ func AdminLogin(w http.ResponseWriter, r *http.Request) {
 	w.Write(token)
 }
 
+// AdminRefreshToken returns the result of an attempted token refresh by an admin user
 func AdminRefreshToken(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	requestUser := new(models.User)
 	decoder := json.NewDecoder(r.Body)
@@ -31,6 +33,7 @@ func AdminRefreshToken(w http.ResponseWriter, r *http.Request, next http.Handler
 	w.Write(token)
 }
 
+// AdminLogout returns the result of an attempted logout by an admin user
 func AdminLogout(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	err := services.AdminLogout(r)
 	w.Header().Set("Content-Type", "application/json")
@@ -41,6 +44,7 @@ func AdminLogout(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) 
 	}
 }
 
+// AppLogin returns the result of an attempted login by an 'app'
 func AppLogin(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	requestApp := new(models.App)
 	decoder := json.NewDecoder(r.Body)
@@ -53,6 +57,7 @@ func AppLogin(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	w.Write(token)
 }
 
+// AppRefreshToken returns the result of an attempted token refresh by an 'app'
 func AppRefreshToken(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	requestApp := new(models.App)
 	decoder := json.NewDecoder(r.Body)

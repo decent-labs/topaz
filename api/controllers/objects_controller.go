@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/decentorganization/topaz/api/models"
 	"github.com/decentorganization/topaz/api/services"
+	"github.com/decentorganization/topaz/shared/models"
 )
 
 func Trust(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {

@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"net/http"
 
-	auth "github.com/decentorganization/topaz/api/core/authentication"
-	"github.com/decentorganization/topaz/api/core/database"
-	"github.com/decentorganization/topaz/api/models"
+	"github.com/decentorganization/topaz/api/auth"
+	"github.com/decentorganization/topaz/shared/database"
+	"github.com/decentorganization/topaz/shared/models"
 )
 
+// NewUser creates a new 'User' in the database
 func NewUser(newUser *models.User) (int, []byte) {
 	if len(newUser.Email) == 0 || len(newUser.Password) == 0 || len(newUser.Name) == 0 {
 		return http.StatusBadRequest, []byte("bad email, password, or name")
@@ -33,6 +34,7 @@ func NewUser(newUser *models.User) (int, []byte) {
 	return http.StatusOK, response
 }
 
+// EditUser ...
 func EditUser(requestUser *models.User) (int, []byte) {
 	return http.StatusOK, []byte("")
 }

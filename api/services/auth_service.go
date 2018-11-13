@@ -5,11 +5,12 @@ import (
 	"net/http"
 	"strconv"
 
-	auth "github.com/decentorganization/topaz/api/core/authentication"
-	"github.com/decentorganization/topaz/api/core/database"
-	"github.com/decentorganization/topaz/api/models"
+	"github.com/decentorganization/topaz/api/auth"
+	"github.com/decentorganization/topaz/shared/database"
+	"github.com/decentorganization/topaz/shared/models"
 )
 
+// AdminLogin attempts to authenticate an admin user
 func AdminLogin(u *models.User) (int, []byte) {
 	suppliedPassword := u.Password
 
@@ -24,12 +25,14 @@ func AdminLogin(u *models.User) (int, []byte) {
 	return AdminRefreshToken(u)
 }
 
+// AdminRefreshToken attempts to refresh a JWT for an admin user
 func AdminRefreshToken(u *models.User) (int, []byte) {
 	return okToken(
 		auth.InitJWTAuthenticationBackend().GenerateAdminToken(
 			strconv.FormatUint(uint64(u.ID), 10)))
 }
 
+// AdminLogout attempts to logout an admin user
 func AdminLogout(r *http.Request) error {
 	token, err := auth.InitJWTAuthenticationBackend().GetToken(r)
 	if err != nil {
@@ -40,6 +43,7 @@ func AdminLogout(r *http.Request) error {
 	return auth.InitJWTAuthenticationBackend().Logout(tokenString, token)
 }
 
+// AppLogin attempts to authenticate an 'app' user
 func AppLogin(a *models.App) (int, []byte) {
 	if err := a.GetApp(database.Manager); err != nil {
 		return http.StatusUnauthorized, []byte("")
@@ -48,6 +52,7 @@ func AppLogin(a *models.App) (int, []byte) {
 	return AppRefreshToken(a)
 }
 
+// AppRefreshToken attempts to refresh a JWT for an 'app' user
 func AppRefreshToken(a *models.App) (int, []byte) {
 	return okToken(
 		auth.InitJWTAuthenticationBackend().GenerateAppToken(

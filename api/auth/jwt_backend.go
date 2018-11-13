@@ -1,4 +1,4 @@
-package authentication
+package auth
 
 import (
 	"bufio"
@@ -11,13 +11,14 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/decentorganization/topaz/api/core/redis"
-	"github.com/decentorganization/topaz/api/models"
 	"github.com/decentorganization/topaz/api/settings"
+	"github.com/decentorganization/topaz/shared/models"
+	"github.com/decentorganization/topaz/shared/redis"
 	jwt "github.com/dgrijalva/jwt-go"
 	request "github.com/dgrijalva/jwt-go/request"
 )
 
+// JWTAuthenticationBackend ...
 type JWTAuthenticationBackend struct {
 	privateKey *rsa.PrivateKey
 	PublicKey  *rsa.PublicKey
@@ -30,6 +31,7 @@ var (
 
 var authBackendInstance *JWTAuthenticationBackend
 
+// InitJWTAuthenticationBackend ...
 func InitJWTAuthenticationBackend() *JWTAuthenticationBackend {
 	if authBackendInstance == nil {
 		authBackendInstance = &JWTAuthenticationBackend{
@@ -41,6 +43,7 @@ func InitJWTAuthenticationBackend() *JWTAuthenticationBackend {
 	return authBackendInstance
 }
 
+// GenerateAdminToken ...
 func (backend *JWTAuthenticationBackend) GenerateAdminToken(userID string) (string, error) {
 	claims := models.AuthAdminClaims{
 		UserID:         userID,
@@ -50,6 +53,7 @@ func (backend *JWTAuthenticationBackend) GenerateAdminToken(userID string) (stri
 	return backend.generateToken(claims)
 }
 
+// GenerateAppToken ...
 func (backend *JWTAuthenticationBackend) GenerateAppToken(appID string) (string, error) {
 	claims := models.AuthAppClaims{
 		AppID:          appID,
@@ -78,11 +82,13 @@ func (backend *JWTAuthenticationBackend) generateToken(claims jwt.Claims) (strin
 	return tokenString, nil
 }
 
+// Authenticate ...
 func (backend *JWTAuthenticationBackend) Authenticate(suppliedPassword string, dbHash string) bool {
 	valid := CheckPasswordHash(suppliedPassword, dbHash)
 	return valid
 }
 
+// GetToken ...
 func (backend *JWTAuthenticationBackend) GetToken(req *http.Request) (*jwt.Token, error) {
 	token, err := request.ParseFromRequest(req, request.OAuth2Extractor, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
@@ -105,11 +111,13 @@ func (backend *JWTAuthenticationBackend) getTokenRemainingValidity(timestamp int
 	return expireOffset
 }
 
+// Logout ...
 func (backend *JWTAuthenticationBackend) Logout(tokenString string, token *jwt.Token) error {
 	redisConn := redis.Connect()
 	return redisConn.SetValue(tokenString, tokenString, backend.getTokenRemainingValidity(token.Claims.(jwt.MapClaims)["exp"]))
 }
 
+// IsInBlacklist ...
 func (backend *JWTAuthenticationBackend) IsInBlacklist(token string) bool {
 	redisConn := redis.Connect()
 	redisToken, _ := redisConn.GetValue(token)
@@ -128,7 +136,7 @@ func getPrivateKey() *rsa.PrivateKey {
 	}
 
 	pemfileinfo, _ := privateKeyFile.Stat()
-	var size int64 = pemfileinfo.Size()
+	size := pemfileinfo.Size()
 	pembytes := make([]byte, size)
 
 	buffer := bufio.NewReader(privateKeyFile)
@@ -154,7 +162,7 @@ func getPublicKey() *rsa.PublicKey {
 	}
 
 	pemfileinfo, _ := publicKeyFile.Stat()
-	var size int64 = pemfileinfo.Size()
+	size := pemfileinfo.Size()
 	pembytes := make([]byte, size)
 
 	buffer := bufio.NewReader(publicKeyFile)

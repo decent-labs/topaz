@@ -1,4 +1,4 @@
-package authentication
+package auth
 
 import (
 	"net/http"
@@ -39,10 +39,12 @@ func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, id s
 	}
 }
 
+// Admin ...
 func Admin(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	auth(rw, req, next, "userId")
 }
 
+// App ...
 func App(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	auth(rw, req, next, "appId")
 }

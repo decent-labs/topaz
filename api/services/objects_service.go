@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/decentorganization/topaz/api/core/database"
-	"github.com/decentorganization/topaz/api/core/ipfs"
-	"github.com/decentorganization/topaz/api/models"
+	"github.com/decentorganization/topaz/shared/database"
+	"github.com/decentorganization/topaz/shared/ipfs"
+	"github.com/decentorganization/topaz/shared/models"
 )
 
+// Trust adds data to ipfs and creates a new 'object' in the database
 func Trust(newObject *models.Object) (int, []byte) {
 	if len(newObject.DataBlob) == 0 {
 		return http.StatusBadRequest, []byte("no data")

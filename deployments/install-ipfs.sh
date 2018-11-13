@@ -15,14 +15,14 @@ cat > ipfs.service <<EOL
 [Unit]
 Description=ipfs
 [Service]
-ExecStart=/usr/local/bin/ipfs daemon --enable-gc
+ExecStart=/usr/local/bin/shared/ipfs daemon --enable-gc
 Restart=always
 User=ec2-user
 [Install]
 WantedBy=multi-user.target
 EOL
 
-sudo mv ipfs.service /lib/systemd/system/ipfs.service
+sudo mv ipfs.service /lib/systemd/system/shared/ipfs.service
 sudo systemctl daemon-reload
 sudo systemctl enable ipfs
 sudo systemctl start ipfs
