@@ -1,6 +1,13 @@
 version: "3"
 
 services:
+  ## the database service provides the topaz database
+  database:
+    build:
+      context: ./
+      dockerfile: Dockerfile-database
+    ports:
+      - "${DB_PORT}:5432"
   ## the ipfs service provides dedicated access to ipfs
   ipfs:
     image: ipfs/go-ipfs:v0.4.17
@@ -8,20 +15,16 @@ services:
       - "${IPFS_PORT}:5001"
       - "4001:4001"
     volumes:
-      - "./data:/data/ipfs"
-      - "./staging:/export"
-  ## the postgres service provides the topaz database
-  postgres:
-    build:
-      context: ./
-      dockerfile: Dockerfile-postgres
-    ports:
-      - "${PQ_PORT}:5432"
+      - "./shared/ipfs/data:/data/shared/ipfs"
+      - "./shared/ipfs/staging:/export"
   ## the redis store provides to track blacklisted or expired JWTs
   redis:
     image: 'redis:5.0-alpine'
     command: redis-server --requirepass ${REDIS_PASSWORD}
+    ports:
+      - "${REDIS_PORT}:6379"
     volumes:
       - 'redis:/data'
+
 volumes:
   redis:
