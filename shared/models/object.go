@@ -19,8 +19,7 @@ func (o *Object) CreateObject(db *gorm.DB) error {
 }
 
 func (os *Objects) GetObjectsByAppID(db *gorm.DB, id uint) error {
-	clause := "flush_id IS NULL AND app_id = ?"
-	return db.Where(clause, id).Find(&os).Error
+	return db.Where(&Object{FlushID: nil, AppID: id}).Find(&os).Error
 }
 
 func (os *Objects) GetObjectsByHash(db *gorm.DB, o *Object) error {
