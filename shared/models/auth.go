@@ -16,7 +16,7 @@ type CreateAdminTokenRequest struct {
 }
 
 type CreateAppTokenRequest struct {
-	AppId int `json:"appId"`
+	AppID int `json:"appId"`
 }
 
 type AuthAdminClaims struct {
