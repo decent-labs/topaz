@@ -22,3 +22,17 @@ func Trust(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	w.WriteHeader(responseStatus)
 	w.Write(app)
 }
+
+func Verify(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	bytes, _ := ioutil.ReadAll(r.Body)
+
+	requestObject := new(models.Object)
+	appID, _ := strconv.Atoi(r.Header.Get("appId"))
+	requestObject.AppID = uint(appID)
+	requestObject.DataBlob = bytes
+
+	responseStatus, app := services.Verify(requestObject)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(responseStatus)
+	w.Write(app)
+}
