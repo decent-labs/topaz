@@ -8,8 +8,8 @@ type Object struct {
 	Hash     string `json:"hash"`
 	AppID    uint   `json:"appId"`
 	App      App    `json:"app"`
-	FlushID  *uint  `json:"flushId"`
-	Flush    Flush  `json:"flush"`
+	BatchID  *uint  `json:"batchId"`
+	Batch    Batch  `json:"batch"`
 }
 
 type Objects []Object
@@ -19,7 +19,8 @@ func (o *Object) CreateObject(db *gorm.DB) error {
 }
 
 func (os *Objects) GetObjectsByAppID(db *gorm.DB, id uint) error {
-	return db.Where(&Object{FlushID: nil, AppID: id}).Find(&os).Error
+	clause := "batch_id IS NULL AND app_id = ?"
+	return db.Where(clause, id).Find(&os).Error
 }
 
 func (os *Objects) GetObjectsByHash(db *gorm.DB, o *Object) error {

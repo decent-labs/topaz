@@ -10,10 +10,10 @@ type App struct {
 	gorm.Model
 	Interval    int        `json:"interval"`
 	Name        string     `json:"name"`
-	LastFlushed *time.Time `json:"lastFlushed"`
+	LastBatched *time.Time `json:"lastBatched"`
 	UserID      uint       `json:"userID"`
 	User        User       `json:"user"`
-	Flushes     []Flush    `json:"flushes"`
+	Batches     []Batch    `json:"batches"`
 	Objects     []Object   `json:"objects"`
 	EthAddress  string     `json:"ethAddress"`
 }
@@ -35,7 +35,7 @@ func (a *App) GetApp(db *gorm.DB) error {
 }
 
 func (as *Apps) GetAppsToBatch(db *gorm.DB) error {
-	clause := "last_flushed IS NULL OR NOW() - last_flushed >= interval * '1 second'::interval"
+	clause := "last_batched IS NULL OR NOW() - last_batched >= interval * '1 second'::interval"
 
 	if err := db.Where(clause).Find(&as).Error; err != nil {
 		return err

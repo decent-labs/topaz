@@ -17,12 +17,12 @@ CREATE TABLE apps (
     deleted_at TIMESTAMP,
     interval INTEGER NOT NULL,
     name CHARACTER varying(255) NOT NULL,
-    last_flushed TIMESTAMP,
+    last_batched TIMESTAMP,
     user_id INTEGER REFERENCES users(id),
     eth_address CHARACTER varying(255) NOT NULL
 );
 
-CREATE TABLE flushes (
+CREATE TABLE batches (
     id BIGSERIAL PRIMARY KEY,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
@@ -40,9 +40,9 @@ CREATE TABLE objects (
     data_blob BYTEA NOT NULL,
     hash CHARACTER varying(255) NOT NULL,
     app_id INT REFERENCES apps(id),
-    flush_id INT
+    batch_id INT
 );
 
 -- +migrate Down
 
-DROP TABLE objects, flushes, apps, users;
+DROP TABLE objects, batches, apps, users;
