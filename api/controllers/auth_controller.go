@@ -50,7 +50,8 @@ func AppLogin(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&requestApp)
 
-	requestApp.UserID, _ = strconv.Atoi(r.Header.Get("userId"))
+	userID, _ := strconv.Atoi(r.Header.Get("userId"))
+	requestApp.UserID = uint(userID)
 	responseStatus, token := services.AppLogin(requestApp)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(responseStatus)

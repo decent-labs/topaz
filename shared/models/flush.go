@@ -6,7 +6,7 @@ type Flush struct {
 	gorm.Model
 	DirectoryHash  string
 	EthTransaction string
-	AppID          int
+	AppID          uint
 	App            App
 	Objects        []Object
 }
