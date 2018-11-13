@@ -1,28 +1,34 @@
-# topaz
+# Topaz
 
-## getting started
+Topaz is a platform for api-based blockchain interaction
+
+## Getting Started
+
+### Spin up external services
 
 ```sh
 $ docker-compose up
 ```
 
-```sh
-$ go run api/main.go
-```
-
-## run batch process
-
-```sh
-$ go run batch/main.go
-```
-
-## run migrations
+### Run DB migrations if you have to
 
 ```sh
 $ go run migrations/main.go
 ```
 
-## where you at?
+### Start the API
+
+```sh
+$ go run api/main.go
+```
+
+### Begin the batch process
+
+```sh
+$ go run batch/main.go
+```
+
+## Where you at?
 
 Made with :heart: in:
 * British Airways Flight 1575
