@@ -25,7 +25,7 @@ func (a *App) CreateApp(db *gorm.DB) error {
 }
 
 func (a *App) GetApp(db *gorm.DB) error {
-	return db.Where("id = ? AND user_id = ?", a.ID, a.UserID).First(&a).Error
+	return db.Model(&a).Related(&a.User).First(&a).Error
 }
 
 func (as *Apps) GetAppsToBatch(db *gorm.DB) error {
