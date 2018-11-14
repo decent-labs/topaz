@@ -21,32 +21,20 @@ type App struct {
 type Apps []App
 
 func (a *App) CreateApp(db *gorm.DB) error {
-	if err := db.Create(&a).Error; err != nil {
-		return err
-	}
-	return nil
+	return db.Create(&a).Error
 }
 
 func (a *App) GetApp(db *gorm.DB) error {
-	if err := db.Where("id = ? AND user_id = ?", a.ID, a.UserID).First(&a).Error; err != nil {
-		return err
-	}
-	return nil
+	return db.Where("id = ? AND user_id = ?", a.ID, a.UserID).First(&a).Error
 }
 
 func (as *Apps) GetAppsToBatch(db *gorm.DB) error {
 	// TODO: Fix query
 	// clause := "last_batched IS NULL OR NOW() - last_batched >= interval * '1 second'::interval"
 
-	if err := db.Find(&as).Error; err != nil {
-		return err
-	}
-	return nil
+	return db.Find(&as).Error
 }
 
 func (a *App) UpdateApp(db *gorm.DB) error {
-	if err := db.Save(a).Error; err != nil {
-		return err
-	}
-	return nil
+	return db.Save(a).Error
 }
