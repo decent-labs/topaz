@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"time"
 
 	"github.com/decentorganization/topaz/shared/database"
 	"github.com/decentorganization/topaz/shared/ethereum"
@@ -71,7 +72,8 @@ func batch(a models.App, objs models.Objects, root string, tx string) {
 		}
 	}
 
-	a.LastBatched = &b.CreatedAt
+	ut := time.Now().Unix()
+	a.LastBatched = &ut
 	if err := a.UpdateApp(database.Manager); err != nil {
 		log.Printf("couldn't update app in database: %s", err.Error())
 	}
