@@ -25,10 +25,8 @@ func (a *App) GetApp(db *gorm.DB) error {
 }
 
 func (as *Apps) GetAppsToBatch(db *gorm.DB) error {
-	// TODO: Fix query
-	// clause := "last_batched IS NULL OR NOW() - last_batched >= interval * '1 second'::interval"
-
-	return db.Find(&as).Error
+	clause := "last_batched is null or (extract(epoch from now()) - last_batched >= interval)"
+	return db.Where(clause).Find(&as).Error
 }
 
 func (a *App) UpdateApp(db *gorm.DB) error {
