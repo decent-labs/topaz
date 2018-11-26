@@ -27,7 +27,7 @@ CREATE TABLE batches (
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
     deleted_at TIMESTAMP,
-    app_id INT REFERENCES apps(id),
+    app_id INTEGER REFERENCES apps(id),
     directory_hash CHARACTER varying(255) NOT NULL,
     eth_transaction CHARACTER varying(255) NOT NULL
 );
@@ -39,8 +39,8 @@ CREATE TABLE objects (
     deleted_at TIMESTAMP,
     data_blob BYTEA NOT NULL,
     hash CHARACTER varying(255) NOT NULL,
-    app_id INT REFERENCES apps(id),
-    batch_id INT
+    app_id INTEGER REFERENCES apps(id),
+    batch_id INTEGER
 );
 
 -- +migrate Down
