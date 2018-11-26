@@ -31,6 +31,16 @@ CREATE TABLE batches (
     unix_timestamp INTEGER NOT NULL
 );
 
+CREATE TABLE proofs (
+    id BIGSERIAL PRIMARY KEY,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
+    deleted_at TIMESTAMP,
+    batch_id INTEGER REFERENCES batches(id),
+    directory_hash CHARACTER varying(255) NOT NULL,
+    eth_transaction CHARACTER varying(255) NOT NULL
+);
+
 CREATE TABLE objects (
     id BIGSERIAL PRIMARY KEY,
     created_at TIMESTAMP NOT NULL,
