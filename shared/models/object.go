@@ -8,8 +8,8 @@ type Object struct {
 	Hash     string `json:"hash"`
 	AppID    uint   `json:"appId"`
 	App      App    `json:"app"`
-	BatchID  *uint  `json:"batchId"`
-	Batch    Batch  `json:"batch"`
+	ProofID  *uint  `json:"proofId"`
+	Proof    Proof  `json:"proof"`
 }
 
 type Objects []Object
@@ -19,7 +19,7 @@ func (o *Object) CreateObject(db *gorm.DB) error {
 }
 
 func (os *Objects) GetObjectsByAppID(db *gorm.DB, id uint) error {
-	clause := "batch_id IS NULL AND app_id = ?"
+	clause := "proof_id IS NULL AND app_id = ?"
 	return db.Where(clause, id).Find(&os).Error
 }
 

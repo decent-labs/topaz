@@ -49,7 +49,7 @@ CREATE TABLE objects (
     data_blob BYTEA NOT NULL,
     hash CHARACTER varying(255) NOT NULL,
     app_id INTEGER REFERENCES apps(id),
-    batch_id INTEGER
+    proof_id INTEGER
 );
 
 -- +migrate Down
