@@ -5,11 +5,10 @@ import "github.com/jinzhu/gorm"
 // Batch represents a collection of objects prepared for IPFS and Ethereum
 type Batch struct {
 	gorm.Model
-	DirectoryHash  string
-	EthTransaction string
-	AppID          uint
-	App            App
-	Objects        []Object
+	UnixTimestamp int64
+	AppID         uint
+	App           App
+	Objects       []Object
 }
 
 // CreateBatch creates a new entry in our database for a 'batch'

@@ -28,8 +28,7 @@ CREATE TABLE batches (
     updated_at TIMESTAMP NOT NULL,
     deleted_at TIMESTAMP,
     app_id INTEGER REFERENCES apps(id),
-    directory_hash CHARACTER varying(255) NOT NULL,
-    eth_transaction CHARACTER varying(255) NOT NULL
+    unix_timestamp INTEGER NOT NULL
 );
 
 CREATE TABLE objects (
