@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"time"
 
 	"github.com/decentorganization/topaz/shared/database"
@@ -10,81 +10,110 @@ import (
 	"github.com/decentorganization/topaz/shared/models"
 )
 
-func getAppsToBatch() models.Apps {
+func getAppsToBatch() (models.Apps, error) {
 	apps := new(models.Apps)
-	if err := apps.GetAppsToBatch(database.Manager); err != nil {
-		log.Fatalf("couldn't get apps to batch: %s", err.Error())
-	}
-
-	return *apps
+	err := apps.GetAppsToBatch(database.Manager)
+	return *apps, err
 }
 
-func getObjectsToBatch(app models.App) models.Objects {
+func makeBatch(a models.App) (models.Batch, error) {
+	ut := time.Now().Unix()
+
+	b := models.Batch{
+		AppID:         a.ID,
+		UnixTimestamp: ut,
+	}
+
+	if err := b.CreateBatch(database.Manager); err != nil {
+		return b, err
+	}
+
+	a.LastBatched = &ut
+	if err := a.UpdateApp(database.Manager); err != nil {
+		return b, err
+	}
+
+	return b, nil
+}
+
+func getObjectsToBatch(app models.App) (models.Objects, error) {
 	objects := new(models.Objects)
-	if err := objects.GetObjectsByAppID(database.Manager, app.ID); err != nil {
-		log.Fatalf("couldn't get objects to batch: %s", err.Error())
-	}
-
-	return *objects
+	err := objects.GetObjectsByAppID(database.Manager, app.ID)
+	return *objects, err
 }
 
-func createTree(objs models.Objects) string {
+func createTree(objs models.Objects) (string, error) {
 	root, err := ipfs.NewObject("unixfs-dir")
 	if err != nil {
-		log.Fatalf("couldn't create new ipfs object: %s", err.Error())
+		return root, err
 	}
 
 	for _, obj := range objs {
 		root, err = ipfs.PatchLink(root, obj.Hash, obj.Hash, true)
 		if err != nil {
-			log.Fatalf("couldn't patchlink ipfs object: %s", err.Error())
+			return root, err
 		}
 	}
 
-	return root
+	return root, nil
 }
 
-func storeInCaptureContract(ethAddress string, root string) string {
-	tx, err := ethereum.Store(ethAddress, root)
-	if err != nil {
-		log.Fatalf("couldn't store hash in Capture contract: %s", err.Error())
-	}
-
-	return tx
-}
-
-func batch(a models.App, objs models.Objects, root string, tx string) {
-	b := models.Batch{
+func makeProof(objs models.Objects, batch models.Batch, root string, tx string) (models.Proof, error) {
+	p := models.Proof{
+		BatchID:        batch.ID,
 		DirectoryHash:  root,
 		EthTransaction: tx,
-		App:            a,
 	}
 
-	if err := b.CreateBatch(database.Manager); err != nil {
-		log.Fatalf("couln't create batch in database: %s", err.Error())
+	if err := p.CreateProof(database.Manager); err != nil {
+		return p, err
 	}
 
 	for _, obj := range objs {
-		obj.BatchID = &b.ID
-
+		obj.ProofID = &p.ID
 		if err := obj.UpdateObject(database.Manager); err != nil {
-			log.Printf("couldn't update object in database: %s", err.Error())
+			return p, err
 		}
 	}
 
-	ut := time.Now().Unix()
-	a.LastBatched = &ut
-	if err := a.UpdateApp(database.Manager); err != nil {
-		log.Printf("couldn't update app in database: %s", err.Error())
-	}
+	return p, nil
 }
 
 func main() {
-	for _, a := range getAppsToBatch() {
-		objs := getObjectsToBatch(a)
-		root := createTree(objs)
-		tx := storeInCaptureContract(a.EthAddress, root)
+	apps, err := getAppsToBatch()
+	if err != nil {
+		panic(fmt.Sprintf("didn't get apps to batch: %s" + err.Error()))
+	}
 
-		batch(a, objs, root, tx)
+	for _, a := range apps {
+		b, err := makeBatch(a)
+		if err != nil {
+			panic("didn't create batch record")
+		}
+
+		objs, err := getObjectsToBatch(a)
+		if err != nil {
+			panic("couldn't get objects to bacth")
+		}
+
+		if len(objs) == 0 {
+			// no objects to batch
+			continue
+		}
+
+		root, err := createTree(objs)
+		if err != nil {
+			panic("couldn't create hash tree")
+		}
+
+		tx, err := ethereum.Store(a.EthAddress, root)
+		if err != nil {
+			panic("couldn't store in contract")
+		}
+
+		_, err = makeProof(objs, b, root, tx)
+		if err != nil {
+			panic("couldn't create proof")
+		}
 	}
 }
