@@ -79,7 +79,7 @@ func makeProof(objs models.Objects, batch models.Batch, root string, tx string) 
 	return p, nil
 }
 
-func main() {
+func mainLoop() {
 	apps, err := getAppsToBatch()
 	if err != nil {
 		panic(fmt.Sprintf("didn't get apps to batch: %s" + err.Error()))
@@ -114,6 +114,16 @@ func main() {
 		_, err = makeProof(objs, b, root, tx)
 		if err != nil {
 			panic("couldn't create proof")
+		}
+	}
+}
+
+func main() {
+	tick := time.Tick(1 * time.Second)
+	for {
+		select {
+		case <-tick:
+			mainLoop()
 		}
 	}
 }
