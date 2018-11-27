@@ -45,7 +45,7 @@ func AdminLogout(r *http.Request) error {
 
 // AppLogin attempts to authenticate an 'app' user
 func AppLogin(a *models.App) (int, []byte) {
-	if err := a.GetApp(database.Manager); err != nil {
+	if err := a.FindApp(database.Manager); err != nil {
 		return http.StatusUnauthorized, []byte("")
 	}
 

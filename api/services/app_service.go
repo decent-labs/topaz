@@ -31,10 +31,6 @@ func NewApp(newApp *models.App) (int, []byte) {
 		return http.StatusInternalServerError, []byte(err.Error())
 	}
 
-	if err := a.GetApp(database.Manager); err != nil {
-		return http.StatusInternalServerError, []byte(err.Error())
-	}
-
 	response, _ := json.Marshal(a)
 	return http.StatusOK, response
 }

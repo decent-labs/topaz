@@ -23,8 +23,8 @@ func (a *App) CreateApp(db *gorm.DB) error {
 	return db.Create(&a).Error
 }
 
-func (a *App) GetApp(db *gorm.DB) error {
-	return db.Model(&a).Related(&a.User).First(&a).Error
+func (a *App) FindApp(db *gorm.DB) error {
+	return db.First(&a).Error
 }
 
 func (as *Apps) GetAppsToBatch(db *gorm.DB) error {
