@@ -17,7 +17,7 @@ func Add(data []byte) (string, error) {
 
 // Hash the given data without adding it to IPFS
 func Hash(data []byte) (string, error) {
-	return sh.AddOnlyHash(bytes.NewReader(data))
+	return sh.Add(bytes.NewReader(data), shell.OnlyHash(true))
 }
 
 // NewObject creates a new IPFS object based on the object template provided i.e. "unixfs-dir"
