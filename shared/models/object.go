@@ -1,6 +1,8 @@
 package models
 
-import "github.com/jinzhu/gorm"
+import (
+	"github.com/jinzhu/gorm"
+)
 
 type Object struct {
 	gorm.Model
@@ -25,8 +27,8 @@ func (os *Objects) GetObjectsByAppID(db *gorm.DB, id uint) error {
 	return db.Where(clause, id).Find(&os).Error
 }
 
-func (os *Objects) GetObjectsByHash(db *gorm.DB, o *Object) error {
-	return db.Preload("Proof.Batch").Where(&Object{Hash: o.Hash, AppID: o.AppID}).Find(&os).Error
+func (os *Objects) GetObjects(db *gorm.DB, o *Object) error {
+	return db.Preload("Proof.Batch").Where(o).Find(&os).Error
 }
 
 func (os Objects) UpdateProof(db *gorm.DB, proofID *uint) error {

@@ -6,32 +6,23 @@ import (
 	"strconv"
 
 	"github.com/decentorganization/topaz/api/services"
-	"github.com/decentorganization/topaz/shared/models"
 )
 
 func Trust(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	bytes, _ := ioutil.ReadAll(r.Body)
-
-	requestObject := new(models.Object)
 	appID, _ := strconv.Atoi(r.Header.Get("appId"))
-	requestObject.AppID = uint(appID)
-	requestObject.DataBlob = bytes
+	body, _ := ioutil.ReadAll(r.Body)
 
-	responseStatus, app := services.Trust(requestObject)
+	responseStatus, app := services.Trust(uint(appID), body)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(responseStatus)
 	w.Write(app)
 }
 
 func Verify(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	bytes, _ := ioutil.ReadAll(r.Body)
-
-	requestObject := new(models.Object)
 	appID, _ := strconv.Atoi(r.Header.Get("appId"))
-	requestObject.AppID = uint(appID)
-	requestObject.DataBlob = bytes
+	body, _ := ioutil.ReadAll(r.Body)
 
-	responseStatus, app := services.Verify(requestObject)
+	responseStatus, app := services.Verify(uint(appID), body)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(responseStatus)
 	w.Write(app)
