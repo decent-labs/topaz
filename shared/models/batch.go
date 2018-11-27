@@ -2,16 +2,19 @@ package models
 
 import "github.com/jinzhu/gorm"
 
-// Batch represents a collection of objects prepared for IPFS and Ethereum
 type Batch struct {
 	gorm.Model
-	UnixTimestamp int64
-	AppID         uint
-	App           App
-	Objects       []Object
+
+	UnixTimestamp int64 `json:"unixTimestamp"`
+
+	AppID uint `json:"appId"`
+	App   *App `json:"app,omitempty"`
+
+	Objects *Objects `json:"objects,omitempty"`
 }
 
-// CreateBatch creates a new entry in our database for a 'batch'
+type Batches []Batch
+
 func (b *Batch) CreateBatch(db *gorm.DB) error {
 	if err := db.Create(&b).Error; err != nil {
 		return err

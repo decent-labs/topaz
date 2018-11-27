@@ -4,12 +4,14 @@ import "github.com/jinzhu/gorm"
 
 type Object struct {
 	gorm.Model
+
 	DataBlob []byte `json:"dataBlob"`
 	Hash     string `json:"hash"`
-	AppID    uint   `json:"appId"`
-	App      App    `json:"app"`
-	ProofID  *uint  `json:"proofId"`
-	Proof    Proof  `json:"proof"`
+
+	AppID   uint   `json:"appId"`
+	App     *App   `json:"app,omitempty"`
+	ProofID *uint  `json:"proofId"`
+	Proof   *Proof `json:"proof,omitempty"`
 }
 
 type Objects []Object
