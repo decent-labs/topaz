@@ -81,42 +81,49 @@ func makeProof(objs models.Objects, batch models.Batch, root string, tx string) 
 func newObjectsFlow(a models.App, os models.Objects) {
 	root, err := createTree(os)
 	if err != nil {
-		panic("couldn't create hash tree")
+		fmt.Errorf("couldn't create hash tree: " + err.Error())
+		return
 	}
 
 	tx, err := ethereum.Store(a.EthAddress, root)
 	if err != nil {
-		panic("couldn't store in contract")
+		fmt.Errorf("couldn't store in contract: " + err.Error())
+		return
 	}
 
 	b, err := makeBatch(a)
 	if err != nil {
-		panic("didn't create batch record")
+		fmt.Errorf("didn't create batch record: " + err.Error())
+		return
 	}
 
 	_, err = makeProof(os, b, root, tx)
 	if err != nil {
-		panic("couldn't create proof")
+		fmt.Errorf("couldn't create proof: " + err.Error())
+		return
 	}
 }
 
 func noObjectsFlow(a models.App) {
 	_, err := makeBatch(a)
 	if err != nil {
-		panic("didn't create batch record")
+		fmt.Errorf("didn't create batch record: " + err.Error())
+		return
 	}
 }
 
 func mainLoop() {
 	apps, err := getAppsToBatch()
 	if err != nil {
-		panic(fmt.Sprintf("didn't get apps to batch: %s" + err.Error()))
+		fmt.Errorf("didn't get apps to batch: " + err.Error())
+		return
 	}
 
 	for _, a := range apps {
 		objs, err := getObjectsToBatch(a)
 		if err != nil {
-			panic("couldn't get objects to bacth")
+			fmt.Errorf("couldn't get objects to bacth: " + err.Error())
+			return
 		}
 
 		if len(objs) > 0 {
