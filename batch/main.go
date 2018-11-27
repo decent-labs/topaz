@@ -71,11 +71,8 @@ func makeProof(objs models.Objects, batch models.Batch, root string, tx string) 
 		return p, err
 	}
 
-	for _, obj := range objs {
-		obj.ProofID = &p.ID
-		if err := obj.UpdateObject(database.Manager); err != nil {
-			return p, err
-		}
+	if err := objs.UpdateProof(database.Manager, &p.ID); err != nil {
+		return p, err
 	}
 
 	return p, nil
