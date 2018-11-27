@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"strconv"
 	"time"
 
 	"github.com/decentorganization/topaz/shared/database"
@@ -119,7 +121,8 @@ func mainLoop() {
 }
 
 func main() {
-	tick := time.Tick(1 * time.Second)
+	i, _ := strconv.Atoi(os.Getenv("BATCH_TICKER"))
+	tick := time.Tick(time.Duration(i) * time.Second)
 	for {
 		select {
 		case <-tick:
