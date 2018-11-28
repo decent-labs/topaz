@@ -26,7 +26,7 @@ func (os *Objects) GetObjectsByAppID(db *gorm.DB, id uint) error {
 }
 
 func (os *Objects) GetObjectsByHash(db *gorm.DB, o *Object) error {
-	return db.Where(&Object{Hash: o.Hash, AppID: o.AppID}).Find(&os).Error
+	return db.Preload("Proof.Batch").Where(&Object{Hash: o.Hash, AppID: o.AppID}).Find(&os).Error
 }
 
 func (os Objects) UpdateProof(db *gorm.DB, proofID *uint) error {
