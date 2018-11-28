@@ -8,7 +8,6 @@ import (
 
 	"github.com/decentorganization/topaz/shared/database"
 	"github.com/decentorganization/topaz/shared/ethereum"
-	"github.com/decentorganization/topaz/shared/ipfs"
 	"github.com/decentorganization/topaz/shared/models"
 )
 
@@ -44,22 +43,6 @@ func getObjectsToBatch(app models.App) (models.Objects, error) {
 	return *objects, err
 }
 
-func createTree(objs models.Objects) (string, error) {
-	root, err := ipfs.NewObject("unixfs-dir")
-	if err != nil {
-		return root, err
-	}
-
-	for _, obj := range objs {
-		root, err = ipfs.PatchLink(root, obj.Hash, obj.Hash, true)
-		if err != nil {
-			return root, err
-		}
-	}
-
-	return root, nil
-}
-
 func makeProof(objs models.Objects, batch models.Batch, root string, tx string) (models.Proof, error) {
 	p := models.Proof{
 		BatchID:        batch.ID,
@@ -79,7 +62,6 @@ func makeProof(objs models.Objects, batch models.Batch, root string, tx string) 
 }
 
 func newObjectsFlow(a models.App, os models.Objects) {
-	root, err := createTree(os)
 	if err != nil {
 		fmt.Errorf("couldn't create hash tree: " + err.Error())
 		return

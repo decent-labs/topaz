@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/decentorganization/topaz/shared/database"
-	"github.com/decentorganization/topaz/shared/ipfs"
 	"github.com/decentorganization/topaz/shared/models"
 )
 
@@ -16,14 +15,9 @@ func Trust(appId uint, dataBlob []byte) (int, []byte) {
 		return http.StatusBadRequest, []byte("no data")
 	}
 
-	hash, err := ipfs.Add(dataBlob)
-	if err != nil {
-		return http.StatusInternalServerError, []byte(err.Error())
-	}
-
 	o := models.Object{
 		DataBlob:      dataBlob,
-		Hash:          hash,
+		Hash:          "",
 		AppID:         appId,
 		UnixTimestamp: time.Now().Unix(),
 	}
@@ -37,14 +31,9 @@ func Trust(appId uint, dataBlob []byte) (int, []byte) {
 }
 
 func Verify(appId uint, dataBlob []byte) (int, []byte) {
-	hash, err := ipfs.Hash(dataBlob)
-	if err != nil {
-		return http.StatusInternalServerError, []byte(err.Error())
-	}
-
 	o := models.Object{
 		AppID: appId,
-		Hash:  hash,
+		Hash:  "",
 	}
 
 	os := new(models.Objects)
