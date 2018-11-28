@@ -7,7 +7,7 @@ type App struct {
 
 	Interval    int    `json:"interval"`
 	Name        string `json:"name"`
-	LastBatched *int64 `json:"lastBatched"`
+	LastBatched *int64 `json:"-"`
 	EthAddress  string `json:"ethAddress"`
 
 	UserID uint  `json:"userId"`
