@@ -62,6 +62,7 @@ func makeProof(objs models.Objects, batch models.Batch, root string, tx string) 
 }
 
 func newObjectsFlow(a models.App, os models.Objects) {
+	root, err := os.GetMerkleRoot()
 	if err != nil {
 		fmt.Errorf("couldn't create hash tree: " + err.Error())
 		return

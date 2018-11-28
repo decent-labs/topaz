@@ -1,7 +1,13 @@
 package models
 
 import (
+	"bytes"
+	"crypto/sha256"
+
+	"github.com/cbergoon/merkletree"
 	"github.com/jinzhu/gorm"
+
+	multihash "github.com/multiformats/go-multihash"
 )
 
 type Object struct {
@@ -18,6 +24,34 @@ type Object struct {
 }
 
 type Objects []Object
+
+func (o Object) CalculateHash() ([]byte, error) {
+	h := sha256.New()
+	if _, err := h.Write(o.DataBlob); err != nil {
+		return nil, err
+	}
+
+	return h.Sum(nil), nil
+}
+
+func (o Object) Equals(other merkletree.Content) (bool, error) {
+	return bytes.Compare(o.DataBlob, other.(Object).DataBlob) == 0, nil
+}
+
+func (os Objects) GetMerkleRoot() (string, error) {
+	var list []merkletree.Content
+	for _, obj := range os {
+		list = append(list, obj)
+	}
+
+	t, err := merkletree.NewTree(list)
+	if err != nil {
+		return "", err
+	}
+
+	root := t.MerkleRoot()
+	return getReadableHash(root)
+}
 
 func (o *Object) CreateObject(db *gorm.DB) error {
 	return db.Create(&o).Error
@@ -47,4 +81,18 @@ func (os *Objects) GetObjectsByTimestamps(db *gorm.DB, appId uint, start int, en
 		Where("unix_timestamp BETWEEN (?) AND (?)", start, end).
 		Find(&os).
 		Error
+}
+
+func getReadableHash(digest []byte) (string, error) {
+	mhBuf, err := multihash.Encode(digest, multihash.SHA2_256)
+	if err != nil {
+		return "", err
+	}
+
+	mh, err := multihash.Cast(mhBuf)
+	if err != nil {
+		return "", err
+	}
+
+	return mh.B58String(), nil
 }
