@@ -3,6 +3,7 @@ package services
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/decentorganization/topaz/shared/database"
 	"github.com/decentorganization/topaz/shared/ipfs"
@@ -21,9 +22,10 @@ func Trust(appId uint, dataBlob []byte) (int, []byte) {
 	}
 
 	o := models.Object{
-		DataBlob: dataBlob,
-		Hash:     hash,
-		AppID:    appId,
+		DataBlob:      dataBlob,
+		Hash:          hash,
+		AppID:         appId,
+		UnixTimestamp: time.Now().Unix(),
 	}
 
 	if err := o.CreateObject(database.Manager); err != nil {

@@ -48,10 +48,11 @@ CREATE TABLE objects (
     deleted_at TIMESTAMP,
     data_blob BYTEA NOT NULL,
     hash CHARACTER varying(255) NOT NULL,
+    unix_timestamp INTEGER NOT NULL,
     app_id INTEGER REFERENCES apps(id),
     proof_id INTEGER
 );
 
 -- +migrate Down
 
-DROP TABLE objects, batches, apps, users;
+DROP TABLE objects, batches, apps, users, proofs;

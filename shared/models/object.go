@@ -7,8 +7,9 @@ import (
 type Object struct {
 	gorm.Model
 
-	DataBlob []byte `json:"dataBlob"`
-	Hash     string `json:"hash"`
+	DataBlob      []byte `json:"dataBlob"`
+	Hash          string `json:"hash"`
+	UnixTimestamp int64  `json:"unixTimestamp"`
 
 	AppID   uint   `json:"appId"`
 	App     *App   `json:"app,omitempty"`
@@ -42,10 +43,8 @@ func (os Objects) UpdateProof(db *gorm.DB, proofID *uint) error {
 func (os *Objects) GetObjectsByTimestamps(db *gorm.DB, appId uint, start int, end int) error {
 	return db.
 		Preload("Proof.Batch").
-		Joins("JOIN batches ON batches.app_id = (?)", appId).
-		Joins("JOIN proofs ON proofs.batch_id = batches.id").
-		Where("proof_id = proofs.id").
-		Where("batches.unix_timestamp BETWEEN (?) AND (?)", start, end).
+		Where("app_id = ?", appId).
+		Where("unix_timestamp BETWEEN (?) AND (?)", start, end).
 		Find(&os).
 		Error
 }
