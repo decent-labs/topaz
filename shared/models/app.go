@@ -4,14 +4,17 @@ import "github.com/jinzhu/gorm"
 
 type App struct {
 	gorm.Model
-	Interval    int      `json:"interval"`
-	Name        string   `json:"name"`
-	LastBatched *int64   `json:"lastBatched"`
-	UserID      uint     `json:"userID"`
-	User        User     `json:"user"`
-	Batches     []Batch  `json:"batches"`
-	Objects     []Object `json:"objects"`
-	EthAddress  string   `json:"ethAddress"`
+
+	Interval    int    `json:"interval"`
+	Name        string `json:"name"`
+	LastBatched *int64 `json:"-"`
+	EthAddress  string `json:"ethAddress"`
+
+	UserID uint  `json:"userId"`
+	User   *User `json:"user,omitempty"`
+
+	Objects *Objects `json:"objects,omitempty"`
+	Batches *Batches `json:"batches,omitempty"`
 }
 
 type Apps []App
@@ -20,8 +23,8 @@ func (a *App) CreateApp(db *gorm.DB) error {
 	return db.Create(&a).Error
 }
 
-func (a *App) GetApp(db *gorm.DB) error {
-	return db.Model(&a).Related(&a.User).First(&a).Error
+func (a *App) FindApp(db *gorm.DB) error {
+	return db.First(&a).Error
 }
 
 func (as *Apps) GetAppsToBatch(db *gorm.DB) error {
