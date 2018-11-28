@@ -1,6 +1,7 @@
 package ethereum
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -55,7 +56,8 @@ func Deploy() (string, error) {
 }
 
 func init() {
-	bc, err := ethclient.Dial(os.Getenv("GETH_HOST"))
+	conn := fmt.Sprintf("%s:%s", os.Getenv("GETH_HOST"), os.Getenv("GETH_PORT"))
+	bc, err := ethclient.Dial(conn)
 	if err != nil {
 		log.Fatalf(err.Error())
 	}

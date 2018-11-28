@@ -1,44 +1,34 @@
 package models
 
-import (
-	"time"
-
-	"github.com/jinzhu/gorm"
-)
+import "github.com/jinzhu/gorm"
 
 type App struct {
 	gorm.Model
-	Interval    int        `json:"interval"`
-	Name        string     `json:"name"`
-	LastFlushed *time.Time `json:"lastFlushed"`
-	UserID      uint       `json:"userID"`
-	User        User       `json:"user"`
-	Flushes     []Flush    `json:"flushes"`
-	Objects     []Object   `json:"objects"`
-	EthAddress  string     `json:"ethAddress"`
+	Interval    int      `json:"interval"`
+	Name        string   `json:"name"`
+	LastBatched *int64   `json:"lastBatched"`
+	UserID      uint     `json:"userID"`
+	User        User     `json:"user"`
+	Batches     []Batch  `json:"batches"`
+	Objects     []Object `json:"objects"`
+	EthAddress  string   `json:"ethAddress"`
 }
 
 type Apps []App
 
 func (a *App) CreateApp(db *gorm.DB) error {
-	if err := db.Create(&a).Error; err != nil {
-		return err
-	}
-	return nil
+	return db.Create(&a).Error
 }
 
 func (a *App) GetApp(db *gorm.DB) error {
-	if err := db.Where("id = ? AND user_id = ?", a.ID, a.UserID).First(&a).Error; err != nil {
-		return err
-	}
-	return nil
+	return db.Model(&a).Related(&a.User).First(&a).Error
 }
 
 func (as *Apps) GetAppsToBatch(db *gorm.DB) error {
-	clause := "last_flushed IS NULL OR NOW() - last_flushed >= interval * '1 second'::interval"
+	clause := "last_batched is null or (extract(epoch from now()) - last_batched >= interval)"
+	return db.Where(clause).Find(&as).Error
+}
 
-	if err := db.Where(clause).Find(&as).Error; err != nil {
-		return err
-	}
-	return nil
+func (a *App) UpdateApp(db *gorm.DB) error {
+	return db.Save(a).Error
 }

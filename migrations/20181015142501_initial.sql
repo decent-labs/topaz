@@ -17,17 +17,26 @@ CREATE TABLE apps (
     deleted_at TIMESTAMP,
     interval INTEGER NOT NULL,
     name CHARACTER varying(255) NOT NULL,
-    last_flushed TIMESTAMP,
+    last_batched INTEGER,
     user_id INTEGER REFERENCES users(id),
     eth_address CHARACTER varying(255) NOT NULL
 );
 
-CREATE TABLE flushes (
+CREATE TABLE batches (
     id BIGSERIAL PRIMARY KEY,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
     deleted_at TIMESTAMP,
-    app_id INT REFERENCES apps(id),
+    app_id INTEGER REFERENCES apps(id),
+    unix_timestamp INTEGER NOT NULL
+);
+
+CREATE TABLE proofs (
+    id BIGSERIAL PRIMARY KEY,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
+    deleted_at TIMESTAMP,
+    batch_id INTEGER REFERENCES batches(id),
     directory_hash CHARACTER varying(255) NOT NULL,
     eth_transaction CHARACTER varying(255) NOT NULL
 );
@@ -39,10 +48,10 @@ CREATE TABLE objects (
     deleted_at TIMESTAMP,
     data_blob BYTEA NOT NULL,
     hash CHARACTER varying(255) NOT NULL,
-    app_id INT REFERENCES apps(id),
-    flush_id INT
+    app_id INTEGER REFERENCES apps(id),
+    proof_id INTEGER
 );
 
 -- +migrate Down
 
-DROP TABLE objects, flushes, apps, users;
+DROP TABLE objects, batches, apps, users;

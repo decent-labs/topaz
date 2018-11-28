@@ -8,8 +8,8 @@ type Object struct {
 	Hash     string `json:"hash"`
 	AppID    uint   `json:"appId"`
 	App      App    `json:"app"`
-	FlushID  *uint  `json:"flushId"`
-	Flush    Flush  `json:"flush"`
+	ProofID  *uint  `json:"proofId"`
+	Proof    Proof  `json:"proof"`
 }
 
 type Objects []Object
@@ -19,9 +19,18 @@ func (o *Object) CreateObject(db *gorm.DB) error {
 }
 
 func (os *Objects) GetObjectsByAppID(db *gorm.DB, id uint) error {
-	return db.Where(&Object{FlushID: nil, AppID: id}).Find(&os).Error
+	clause := "proof_id IS NULL AND app_id = ?"
+	return db.Where(clause, id).Find(&os).Error
 }
 
 func (os *Objects) GetObjectsByHash(db *gorm.DB, o *Object) error {
 	return db.Where(&Object{Hash: o.Hash, AppID: o.AppID}).Find(&os).Error
+}
+
+func (os Objects) UpdateProof(db *gorm.DB, proofID *uint) error {
+	ids := make([]uint, len(os))
+	for i, o := range os {
+		ids[i] = o.ID
+	}
+	return db.Model(Object{}).Where("id IN (?)", ids).Updates(Object{ProofID: proofID}).Error
 }

@@ -10,15 +10,6 @@ type TokenAuthentication struct {
 	Token string `json:"token" form:"token"`
 }
 
-type CreateAdminTokenRequest struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
-type CreateAppTokenRequest struct {
-	AppId int `json:"appId"`
-}
-
 type AuthAdminClaims struct {
 	UserID string `json:"userId"`
 	jwt.StandardClaims

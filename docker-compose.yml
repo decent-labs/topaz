@@ -8,6 +8,12 @@ services:
       dockerfile: Dockerfile-database
     ports:
       - "${DB_PORT}:5432"
+  ## the ethereum service for pushing txs to the networks
+  ethereum:
+    image: trufflesuite/ganache-cli
+    command: -m ${GANACHE_MNEMONIC}
+    ports:
+      - "${GETH_PORT}:8545"
   ## the ipfs service provides dedicated access to ipfs
   ipfs:
     image: ipfs/go-ipfs:v0.4.17
