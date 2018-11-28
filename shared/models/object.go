@@ -38,3 +38,14 @@ func (os Objects) UpdateProof(db *gorm.DB, proofID *uint) error {
 	}
 	return db.Model(Object{}).Where("id IN (?)", ids).Updates(Object{ProofID: proofID}).Error
 }
+
+func (os *Objects) GetObjectsByTimestamps(db *gorm.DB, appId uint, start int, end int) error {
+	return db.
+		Preload("Proof.Batch").
+		Joins("JOIN batches ON batches.app_id = (?)", appId).
+		Joins("JOIN proofs ON proofs.batch_id = batches.id").
+		Where("proof_id = proofs.id").
+		Where("batches.unix_timestamp BETWEEN (?) AND (?)", start, end).
+		Find(&os).
+		Error
+}
