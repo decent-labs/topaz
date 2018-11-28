@@ -53,3 +53,22 @@ func Verify(appId uint, dataBlob []byte) (int, []byte) {
 	response, _ := json.Marshal(os)
 	return http.StatusOK, response
 }
+
+func Report(appId uint, body []byte) (int, []byte) {
+	var f interface{}
+	if err := json.Unmarshal(body, &f); err != nil {
+		return http.StatusInternalServerError, []byte(err.Error())
+	}
+
+	m := f.(map[string]interface{})
+	start := int(m["start"].(float64))
+	end := int(m["end"].(float64))
+
+	os := new(models.Objects)
+	if err := os.GetObjectsByTimestamps(database.Manager, appId, start, end); err != nil {
+		return http.StatusInternalServerError, []byte(err.Error())
+	}
+
+	response, _ := json.Marshal(os)
+	return http.StatusOK, response
+}
