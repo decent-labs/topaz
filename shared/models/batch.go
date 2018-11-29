@@ -9,8 +9,6 @@ type Batch struct {
 
 	AppID uint `json:"appId"`
 	App   *App `json:"app,omitempty"`
-
-	Objects *Objects `json:"objects,omitempty"`
 }
 
 type Batches []Batch
