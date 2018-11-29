@@ -48,12 +48,7 @@ func (o Object) MakeHash() (string, error) {
 }
 
 func (os Objects) GetMerkleRoot() (string, error) {
-	var list []merkletree.Content
-	for _, obj := range os {
-		list = append(list, obj)
-	}
-
-	t, err := merkletree.NewTree(list)
+	t, err := makeMerkleTree(&os)
 	if err != nil {
 		return "", err
 	}
@@ -104,4 +99,13 @@ func getReadableHash(digest []byte) (string, error) {
 	}
 
 	return mh.B58String(), nil
+}
+
+func makeMerkleTree(os *Objects) (*merkletree.MerkleTree, error) {
+	var list []merkletree.Content
+	for _, obj := range *os {
+		list = append(list, obj)
+	}
+
+	return merkletree.NewTree(list)
 }
