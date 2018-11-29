@@ -53,8 +53,7 @@ func (os Objects) GetMerkleRoot() (string, error) {
 		return "", err
 	}
 
-	root := t.MerkleRoot()
-	return getReadableHash(root)
+	return getReadableHash(t.MerkleRoot())
 }
 
 func (o *Object) CreateObject(db *gorm.DB) error {
