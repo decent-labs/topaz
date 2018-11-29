@@ -38,6 +38,15 @@ func (o Object) Equals(other merkletree.Content) (bool, error) {
 	return bytes.Compare(o.DataBlob, other.(Object).DataBlob) == 0, nil
 }
 
+func (o Object) MakeHash() (string, error) {
+	digest, err := o.CalculateHash()
+	if err != nil {
+		return "", err
+	}
+
+	return getReadableHash(digest)
+}
+
 func (os Objects) GetMerkleRoot() (string, error) {
 	var list []merkletree.Content
 	for _, obj := range os {
