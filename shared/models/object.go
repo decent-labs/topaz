@@ -65,7 +65,7 @@ func (os *Objects) GetObjectsByAppID(db *gorm.DB, id uint) error {
 	return db.Where(clause, id).Find(&os).Error
 }
 
-func (os *Objects) GetObjects(db *gorm.DB, o *Object) error {
+func (os *Objects) GetVerifiedObjects(db *gorm.DB, o *Object) error {
 	return db.Preload("Proof.Batch").Where(o).Find(&os).Error
 }
 

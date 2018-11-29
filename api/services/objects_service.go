@@ -52,7 +52,7 @@ func Verify(appId uint, dataBlob []byte) (int, []byte) {
 	}
 
 	os := new(models.Objects)
-	if err := os.GetObjects(database.Manager, &so); err != nil {
+	if err := os.GetVerifiedObjects(database.Manager, &so); err != nil {
 		return http.StatusInternalServerError, []byte(err.Error())
 	}
 
