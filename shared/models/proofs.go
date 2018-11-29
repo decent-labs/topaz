@@ -5,7 +5,7 @@ import "github.com/jinzhu/gorm"
 type Proof struct {
 	gorm.Model
 
-	DirectoryHash  string `json:"directoryHash"`
+	MerkleRoot     string `json:"merkleRoot"`
 	EthTransaction string `json:"ethTransaction"`
 
 	BatchID uint   `json:"batchId"`

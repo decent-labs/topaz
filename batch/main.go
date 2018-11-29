@@ -46,7 +46,7 @@ func getObjectsToBatch(app models.App) (models.Objects, error) {
 func makeProof(objs models.Objects, batch models.Batch, root string, tx string) (models.Proof, error) {
 	p := models.Proof{
 		BatchID:        batch.ID,
-		DirectoryHash:  root,
+		MerkleRoot:     root,
 		EthTransaction: tx,
 	}
 

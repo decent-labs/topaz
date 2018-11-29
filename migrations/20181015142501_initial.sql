@@ -37,7 +37,7 @@ CREATE TABLE proofs (
     updated_at TIMESTAMP NOT NULL,
     deleted_at TIMESTAMP,
     batch_id INTEGER REFERENCES batches(id),
-    directory_hash CHARACTER varying(255) NOT NULL,
+    merkle_root CHARACTER varying(255) NOT NULL,
     eth_transaction CHARACTER varying(255) NOT NULL
 );
 
