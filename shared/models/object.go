@@ -66,7 +66,21 @@ func (os *Objects) GetObjectsByAppID(db *gorm.DB, id uint) error {
 }
 
 func (os *Objects) GetVerifiedObjects(db *gorm.DB, o *Object) error {
-	return db.Preload("Proof.Batch").Where(o).Find(&os).Error
+	if err := db.Preload("Proof.Batch").Preload("Proof.Objects").Where(o).Find(&os).Error; err != nil {
+		return err
+	}
+
+	for _, o := range *os {
+		if o.Proof == nil {
+			continue
+		}
+
+		if err := o.Proof.CheckValidity(); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (os Objects) UpdateProof(db *gorm.DB, proofID *uint) error {
@@ -74,6 +88,7 @@ func (os Objects) UpdateProof(db *gorm.DB, proofID *uint) error {
 	for i, o := range os {
 		ids[i] = o.ID
 	}
+
 	return db.Model(Object{}).Where("id IN (?)", ids).Updates(Object{ProofID: proofID}).Error
 }
 
