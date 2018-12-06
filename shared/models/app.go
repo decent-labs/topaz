@@ -12,9 +12,6 @@ type App struct {
 
 	UserID uint  `json:"userId"`
 	User   *User `json:"user,omitempty"`
-
-	Objects *Objects `json:"objects,omitempty"`
-	Batches *Batches `json:"batches,omitempty"`
 }
 
 type Apps []App
