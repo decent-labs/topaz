@@ -145,7 +145,7 @@ This token will be used for all subsequent calls to Topaz API, in order to use t
 
 ## Trust your data
 
-Use the `/trust` endpoint to send your business-valuable data to Topaz to be processed.
+Use the `/trust` endpoint to send a hash of your business-valuable data to Topaz to be processed. The POST status code is used for new objects which have not yet been seen by Topaz, and does not require a `UUID` parameter.
 
 ### Request
 
@@ -157,9 +157,11 @@ Use the `/trust` endpoint to send your business-valuable data to Topaz to be pro
 
 #### Body
 
-Any raw byte-stream of data is acceptable in the body of the request.
-
-*Note: this implementation will change so that it accepts a json object consisting of a hash of some data, instead of the data itself. Topaz won't deal with raw data.*
+```json
+{
+	"hash": "17fee8f6b4c18e3ceb93362e67551aadb3b5772264e6c7523613f87f10342592"
+}
+```
 
 ### Response
 
@@ -169,21 +171,21 @@ Any raw byte-stream of data is acceptable in the body of the request.
     "CreatedAt": "2018-12-18T16:16:53.061753-05:00",
     "UpdatedAt": "2018-12-18T16:16:53.061753-05:00",
     "DeletedAt": null,
-    "dataBlob": "ewoJImEiOiAiZm9vIiwKCSJiIjogImJhciIKfQ==",
-    "hash": "QmaL944MqFQ7y84q38YMAboG1KFRCanvPgGZwHJNJQAjyL",
+    "uuid": "cb01ed8c-2fb4-4b42-b449-0e24c4782c83",
+    "hash": "17fee8f6b4c18e3ceb93362e67551aadb3b5772264e6c7523613f87f10342592",
     "unixTimestamp": 1545167813,
     "appId": 1,
     "proofId": null
 }
 ```
 
-## Verify your data
+## Update your previously trusted data
 
-Use the `/verify` endpoint to check whether or not a particular piece of data has been seen by Topaz API.
+Use the `/trust` endpoint to send a hash of your business-valuable data to Topaz to be processed. The PUT/PATCH status codes are used for existing objects which have already been previously trusted by Topaz, and require the UUID of the object to be passed to the endpoint.
 
 ### Request
 
-`POST /verify`
+`PUT/PATCH /trust`
 
 #### Headers
 
@@ -191,9 +193,42 @@ Use the `/verify` endpoint to check whether or not a particular piece of data ha
 
 #### Body
 
-Any raw byte-stream of data is acceptable in the body of the request.
+```json
+{
+    "uuid": "cb01ed8c-2fb4-4b42-b449-0e24c4782c83",
+	"hash": "85cf5d1d911e1dde12d8f701b85c69591e1e19e1b1c642d54b4a57fc6a5fbee7"
+}
+```
 
-*Note: this implementation will change so that it accepts a json object consisting of a hash of some data, instead of the data itself. Topaz won't deal with raw data.*
+### Response
+
+```json
+{
+    "ID": 72,
+    "CreatedAt": "2018-12-18T16:16:53.061753-05:00",
+    "UpdatedAt": "2018-12-18T16:16:53.061753-05:00",
+    "DeletedAt": null,
+    "uuid": "cb01ed8c-2fb4-4b42-b449-0e24c4782c83",
+    "hash": "85cf5d1d911e1dde12d8f701b85c69591e1e19e1b1c642d54b4a57fc6a5fbee7",
+    "unixTimestamp": 1545169876,
+    "appId": 1,
+    "proofId": null
+}
+```
+
+## Verify your data
+
+Use the `/verify` endpoint to check whether or not a particular hash of data has been seen by Topaz API.
+
+### Request
+
+`GET /verify/{hash}`
+
+example: `/verify/17fee8f6b4c18e3ceb93362e67551aadb3b5772264e6c7523613f87f10342592`
+
+#### Headers
+
+* `'Authorization: Bearer eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6IjIiLCJleHAiOjE1NDU0MjY2MTEsImlhdCI6MTU0NTE2NzQxMSwic3ViIjoiMiJ9.L6fYvVSp1WNmazPk4Rwo7pLxiXIJiYv0U5vc2hhHWf7zk7f3L7kCsVwE7EJUFFINqneQ0EW5gklBthEaVWl3Ven10dvnpGNgL5MtlXyzdXnRf5duc2qeVBLRUD8V8JJsAt28EVBu-rU27thWAtod0kLgDnSmaoOmqEAF4uizD5dvOcKAH9-rLwEDsiYFrsO8AI23Wdjcg_w7AVYz_lZteZXk9J5KKEmohv3a6nlOblFdHBGrsv8kgnyX4OYB9wfJOXCvuD5a_WGbfjX590iVe9pR7Z7WaYUd5gmRSe0uhOWRYpT5O72rQcvcv-FT0pa59SFM6HZb1kYQJGE5RRg_fw'`
 
 ### Response
 
@@ -204,8 +239,8 @@ Any raw byte-stream of data is acceptable in the body of the request.
         "CreatedAt": "2018-12-18T16:16:53.061753Z",
         "UpdatedAt": "2018-12-18T16:25:14.690197Z",
         "DeletedAt": null,
-        "dataBlob": "ewoJImEiOiAiZm9vIiwKCSJiIjogImJhciIKfQ==",
-        "hash": "QmaL944MqFQ7y84q38YMAboG1KFRCanvPgGZwHJNJQAjyL",
+        "uuid": "cb01ed8c-2fb4-4b42-b449-0e24c4782c83",
+        "hash": "17fee8f6b4c18e3ceb93362e67551aadb3b5772264e6c7523613f87f10342592",
         "unixTimestamp": 1545167813,
         "appId": 1,
         "proofId": 24,
@@ -232,11 +267,116 @@ Any raw byte-stream of data is acceptable in the body of the request.
                     "CreatedAt": "2018-12-18T16:16:53.061753Z",
                     "UpdatedAt": "2018-12-18T16:25:14.690197Z",
                     "DeletedAt": null,
-                    "dataBlob": "ewoJImEiOiAiZm9vIiwKCSJiIjogImJhciIKfQ==",
-                    "hash": "QmaL944MqFQ7y84q38YMAboG1KFRCanvPgGZwHJNJQAjyL",
+                    "uuid": "cb01ed8c-2fb4-4b42-b449-0e24c4782c83",
+                    "hash": "17fee8f6b4c18e3ceb93362e67551aadb3b5772264e6c7523613f87f10342592",
                     "unixTimestamp": 1545167813,
                     "appId": 1,
                     "proofId": 24
+                }
+            ]
+        }
+    }
+]
+```
+
+## Trace your data
+
+Use the `/trace` endpoint to track the changes of a UUID over time
+
+### Request
+
+`GET /trace/{uuid}`
+
+example: `/trace/cb01ed8c-2fb4-4b42-b449-0e24c4782c83`
+
+#### Headers
+
+* `'Authorization: Bearer eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6IjIiLCJleHAiOjE1NDU0MjY2MTEsImlhdCI6MTU0NTE2NzQxMSwic3ViIjoiMiJ9.L6fYvVSp1WNmazPk4Rwo7pLxiXIJiYv0U5vc2hhHWf7zk7f3L7kCsVwE7EJUFFINqneQ0EW5gklBthEaVWl3Ven10dvnpGNgL5MtlXyzdXnRf5duc2qeVBLRUD8V8JJsAt28EVBu-rU27thWAtod0kLgDnSmaoOmqEAF4uizD5dvOcKAH9-rLwEDsiYFrsO8AI23Wdjcg_w7AVYz_lZteZXk9J5KKEmohv3a6nlOblFdHBGrsv8kgnyX4OYB9wfJOXCvuD5a_WGbfjX590iVe9pR7Z7WaYUd5gmRSe0uhOWRYpT5O72rQcvcv-FT0pa59SFM6HZb1kYQJGE5RRg_fw'`
+
+### Response
+
+```json
+[
+    {
+        "ID": 71,
+        "CreatedAt": "2018-12-18T16:16:53.061753Z",
+        "UpdatedAt": "2018-12-18T16:25:14.690197Z",
+        "DeletedAt": null,
+        "uuid": "cb01ed8c-2fb4-4b42-b449-0e24c4782c83",
+        "hash": "17fee8f6b4c18e3ceb93362e67551aadb3b5772264e6c7523613f87f10342592",
+        "unixTimestamp": 1545167813,
+        "appId": 1,
+        "proofId": 24,
+        "proof": {
+            "ID": 24,
+            "CreatedAt": "2018-12-18T16:25:14.67507Z",
+            "UpdatedAt": "2018-12-18T16:25:14.67507Z",
+            "DeletedAt": null,
+            "merkleRoot": "QmYoB7DqNkQ5aaSuJYVeNATeWYdaSk3trugK7X6SwGKBdp",
+            "ethTransaction": "0xd4fd388f808993612627644add6d4ade7591865be858b009741f010c2ca2a852",
+            "validStructure": true,
+            "batchId": 8894,
+            "batch": {
+                "ID": 8894,
+                "CreatedAt": "2018-12-18T16:25:14.657868Z",
+                "UpdatedAt": "2018-12-18T16:25:14.657868Z",
+                "DeletedAt": null,
+                "unixTimestamp": 1545168314,
+                "appId": 1
+            },
+            "objects": [
+                {
+                    "ID": 71,
+                    "CreatedAt": "2018-12-18T16:16:53.061753Z",
+                    "UpdatedAt": "2018-12-18T16:25:14.690197Z",
+                    "DeletedAt": null,
+                    "uuid": "cb01ed8c-2fb4-4b42-b449-0e24c4782c83",
+                    "hash": "17fee8f6b4c18e3ceb93362e67551aadb3b5772264e6c7523613f87f10342592",
+                    "unixTimestamp": 1545167813,
+                    "appId": 1,
+                    "proofId": 24
+                }
+            ]
+        }
+    },
+    {
+        "ID": 72,
+        "CreatedAt": "2018-12-18T21:51:16.061753-05:00",
+        "UpdatedAt": "2018-12-18T21:51:16.061753-05:00",
+        "DeletedAt": null,
+        "uuid": "cb01ed8c-2fb4-4b42-b449-0e24c4782c83",
+        "hash": "85cf5d1d911e1dde12d8f701b85c69591e1e19e1b1c642d54b4a57fc6a5fbee7",
+        "unixTimestamp": 1545169876,
+        "appId": 1,
+        "proofId": 25,
+        "proof": {
+            "ID": 25,
+            "CreatedAt": "2018-12-18T21:16:00.00007Z",
+            "UpdatedAt": "2018-12-18T21:16:00.00007Z",
+            "DeletedAt": null,
+            "merkleRoot": "QmYoB7DqNkQ5aaSuJYVeNATeWYdaSk3trugK7X6SwGKBdp",
+            "ethTransaction": "0x1a62c1fbbeb49946cb13337971056aa0e58c46a77192d8eb4bc5f23a64200fbe",
+            "validStructure": true,
+            "batchId": 8895,
+            "batch": {
+                "ID": 8895,
+                "CreatedAt": "2018-12-18T21:16:00.00007Z",
+                "UpdatedAt": "2018-12-18T21:16:00.00007Z",
+                "DeletedAt": null,
+                "unixTimestamp": 1545168314,
+                "appId": 1
+            },
+            "objects": [
+                {
+                    "ID": 72,
+                    "CreatedAt": "2018-12-18T21:51:16.061753-05:00",
+                    "UpdatedAt": "2018-12-18T21:51:16.061753-05:00",
+                    "DeletedAt": null,
+                    "uuid": "cb01ed8c-2fb4-4b42-b449-0e24c4782c83",
+                    "hash": "85cf5d1d911e1dde12d8f701b85c69591e1e19e1b1c642d54b4a57fc6a5fbee7",
+                    "unixTimestamp": 1545169876,
+                    "appId": 1,
+                    "proofId": 25,
                 }
             ]
         }
@@ -273,28 +413,28 @@ Use Unix timestamps to create a range in which to run reports.
 ```json
 [
     {
-        "ID": 71,
-        "CreatedAt": "2018-12-18T16:16:53.061753Z",
-        "UpdatedAt": "2018-12-18T16:25:14.690197Z",
+        "ID": 72,
+        "CreatedAt": "2018-12-18T21:51:16.061753-05:00",
+        "UpdatedAt": "2018-12-18T21:51:16.061753-05:00",
         "DeletedAt": null,
-        "dataBlob": "ewoJImEiOiAiZm9vIiwKCSJiIjogImJhciIKfQ==",
-        "hash": "QmaL944MqFQ7y84q38YMAboG1KFRCanvPgGZwHJNJQAjyL",
-        "unixTimestamp": 1545167813,
+        "uuid": "cb01ed8c-2fb4-4b42-b449-0e24c4782c83",
+        "hash": "85cf5d1d911e1dde12d8f701b85c69591e1e19e1b1c642d54b4a57fc6a5fbee7",
+        "unixTimestamp": 1545169876,
         "appId": 1,
-        "proofId": 24,
+        "proofId": 25,
         "proof": {
-            "ID": 24,
-            "CreatedAt": "2018-12-18T16:25:14.67507Z",
-            "UpdatedAt": "2018-12-18T16:25:14.67507Z",
+            "ID": 25,
+            "CreatedAt": "2018-12-18T21:16:00.00007Z",
+            "UpdatedAt": "2018-12-18T21:16:00.00007Z",
             "DeletedAt": null,
             "merkleRoot": "QmYoB7DqNkQ5aaSuJYVeNATeWYdaSk3trugK7X6SwGKBdp",
-            "ethTransaction": "0xd4fd388f808993612627644add6d4ade7591865be858b009741f010c2ca2a852",
-            "validStructure": false,
-            "batchId": 8894,
+            "ethTransaction": "0x1a62c1fbbeb49946cb13337971056aa0e58c46a77192d8eb4bc5f23a64200fbe",
+            "validStructure": true,
+            "batchId": 8895,
             "batch": {
-                "ID": 8894,
-                "CreatedAt": "2018-12-18T16:25:14.657868Z",
-                "UpdatedAt": "2018-12-18T16:25:14.657868Z",
+                "ID": 8895,
+                "CreatedAt": "2018-12-18T21:16:00.00007Z",
+                "UpdatedAt": "2018-12-18T21:16:00.00007Z",
                 "DeletedAt": null,
                 "unixTimestamp": 1545168314,
                 "appId": 1
