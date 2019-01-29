@@ -16,7 +16,7 @@ type Proof struct {
 	BatchID uint   `json:"batchId"`
 	Batch   *Batch `json:"batch,omitempty"`
 
-	Objects Objects `json:"objects,omitempty"`
+	Hashes Hashes `json:"hashes,omitempty"`
 }
 
 func (p *Proof) CreateProof(db *gorm.DB) error {
@@ -24,14 +24,14 @@ func (p *Proof) CreateProof(db *gorm.DB) error {
 }
 
 func (p *Proof) CheckValidity() error {
-	cur, err := p.Objects.GetMerkleRoot()
+	cur, err := p.Hashes.GetMerkleRoot()
 	if err != nil {
 		return err
 	}
 
 	validRoot := strings.Compare(cur, p.MerkleRoot) == 0
 
-	t, err := makeMerkleTree(&p.Objects)
+	t, err := makeMerkleTree(&p.Hashes)
 	if err != nil {
 		return err
 	}

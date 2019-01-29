@@ -46,13 +46,22 @@ CREATE TABLE objects (
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
     deleted_at TIMESTAMP,
-    data_blob BYTEA NOT NULL,
-    hash CHARACTER varying(255) NOT NULL,
-    unix_timestamp INTEGER NOT NULL,
     app_id INTEGER REFERENCES apps(id),
-    proof_id INTEGER
+    uuid uuid NOT NULL,
+    unix_timestamp INTEGER NOT NULL
+);
+
+CREATE TABLE hashes (
+    id BIGSERIAL PRIMARY KEY,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
+    deleted_at TIMESTAMP,
+    object_id INTEGER REFERENCES objects(id),
+    proof_id INTEGER,
+    hash BYTEA NOT NULL,
+    unix_timestamp INTEGER NOT NULL
 );
 
 -- +migrate Down
 
-DROP TABLE objects, batches, apps, users, proofs;
+DROP TABLE objects, batches, apps, users, proofs, hashes;
