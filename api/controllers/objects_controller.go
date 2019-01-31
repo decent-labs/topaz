@@ -19,21 +19,21 @@ func Trust(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 }
 
 func Verify(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	appID, _ := strconv.Atoi(r.Header.Get("appId"))
-	body, _ := ioutil.ReadAll(r.Body)
+	aid, _ := strconv.Atoi(r.Header.Get("appId"))
+	b, _ := ioutil.ReadAll(r.Body)
 
-	responseStatus, app := services.Verify(uint(appID), body)
+	rs, hs := services.Verify(uint(aid), b)
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(responseStatus)
-	w.Write(app)
+	w.WriteHeader(rs)
+	w.Write(hs)
 }
 
 func Report(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	appID, _ := strconv.Atoi(r.Header.Get("appId"))
-	body, _ := ioutil.ReadAll(r.Body)
+	aid, _ := strconv.Atoi(r.Header.Get("appId"))
+	b, _ := ioutil.ReadAll(r.Body)
 
-	responseStatus, app := services.Report(uint(appID), body)
+	rs, os := services.Report(uint(aid), b)
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(responseStatus)
-	w.Write(app)
+	w.WriteHeader(rs)
+	w.Write(os)
 }
