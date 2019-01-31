@@ -89,11 +89,11 @@ func (hs Hashes) UpdateProof(db *gorm.DB, proofID *uint) error {
 	return db.Model(Hash{}).Where("id IN (?)", ids).Updates(Hash{ProofID: proofID}).Error
 }
 
-func (hs *Hashes) GetHashesByTimestamps(db *gorm.DB, appID uint, start int, end int) error {
-	return db.
-		Preload("Proof.Batch").
-		Where("app_id = ?", appID).
-		Where("unix_timestamp BETWEEN (?) AND (?)", start, end).
+func (hs *Hashes) GetHashesByTimestamps(db *gorm.DB, app *App, start int, end int) error {
+	return db.Model(&app).
+		Table("hashes").
+		Joins("join objects on objects.id = hashes.object_id").
+		Where("hashes.unix_timestamp BETWEEN (?) AND (?)", start, end).
 		Find(&hs).
 		Error
 }

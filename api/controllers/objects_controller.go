@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"path"
 	"strconv"
@@ -36,9 +35,10 @@ func Verify(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 
 func Report(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	aid, _ := strconv.Atoi(r.Header.Get("appId"))
-	b, _ := ioutil.ReadAll(r.Body)
+	s, _ := strconv.Atoi(path.Base(path.Dir(r.URL.Path)))
+	e, _ := strconv.Atoi(path.Base(r.URL.Path))
 
-	rs, os := services.Report(uint(aid), b)
+	rs, os := services.Report(uint(aid), s, e)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(rs)
 	w.Write(os)

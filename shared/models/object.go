@@ -25,12 +25,3 @@ func (o *Object) CreateObject(db *gorm.DB) error {
 	o.UUID = uuid.String()
 	return db.Create(&o).Error
 }
-
-func (os *Objects) GetObjectsByTimestamps(db *gorm.DB, appId uint, start int, end int) error {
-	return db.
-		Preload("Proof.Batch").
-		Where("app_id = ?", appId).
-		Where("unix_timestamp BETWEEN (?) AND (?)", start, end).
-		Find(&os).
-		Error
-}

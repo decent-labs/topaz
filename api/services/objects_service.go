@@ -62,21 +62,15 @@ func Verify(appID uint, hash string) (int, []byte) {
 	return http.StatusOK, response
 }
 
-func Report(appID uint, body []byte) (int, []byte) {
-	var f interface{}
-	if err := json.Unmarshal(body, &f); err != nil {
+func Report(appID uint, start int, end int) (int, []byte) {
+	sa := new(models.App)
+	sa.ID = appID
+
+	hs := new(models.Hashes)
+	if err := hs.GetHashesByTimestamps(database.Manager, sa, start, end); err != nil {
 		return http.StatusInternalServerError, []byte(err.Error())
 	}
 
-	m := f.(map[string]interface{})
-	start := int(m["start"].(float64))
-	end := int(m["end"].(float64))
-
-	os := new(models.Objects)
-	if err := os.GetObjectsByTimestamps(database.Manager, appID, start, end); err != nil {
-		return http.StatusInternalServerError, []byte(err.Error())
-	}
-
-	response, _ := json.Marshal(os)
+	response, _ := json.Marshal(hs)
 	return http.StatusOK, response
 }

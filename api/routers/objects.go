@@ -21,10 +21,10 @@ func SetObjectsRoutes(router *mux.Router) *mux.Router {
 			negroni.HandlerFunc(controllers.Verify),
 		)).Methods("GET")
 
-	router.Handle("/report",
+	router.Handle("/report/{start}/{end}",
 		negroni.New(
 			negroni.HandlerFunc(auth.App),
 			negroni.HandlerFunc(controllers.Report),
-		)).Methods("POST")
+		)).Methods("GET")
 	return router
 }
