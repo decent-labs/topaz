@@ -1,21 +1,26 @@
 package controllers
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 
 	"github.com/decentorganization/topaz/api/services"
+	"github.com/decentorganization/topaz/shared/models"
 )
 
 func Trust(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	appID, _ := strconv.Atoi(r.Header.Get("appId"))
-	body, _ := ioutil.ReadAll(r.Body)
+	aid, _ := strconv.Atoi(r.Header.Get("appId"))
 
-	responseStatus, app := services.Trust(uint(appID), body)
+	rh := new(models.Hash)
+	d := json.NewDecoder(r.Body)
+	d.Decode(&rh)
+
+	rs, h := services.Trust(uint(aid), rh)
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(responseStatus)
-	w.Write(app)
+	w.WriteHeader(rs)
+	w.Write(h)
 }
 
 func Verify(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
