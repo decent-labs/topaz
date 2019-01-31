@@ -2,6 +2,7 @@ package models
 
 import (
 	"bytes"
+	"encoding/hex"
 
 	"github.com/cbergoon/merkletree"
 	"github.com/jinzhu/gorm"
@@ -55,8 +56,14 @@ func (hs *Hashes) GetHashesByApp(db *gorm.DB, app *App) error {
 		Error
 }
 
-func (hs *Hashes) GetVerifiedHashes(db *gorm.DB, o *Object, h *Hash) error {
-	if err := db.Preload("Proof.Batch").Preload("Proof.Objects").Where(o).Where(h).Find(&hs).Error; err != nil {
+func (hs *Hashes) GetVerifiedHashes(db *gorm.DB, a *App, h *Hash) error {
+	h.Hash, _ = hex.DecodeString(h.HashHex)
+
+	if err := db.Model(&a).
+		Table("hashes").
+		Joins("join objects on objects.id = hashes.object_id").
+		Where(h).
+		Find(&hs).Error; err != nil {
 		return err
 	}
 

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"path"
 	"strconv"
 
 	"github.com/decentorganization/topaz/api/services"
@@ -25,9 +26,9 @@ func Trust(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 
 func Verify(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	aid, _ := strconv.Atoi(r.Header.Get("appId"))
-	b, _ := ioutil.ReadAll(r.Body)
+	h := path.Base(r.URL.Path)
 
-	rs, hs := services.Verify(uint(aid), b)
+	rs, hs := services.Verify(uint(aid), h)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(rs)
 	w.Write(hs)
