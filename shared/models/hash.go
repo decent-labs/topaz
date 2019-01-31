@@ -48,21 +48,25 @@ func (h *Hash) CreateHash(db *gorm.DB) error {
 }
 
 func (hs *Hashes) GetHashesByApp(db *gorm.DB, app *App) error {
-	return db.Model(&app).
+	return db.
 		Table("hashes").
 		Joins("join objects on objects.id = hashes.object_id").
+		Joins("join apps on apps.id = objects.app_id").
+		Where("apps.id = (?)", app.ID).
 		Where("hashes.proof_id IS NULL").
 		Find(&hs).
 		Error
 }
 
-func (hs *Hashes) GetVerifiedHashes(db *gorm.DB, a *App, h *Hash) error {
-	h.Hash, _ = hex.DecodeString(h.HashHex)
+func (hs *Hashes) GetVerifiedHashes(db *gorm.DB, app *App, hash *Hash) error {
+	hash.Hash, _ = hex.DecodeString(hash.HashHex)
 
-	if err := db.Model(&a).
+	if err := db.
 		Table("hashes").
 		Joins("join objects on objects.id = hashes.object_id").
-		Where(h).
+		Joins("join apps on apps.id = objects.app_id").
+		Where("apps.id = (?)", app.ID).
+		Where(hash).
 		Find(&hs).Error; err != nil {
 		return err
 	}
@@ -90,9 +94,11 @@ func (hs Hashes) UpdateProof(db *gorm.DB, proofID *uint) error {
 }
 
 func (hs *Hashes) GetHashesByTimestamps(db *gorm.DB, app *App, start int, end int) error {
-	return db.Model(&app).
+	return db.
 		Table("hashes").
 		Joins("join objects on objects.id = hashes.object_id").
+		Joins("join apps on apps.id = objects.app_id").
+		Where("apps.id = (?)", app.ID).
 		Where("hashes.unix_timestamp BETWEEN (?) AND (?)", start, end).
 		Find(&hs).
 		Error
