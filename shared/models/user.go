@@ -22,3 +22,7 @@ func (u *User) GetUser(db *gorm.DB) error {
 	}
 	return nil
 }
+
+func (u *User) FindUser(db *gorm.DB) error {
+	return db.First(&u).Error
+}
