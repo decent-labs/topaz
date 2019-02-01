@@ -41,7 +41,7 @@ func Trust(appID uint, hash *models.Hash) (int, []byte) {
 		return http.StatusInternalServerError, []byte(err.Error())
 	}
 
-	response, _ := json.Marshal(h)
+	response, _ := h.MarshalJSON()
 	return http.StatusOK, response
 }
 
@@ -49,12 +49,8 @@ func Verify(appID uint, hash string) (int, []byte) {
 	sa := new(models.App)
 	sa.ID = appID
 
-	sh := models.Hash{
-		HashHex: hash,
-	}
-
 	hs := new(models.Hashes)
-	if err := hs.GetVerifiedHashes(database.Manager, sa, &sh); err != nil {
+	if err := hs.GetVerifiedHashes(database.Manager, sa, hash); err != nil {
 		return http.StatusInternalServerError, []byte(err.Error())
 	}
 

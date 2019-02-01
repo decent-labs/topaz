@@ -3,6 +3,7 @@ package models
 import (
 	"bytes"
 	"encoding/hex"
+	"encoding/json"
 
 	"github.com/cbergoon/merkletree"
 	"github.com/jinzhu/gorm"
@@ -24,6 +25,17 @@ type Hash struct {
 }
 
 type Hashes []Hash
+
+func (h *Hash) MarshalJSON() ([]byte, error) {
+	type Alias Hash
+	return json.Marshal(&struct {
+		*Alias
+		HashHex string `json:"hash"`
+	}{
+		Alias:   (*Alias)(h),
+		HashHex: hex.EncodeToString(h.Hash),
+	})
+}
 
 func (h Hash) CalculateHash() ([]byte, error) {
 	return h.Hash, nil
@@ -58,15 +70,18 @@ func (hs *Hashes) GetHashesByApp(db *gorm.DB, app *App) error {
 		Error
 }
 
-func (hs *Hashes) GetVerifiedHashes(db *gorm.DB, app *App, hash *Hash) error {
-	hash.Hash, _ = hex.DecodeString(hash.HashHex)
+func (hs *Hashes) GetVerifiedHashes(db *gorm.DB, app *App, ih string) error {
+	bh, _ := hex.DecodeString(ih)
+	h := Hash{
+		Hash: bh,
+	}
 
 	if err := db.
 		Table("hashes").
 		Joins("join objects on objects.id = hashes.object_id").
 		Joins("join apps on apps.id = objects.app_id").
 		Where("apps.id = (?)", app.ID).
-		Where(hash).
+		Where(h).
 		Find(&hs).Error; err != nil {
 		return err
 	}
