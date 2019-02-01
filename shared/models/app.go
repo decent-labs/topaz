@@ -21,7 +21,7 @@ func (a *App) CreateApp(db *gorm.DB) error {
 }
 
 func (a *App) FindApp(db *gorm.DB) error {
-	return db.First(&a).Error
+	return db.Where(a).First(&a).Error
 }
 
 func (as *Apps) GetAppsToBatch(db *gorm.DB) error {

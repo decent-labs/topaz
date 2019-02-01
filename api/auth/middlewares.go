@@ -47,12 +47,12 @@ func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, id s
 				return
 			}
 		} else if id == "appId" {
-			a := new(models.App)
 			aid, err := strconv.ParseUint(resource.(string), 10, 64)
 			if err != nil {
 				rw.WriteHeader(http.StatusUnauthorized)
 				return
 			}
+			a := new(models.App)
 			a.ID = uint(aid)
 			if err := a.FindApp(database.Manager); err != nil {
 				rw.WriteHeader(http.StatusUnauthorized)
