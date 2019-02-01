@@ -25,3 +25,7 @@ func (o *Object) CreateObject(db *gorm.DB) error {
 	o.UUID = uuid.String()
 	return db.Create(&o).Error
 }
+
+func (o *Object) FindObject(db *gorm.DB) error {
+	return db.Where(o).First(&o).Error
+}

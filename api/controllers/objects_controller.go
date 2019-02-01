@@ -23,6 +23,21 @@ func Trust(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	w.Write(h)
 }
 
+func TrustUpdate(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	aid, _ := strconv.Atoi(r.Header.Get("appId"))
+
+	rh := new(models.Hash)
+	d := json.NewDecoder(r.Body)
+	d.Decode(&rh)
+
+	uuid := path.Base(r.URL.Path)
+
+	rs, h := services.TrustUpdate(uint(aid), uuid, rh)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(rs)
+	w.Write(h)
+}
+
 func Verify(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	aid, _ := strconv.Atoi(r.Header.Get("appId"))
 	h := path.Base(r.URL.Path)
