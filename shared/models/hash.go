@@ -18,8 +18,8 @@ type Hash struct {
 	Hash          []byte `json:"-"`
 	UnixTimestamp int64  `json:"unixTimestamp"`
 
-	ObjectID *uint   `json:"objectId"`
-	Object   *Object `json:"object,omitempty"`
+	ObjectID *uint   `json:"-"`
+	Object   *Object `json:"-"`
 	ProofID  *uint   `json:"proofId"`
 	Proof    *Proof  `json:"proof,omitempty"`
 }
@@ -30,10 +30,12 @@ func (h *Hash) MarshalJSON() ([]byte, error) {
 	type Alias Hash
 	return json.Marshal(&struct {
 		*Alias
-		HashHex string `json:"hash"`
+		HashHex    string `json:"hash"`
+		ObjectUUID string `json:"objectID"`
 	}{
-		Alias:   (*Alias)(h),
-		HashHex: hex.EncodeToString(h.Hash),
+		Alias:      (*Alias)(h),
+		HashHex:    hex.EncodeToString(h.Hash),
+		ObjectUUID: h.Object.UUID,
 	})
 }
 

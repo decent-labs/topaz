@@ -34,7 +34,7 @@ func Trust(appID uint, hash *models.Hash) (int, []byte) {
 	h := models.Hash{
 		Hash:          hb,
 		UnixTimestamp: t,
-		ObjectID:      &o.ID,
+		Object:        &o,
 	}
 
 	if err := h.CreateHash(database.Manager); err != nil {
