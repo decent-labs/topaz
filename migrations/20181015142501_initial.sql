@@ -47,8 +47,7 @@ CREATE TABLE objects (
     updated_at TIMESTAMP NOT NULL,
     deleted_at TIMESTAMP,
     app_id INTEGER REFERENCES apps(id),
-    uuid uuid NOT NULL,
-    unix_timestamp INTEGER NOT NULL
+    uuid uuid NOT NULL
 );
 
 CREATE TABLE hashes (

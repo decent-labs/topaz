@@ -8,8 +8,7 @@ import (
 type Object struct {
 	gorm.Model
 
-	UUID          string `json:"uuid"`
-	UnixTimestamp int64  `json:"unixTimestamp"`
+	UUID string `json:"uuid"`
 
 	AppID uint `json:"appId"`
 	App   *App `json:"app,omitempty"`

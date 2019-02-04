@@ -20,11 +20,8 @@ func Trust(appID uint, hash *models.Hash) (int, []byte) {
 		return http.StatusBadRequest, []byte("invalid hash length")
 	}
 
-	t := time.Now().Unix()
-
 	o := models.Object{
-		AppID:         appID,
-		UnixTimestamp: t,
+		AppID: appID,
 	}
 
 	if err := o.CreateObject(database.Manager); err != nil {
@@ -33,8 +30,8 @@ func Trust(appID uint, hash *models.Hash) (int, []byte) {
 
 	h := models.Hash{
 		Hash:          hb,
-		UnixTimestamp: t,
 		Object:        &o,
+		UnixTimestamp: time.Now().Unix(),
 	}
 
 	if err := h.CreateHash(database.Manager); err != nil {
