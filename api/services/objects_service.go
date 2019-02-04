@@ -73,7 +73,11 @@ func TrustUpdate(appID uint, uuid string, hash *models.Hash) (int, []byte) {
 		return http.StatusInternalServerError, []byte(err.Error())
 	}
 
-	response, _ := h.MarshalJSON()
+	if err := o.FindFullObject(database.Manager); err != nil {
+		return http.StatusInternalServerError, []byte(err.Error())
+	}
+
+	response, _ := json.Marshal(&o)
 	return http.StatusOK, response
 }
 
