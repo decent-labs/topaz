@@ -16,12 +16,16 @@ type Object struct {
 
 type Objects []Object
 
-func (o *Object) CreateObject(db *gorm.DB) error {
+func (o *Object) MakeUUID() error {
 	uuid, err := uuid.NewV4()
 	if err != nil {
 		return err
 	}
 	o.UUID = uuid.String()
+	return nil
+}
+
+func (o *Object) CreateObject(db *gorm.DB) error {
 	return db.Create(&o).Error
 }
 

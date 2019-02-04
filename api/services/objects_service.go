@@ -24,14 +24,14 @@ func Trust(appID uint, hash *models.Hash) (int, []byte) {
 		AppID: appID,
 	}
 
-	if err := o.CreateObject(database.Manager); err != nil {
+	if err := o.MakeUUID(); err != nil {
 		return http.StatusInternalServerError, []byte(err.Error())
 	}
 
 	h := models.Hash{
 		Hash:          hb,
-		Object:        &o,
 		UnixTimestamp: time.Now().Unix(),
+		Object:        o,
 	}
 
 	if err := h.CreateHash(database.Manager); err != nil {
@@ -57,15 +57,14 @@ func TrustUpdate(appID uint, uuid string, hash *models.Hash) (int, []byte) {
 		UUID:  uuid,
 	}
 
-	err = o.FindObject(database.Manager)
-	if err != nil {
+	if err := o.FindObject(database.Manager); err != nil {
 		return http.StatusBadRequest, []byte("invalid object")
 	}
 
 	h := models.Hash{
 		Hash:          hb,
 		UnixTimestamp: time.Now().Unix(),
-		Object:        &o,
+		Object:        o,
 	}
 
 	if err := h.CreateHash(database.Manager); err != nil {
