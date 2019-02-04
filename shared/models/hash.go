@@ -50,8 +50,8 @@ func (h Hash) Equals(other merkletree.Content) (bool, error) {
 
 }
 
-func (hs Hashes) GetMerkleRoot() (string, error) {
-	t, err := makeMerkleTree(&hs)
+func (hs *Hashes) GetMerkleRoot() (string, error) {
+	t, err := makeMerkleTree(hs)
 	if err != nil {
 		return "", err
 	}
@@ -72,35 +72,6 @@ func (hs *Hashes) GetHashesByApp(db *gorm.DB, app *App) error {
 		Where("hashes.proof_id IS NULL").
 		Find(&hs).
 		Error
-}
-
-func (hs *Hashes) GetVerifiedHashes(db *gorm.DB, app *App, ih string) error {
-	bh, _ := hex.DecodeString(ih)
-	h := Hash{
-		Hash: bh,
-	}
-
-	if err := db.
-		Table("hashes").
-		Joins("join objects on objects.id = hashes.object_id").
-		Joins("join apps on apps.id = objects.app_id").
-		Where("apps.id = (?)", app.ID).
-		Where(h).
-		Find(&hs).Error; err != nil {
-		return err
-	}
-
-	for _, h := range *hs {
-		if h.Proof == nil {
-			continue
-		}
-
-		if err := h.Proof.CheckValidity(); err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
 
 func (hs Hashes) UpdateProof(db *gorm.DB, proofID *uint) error {

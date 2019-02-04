@@ -81,16 +81,31 @@ func TrustUpdate(appID uint, uuid string, hash *models.Hash) (int, []byte) {
 	return http.StatusOK, response
 }
 
-func Verify(appID uint, hash string) (int, []byte) {
-	sa := new(models.App)
-	sa.ID = appID
+func Verify(appID uint, uuid string) (int, []byte) {
+	o := models.Object{
+		AppID: appID,
+		UUID:  uuid,
+	}
 
-	hs := new(models.Hashes)
-	if err := hs.GetVerifiedHashes(database.Manager, sa, hash); err != nil {
+	if err := o.FindObject(database.Manager); err != nil {
 		return http.StatusInternalServerError, []byte(err.Error())
 	}
 
-	response, _ := json.Marshal(hs)
+	if err := o.FindFullObject(database.Manager); err != nil {
+		return http.StatusInternalServerError, []byte(err.Error())
+	}
+
+	for _, h := range o.Hashes {
+		if h.Proof == nil {
+			continue
+		}
+
+		if err := h.Proof.CheckValidity(); err != nil {
+			return http.StatusInternalServerError, []byte(err.Error())
+		}
+	}
+
+	response, _ := json.Marshal(&o)
 	return http.StatusOK, response
 }
 
