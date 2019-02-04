@@ -17,10 +17,10 @@ func Trust(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	d := json.NewDecoder(r.Body)
 	d.Decode(&rh)
 
-	rs, h := services.Trust(uint(aid), rh)
+	rs, o := services.Trust(uint(aid), rh)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(rs)
-	w.Write(h)
+	w.Write(o)
 }
 
 func TrustUpdate(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
@@ -40,12 +40,12 @@ func TrustUpdate(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) 
 
 func Verify(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	aid, _ := strconv.Atoi(r.Header.Get("appId"))
-	h := path.Base(r.URL.Path)
+	o := path.Base(r.URL.Path)
 
-	rs, hs := services.Verify(uint(aid), h)
+	rs, os := services.Verify(uint(aid), o)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(rs)
-	w.Write(hs)
+	w.Write(os)
 }
 
 func Report(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
