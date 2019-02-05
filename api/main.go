@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/decentorganization/topaz/api/routers/v1"
 	"github.com/decentorganization/topaz/api/settings"
@@ -15,8 +16,10 @@ func main() {
 	n := negroni.Classic()
 	n.UseHandler(r)
 
-	log.Println("Wake up, Topaz... :)")
-	log.Fatal(http.ListenAndServe(":8080", n))
+	p := os.Getenv("API_PORT")
+
+	log.Println("topaz listening on", p)
+	log.Fatal(http.ListenAndServe(":"+p, n))
 }
 
 func init() {
