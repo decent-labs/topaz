@@ -34,7 +34,9 @@ func Trust(appID uint, hash *models.Hash) (int, []byte) {
 		return http.StatusInternalServerError, []byte(err.Error())
 	}
 
-	o.Hashes = append(o.Hashes, h)
+	if err := o.FindFullObject(database.Manager); err != nil {
+		return http.StatusInternalServerError, []byte(err.Error())
+	}
 
 	response, _ := json.Marshal(&o)
 	return http.StatusOK, response
