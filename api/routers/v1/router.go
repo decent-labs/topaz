@@ -6,11 +6,11 @@ import (
 
 // InitRoutes provisions our router with routes for various models
 func InitRoutes() *mux.Router {
-	router := mux.NewRouter()
-	router = SetAuthenticationRoutes(router)
-	router = SetTestRoutes(router)
-	router = SetUsersRoutes(router)
-	router = SetAppsRoutes(router)
-	router = SetObjectsRoutes(router)
-	return router
+	r := mux.NewRouter()
+	r = SetAuthenticationRoutes(r)
+	r = SetTestRoutes(r)
+	r = SetUsersRoutes(r)
+	r = SetAppsRoutes(r)
+	r = SetObjectsRoutes(r)
+	return r
 }

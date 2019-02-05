@@ -11,9 +11,9 @@ import (
 )
 
 func main() {
-	router := routers.InitRoutes()
+	r := routers.InitRoutes()
 	n := negroni.Classic()
-	n.UseHandler(router)
+	n.UseHandler(r)
 
 	log.Println("Wake up, Topaz... :)")
 	log.Fatal(http.ListenAndServe(":8080", n))
