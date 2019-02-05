@@ -27,7 +27,7 @@ func Trust(appID uint, hash *models.Hash) (int, []byte) {
 	h := models.Hash{
 		Hash:          hb,
 		UnixTimestamp: time.Now().Unix(),
-		Object:        o,
+		Object:        &o,
 	}
 
 	if err := h.CreateHash(database.Manager); err != nil {
@@ -64,7 +64,7 @@ func TrustUpdate(appID uint, uuid string, hash *models.Hash) (int, []byte) {
 	h := models.Hash{
 		Hash:          hb,
 		UnixTimestamp: time.Now().Unix(),
-		Object:        o,
+		Object:        &o,
 	}
 
 	if err := h.CreateHash(database.Manager); err != nil {
