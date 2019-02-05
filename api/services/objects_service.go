@@ -24,10 +24,6 @@ func Trust(appID uint, hash *models.Hash) (int, []byte) {
 		AppID: appID,
 	}
 
-	if err := o.MakeUUID(); err != nil {
-		return http.StatusInternalServerError, []byte(err.Error())
-	}
-
 	h := models.Hash{
 		Hash:          hb,
 		UnixTimestamp: time.Now().Unix(),
