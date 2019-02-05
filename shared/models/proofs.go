@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"strings"
 
 	"github.com/jinzhu/gorm"
@@ -16,7 +17,32 @@ type Proof struct {
 	BatchID uint   `json:"batchId"`
 	Batch   *Batch `json:"batch,omitempty"`
 
-	Objects Objects `json:"objects,omitempty"`
+	Hashes Hashes `json:"-"`
+}
+
+func (p *Proof) MarshalJSON() ([]byte, error) {
+	type Alias Proof
+	return json.Marshal(&struct {
+		*Alias
+		Hashes []interface{} `json:"hashes"`
+	}{
+		Alias:  (*Alias)(p),
+		Hashes: p.reduceHashes(),
+	})
+}
+
+func (p *Proof) reduceHashes() []interface{} {
+	a := make([]interface{}, 0, len(p.Hashes))
+	for _, h := range p.Hashes {
+		a = append(a, struct {
+			ID   uint   `json:"id"`
+			Hash string `json:"hash"`
+		}{
+			h.ID,
+			h.TransformHashToHex(),
+		})
+	}
+	return a
 }
 
 func (p *Proof) CreateProof(db *gorm.DB) error {
@@ -24,14 +50,14 @@ func (p *Proof) CreateProof(db *gorm.DB) error {
 }
 
 func (p *Proof) CheckValidity() error {
-	cur, err := p.Objects.GetMerkleRoot()
+	cur, err := p.Hashes.GetMerkleRoot()
 	if err != nil {
 		return err
 	}
 
 	validRoot := strings.Compare(cur, p.MerkleRoot) == 0
 
-	t, err := makeMerkleTree(&p.Objects)
+	t, err := makeMerkleTree(&p.Hashes)
 	if err != nil {
 		return err
 	}

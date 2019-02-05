@@ -2,7 +2,10 @@ package auth
 
 import (
 	"net/http"
+	"strconv"
 
+	"github.com/decentorganization/topaz/shared/database"
+	"github.com/decentorganization/topaz/shared/models"
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
@@ -29,6 +32,32 @@ func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, id s
 		if resource = claims[id]; resource == nil {
 			rw.WriteHeader(http.StatusUnauthorized)
 			return
+		}
+
+		if id == "userId" {
+			u := new(models.User)
+			uid, err := strconv.ParseUint(resource.(string), 10, 64)
+			if err != nil {
+				rw.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+			u.ID = uint(uid)
+			if err := u.FindUser(database.Manager); err != nil {
+				rw.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+		} else if id == "appId" {
+			aid, err := strconv.ParseUint(resource.(string), 10, 64)
+			if err != nil {
+				rw.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+			a := new(models.App)
+			a.ID = uint(aid)
+			if err := a.FindApp(database.Manager); err != nil {
+				rw.WriteHeader(http.StatusUnauthorized)
+				return
+			}
 		}
 
 		req.Header.Del(id)

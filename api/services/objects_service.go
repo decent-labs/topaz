@@ -1,6 +1,7 @@
 package services
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"net/http"
 	"time"
@@ -9,72 +10,114 @@ import (
 	"github.com/decentorganization/topaz/shared/models"
 )
 
-// Trust adds data to ipfs and creates a new 'object' in the database
-func Trust(appId uint, dataBlob []byte) (int, []byte) {
-	if len(dataBlob) == 0 {
-		return http.StatusBadRequest, []byte("no data")
+func Trust(appID uint, hash *models.Hash) (int, []byte) {
+	hb, err := hex.DecodeString(hash.HashHex)
+	if err != nil {
+		return http.StatusBadRequest, []byte("cannot decode hex hash")
+	}
+
+	if len(hb) != 32 {
+		return http.StatusBadRequest, []byte("invalid hash length")
 	}
 
 	o := models.Object{
-		DataBlob:      dataBlob,
-		AppID:         appId,
+		AppID: appID,
+	}
+
+	if err := o.MakeUUID(); err != nil {
+		return http.StatusInternalServerError, []byte(err.Error())
+	}
+
+	h := models.Hash{
+		Hash:          hb,
 		UnixTimestamp: time.Now().Unix(),
+		Object:        o,
 	}
 
-	hash, err := o.MakeHash()
-	if err != nil {
+	if err := h.CreateHash(database.Manager); err != nil {
 		return http.StatusInternalServerError, []byte(err.Error())
 	}
 
-	o.Hash = hash
+	o.Hashes = append(o.Hashes, h)
 
-	if err := o.CreateObject(database.Manager); err != nil {
-		return http.StatusInternalServerError, []byte(err.Error())
-	}
-
-	response, _ := json.Marshal(o)
+	response, _ := json.Marshal(&o)
 	return http.StatusOK, response
 }
 
-func Verify(appId uint, dataBlob []byte) (int, []byte) {
+func TrustUpdate(appID uint, uuid string, hash *models.Hash) (int, []byte) {
+	hb, err := hex.DecodeString(hash.HashHex)
+	if err != nil {
+		return http.StatusBadRequest, []byte("cannot decode hex hash")
+	}
+
+	if len(hb) != 32 {
+		return http.StatusBadRequest, []byte("invalid hash length")
+	}
+
 	o := models.Object{
-		DataBlob: dataBlob,
+		AppID: appID,
+		UUID:  uuid,
 	}
 
-	hash, err := o.MakeHash()
-	if err != nil {
+	if err := o.FindObject(database.Manager); err != nil {
+		return http.StatusBadRequest, []byte("invalid object")
+	}
+
+	h := models.Hash{
+		Hash:          hb,
+		UnixTimestamp: time.Now().Unix(),
+		Object:        o,
+	}
+
+	if err := h.CreateHash(database.Manager); err != nil {
 		return http.StatusInternalServerError, []byte(err.Error())
 	}
 
-	so := models.Object{
-		AppID: appId,
-		Hash:  hash,
-	}
-
-	os := new(models.Objects)
-	if err := os.GetVerifiedObjects(database.Manager, &so); err != nil {
+	if err := o.FindFullObject(database.Manager); err != nil {
 		return http.StatusInternalServerError, []byte(err.Error())
 	}
 
-	response, _ := json.Marshal(os)
+	response, _ := json.Marshal(&o)
 	return http.StatusOK, response
 }
 
-func Report(appId uint, body []byte) (int, []byte) {
-	var f interface{}
-	if err := json.Unmarshal(body, &f); err != nil {
+func Verify(appID uint, uuid string) (int, []byte) {
+	o := models.Object{
+		AppID: appID,
+		UUID:  uuid,
+	}
+
+	if err := o.FindObject(database.Manager); err != nil {
 		return http.StatusInternalServerError, []byte(err.Error())
 	}
 
-	m := f.(map[string]interface{})
-	start := int(m["start"].(float64))
-	end := int(m["end"].(float64))
-
-	os := new(models.Objects)
-	if err := os.GetObjectsByTimestamps(database.Manager, appId, start, end); err != nil {
+	if err := o.FindFullObject(database.Manager); err != nil {
 		return http.StatusInternalServerError, []byte(err.Error())
 	}
 
-	response, _ := json.Marshal(os)
+	for _, h := range o.Hashes {
+		if h.Proof == nil {
+			continue
+		}
+
+		if err := h.Proof.CheckValidity(); err != nil {
+			return http.StatusInternalServerError, []byte(err.Error())
+		}
+	}
+
+	response, _ := json.Marshal(&o)
+	return http.StatusOK, response
+}
+
+func Report(appID uint, start int, end int) (int, []byte) {
+	sa := new(models.App)
+	sa.ID = appID
+
+	hs := new(models.Hashes)
+	if err := hs.GetHashesByTimestamps(database.Manager, sa, start, end); err != nil {
+		return http.StatusInternalServerError, []byte(err.Error())
+	}
+
+	response, _ := json.Marshal(hs)
 	return http.StatusOK, response
 }

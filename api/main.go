@@ -6,7 +6,7 @@ import (
 
 	"github.com/decentorganization/topaz/api/routers"
 	"github.com/decentorganization/topaz/api/settings"
-	dotenv "github.com/joho/godotenv"
+	"github.com/joho/godotenv"
 	"github.com/urfave/negroni"
 )
 
@@ -20,7 +20,7 @@ func main() {
 }
 
 func init() {
-	err := dotenv.Load(".env")
+	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatalf("couldn't load dotenv: %s", err.Error())
 	}

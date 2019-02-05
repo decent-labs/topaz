@@ -14,15 +14,23 @@ func SetObjectsRoutes(router *mux.Router) *mux.Router {
 			negroni.HandlerFunc(auth.App),
 			negroni.HandlerFunc(controllers.Trust),
 		)).Methods("POST")
-	router.Handle("/verify",
+
+	router.Handle("/trust/{uuid}",
+		negroni.New(
+			negroni.HandlerFunc(auth.App),
+			negroni.HandlerFunc(controllers.TrustUpdate),
+		)).Methods("POST")
+
+	router.Handle("/verify/{hash}",
 		negroni.New(
 			negroni.HandlerFunc(auth.App),
 			negroni.HandlerFunc(controllers.Verify),
-		)).Methods("POST")
-	router.Handle("/report",
+		)).Methods("GET")
+
+	router.Handle("/report/{start}/{end}",
 		negroni.New(
 			negroni.HandlerFunc(auth.App),
 			negroni.HandlerFunc(controllers.Report),
-		)).Methods("POST")
+		)).Methods("GET")
 	return router
 }

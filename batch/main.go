@@ -37,13 +37,13 @@ func makeBatch(a models.App) (models.Batch, error) {
 	return b, nil
 }
 
-func getObjectsToBatch(app models.App) (models.Objects, error) {
-	objects := new(models.Objects)
-	err := objects.GetObjectsByAppID(database.Manager, app.ID)
-	return *objects, err
+func getHashesToBatch(app models.App) (models.Hashes, error) {
+	hashes := new(models.Hashes)
+	err := hashes.GetHashesByApp(database.Manager, &app)
+	return *hashes, err
 }
 
-func makeProof(objs models.Objects, batch models.Batch, root string, tx string) (models.Proof, error) {
+func makeProof(hashes models.Hashes, batch models.Batch, root string, tx string) (models.Proof, error) {
 	p := models.Proof{
 		BatchID:        batch.ID,
 		MerkleRoot:     root,
@@ -54,15 +54,15 @@ func makeProof(objs models.Objects, batch models.Batch, root string, tx string) 
 		return p, err
 	}
 
-	if err := objs.UpdateProof(database.Manager, &p.ID); err != nil {
+	if err := hashes.UpdateProof(database.Manager, &p.ID); err != nil {
 		return p, err
 	}
 
 	return p, nil
 }
 
-func newObjectsFlow(a models.App, os models.Objects) {
-	root, err := os.GetMerkleRoot()
+func newHashesFlow(a models.App, hs models.Hashes) {
+	root, err := hs.GetMerkleRoot()
 	if err != nil {
 		fmt.Errorf("couldn't create hash tree: " + err.Error())
 		return
@@ -80,14 +80,14 @@ func newObjectsFlow(a models.App, os models.Objects) {
 		return
 	}
 
-	_, err = makeProof(os, b, root, tx)
+	_, err = makeProof(hs, b, root, tx)
 	if err != nil {
 		fmt.Errorf("couldn't create proof: " + err.Error())
 		return
 	}
 }
 
-func noObjectsFlow(a models.App) {
+func noHashesFlow(a models.App) {
 	_, err := makeBatch(a)
 	if err != nil {
 		fmt.Errorf("didn't create batch record: " + err.Error())
@@ -103,16 +103,16 @@ func mainLoop() {
 	}
 
 	for _, a := range apps {
-		objs, err := getObjectsToBatch(a)
+		hashes, err := getHashesToBatch(a)
 		if err != nil {
 			fmt.Errorf("couldn't get objects to bacth: " + err.Error())
 			return
 		}
 
-		if len(objs) > 0 {
-			newObjectsFlow(a, objs)
+		if len(hashes) > 0 {
+			newHashesFlow(a, hashes)
 		} else {
-			noObjectsFlow(a)
+			noHashesFlow(a)
 		}
 	}
 }

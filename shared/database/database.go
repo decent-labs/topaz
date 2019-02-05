@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/jinzhu/gorm"
-	dotenv "github.com/joho/godotenv"
+	"github.com/joho/godotenv"
 
 	// gorm requires a "dialect" is imported to communicate with postgres
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -16,7 +16,7 @@ import (
 var Manager *gorm.DB
 
 func init() {
-	err := dotenv.Load(".env")
+	err := godotenv.Load()
 	if err != nil {
 		log.Fatalf("couldn't load dotenv: %s", err.Error())
 	}
