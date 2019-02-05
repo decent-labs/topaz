@@ -24,21 +24,19 @@ func Trust(appID uint, hash *models.Hash) (int, []byte) {
 		AppID: appID,
 	}
 
-	if err := o.MakeUUID(); err != nil {
-		return http.StatusInternalServerError, []byte(err.Error())
-	}
-
 	h := models.Hash{
 		Hash:          hb,
 		UnixTimestamp: time.Now().Unix(),
-		Object:        o,
+		Object:        &o,
 	}
 
 	if err := h.CreateHash(database.Manager); err != nil {
 		return http.StatusInternalServerError, []byte(err.Error())
 	}
 
-	o.Hashes = append(o.Hashes, h)
+	if err := o.FindFullObject(database.Manager); err != nil {
+		return http.StatusInternalServerError, []byte(err.Error())
+	}
 
 	response, _ := json.Marshal(&o)
 	return http.StatusOK, response
@@ -66,7 +64,7 @@ func TrustUpdate(appID uint, uuid string, hash *models.Hash) (int, []byte) {
 	h := models.Hash{
 		Hash:          hb,
 		UnixTimestamp: time.Now().Unix(),
-		Object:        o,
+		Object:        &o,
 	}
 
 	if err := h.CreateHash(database.Manager); err != nil {

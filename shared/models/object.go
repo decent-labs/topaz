@@ -18,12 +18,12 @@ type Object struct {
 
 type Objects []Object
 
-func (o *Object) MakeUUID() error {
+func (o *Object) BeforeCreate(scope *gorm.Scope) error {
 	uuid, err := uuid.NewV4()
 	if err != nil {
 		return err
 	}
-	o.UUID = uuid.String()
+	scope.SetColumn("uuid", uuid.String())
 	return nil
 }
 

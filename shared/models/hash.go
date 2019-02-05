@@ -18,10 +18,10 @@ type Hash struct {
 	Hash          []byte `json:"-"`
 	UnixTimestamp int64  `json:"unixTimestamp"`
 
-	ObjectID uint   `json:"-"`
-	Object   Object `json:"-"`
-	ProofID  *uint  `json:"-"`
-	Proof    *Proof `json:"proof"`
+	ObjectID *uint   `json:"-"`
+	Object   *Object `json:"-"`
+	ProofID  *uint   `json:"-"`
+	Proof    *Proof  `json:"proof"`
 }
 
 type Hashes []Hash
