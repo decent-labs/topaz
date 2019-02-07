@@ -10,7 +10,7 @@ import (
 
 // NewApp allows a user to create a new entry in the 'apps' table
 func NewApp(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	uid := r.Context().Value(models.UserID).(uint)
+	uid := r.Context().Value(models.UserID).(string)
 
 	requestApp := new(models.App)
 	decoder := json.NewDecoder(r.Body)

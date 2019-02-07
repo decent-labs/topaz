@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/hex"
 	"encoding/json"
+	"time"
 
 	"github.com/cbergoon/merkletree"
 	"github.com/jinzhu/gorm"
@@ -12,15 +13,18 @@ import (
 )
 
 type Hash struct {
-	gorm.Model
+	ID        string     `gorm:"primary_key" json:"id"`
+	CreatedAt time.Time  `json:"createdAt"`
+	UpdatedAt time.Time  `json:"updatedAt"`
+	DeletedAt *time.Time `sql:"index" json:"deletedAt"`
 
 	HashHex       string `json:"hash" gorm:"-"`
 	Hash          []byte `json:"-"`
 	UnixTimestamp int64  `json:"unixTimestamp"`
 
-	ObjectID *uint   `json:"-"`
+	ObjectID *string `json:"-"`
 	Object   *Object `json:"-"`
-	ProofID  *uint   `json:"-"`
+	ProofID  *string `json:"-"`
 	Proof    *Proof  `json:"proof"`
 }
 
@@ -74,8 +78,8 @@ func (hs *Hashes) GetHashesByApp(db *gorm.DB, app *App) error {
 		Error
 }
 
-func (hs Hashes) UpdateProof(db *gorm.DB, proofID *uint) error {
-	ids := make([]uint, len(hs))
+func (hs Hashes) UpdateProof(db *gorm.DB, proofID *string) error {
+	ids := make([]string, len(hs))
 	for i, h := range hs {
 		ids[i] = h.ID
 	}

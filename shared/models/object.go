@@ -1,31 +1,24 @@
 package models
 
 import (
-	"github.com/gofrs/uuid"
+	"time"
+
 	"github.com/jinzhu/gorm"
 )
 
 type Object struct {
-	gorm.Model
+	ID        string     `gorm:"primary_key" json:"id"`
+	CreatedAt time.Time  `json:"createdAt"`
+	UpdatedAt time.Time  `json:"updatedAt"`
+	DeletedAt *time.Time `sql:"index" json:"deletedAt"`
 
-	UUID string `json:"uuid"`
-
-	AppID uint `json:"appId"`
-	App   *App `json:"app,omitempty"`
+	AppID string `json:"appId"`
+	App   *App   `json:"app,omitempty"`
 
 	Hashes Hashes `json:"hashes"`
 }
 
 type Objects []Object
-
-func (o *Object) BeforeCreate(scope *gorm.Scope) error {
-	uuid, err := uuid.NewV4()
-	if err != nil {
-		return err
-	}
-	scope.SetColumn("uuid", uuid.String())
-	return nil
-}
 
 func (o *Object) CreateObject(db *gorm.DB) error {
 	return db.Create(&o).Error

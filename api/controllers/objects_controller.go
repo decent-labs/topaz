@@ -11,7 +11,7 @@ import (
 )
 
 func Trust(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	aid := r.Context().Value(models.AppID).(uint)
+	aid := r.Context().Value(models.AppID).(string)
 
 	rh := new(models.Hash)
 	d := json.NewDecoder(r.Body)
@@ -25,7 +25,7 @@ func Trust(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 }
 
 func TrustUpdate(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	aid := r.Context().Value(models.AppID).(uint)
+	aid := r.Context().Value(models.AppID).(string)
 	uuid := path.Base(r.URL.Path)
 
 	rh := new(models.Hash)
@@ -40,7 +40,7 @@ func TrustUpdate(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) 
 }
 
 func Verify(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	aid := r.Context().Value(models.AppID).(uint)
+	aid := r.Context().Value(models.AppID).(string)
 	o := path.Base(r.URL.Path)
 
 	rs, os := services.Verify(aid, o)
@@ -51,7 +51,7 @@ func Verify(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 }
 
 func Report(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	aid := r.Context().Value(models.AppID).(uint)
+	aid := r.Context().Value(models.AppID).(string)
 	s, _ := strconv.Atoi(path.Base(path.Dir(r.URL.Path)))
 	e, _ := strconv.Atoi(path.Base(r.URL.Path))
 

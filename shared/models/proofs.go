@@ -3,18 +3,22 @@ package models
 import (
 	"encoding/json"
 	"strings"
+	"time"
 
 	"github.com/jinzhu/gorm"
 )
 
 type Proof struct {
-	gorm.Model
+	ID        string     `gorm:"primary_key" json:"id"`
+	CreatedAt time.Time  `json:"createdAt"`
+	UpdatedAt time.Time  `json:"updatedAt"`
+	DeletedAt *time.Time `sql:"index" json:"deletedAt"`
 
 	MerkleRoot     string `json:"merkleRoot"`
 	EthTransaction string `json:"ethTransaction"`
 	ValidStructure bool   `json:"validStructure" gorm:"-"`
 
-	BatchID uint   `json:"batchId"`
+	BatchID string `json:"batchId"`
 	Batch   *Batch `json:"batch,omitempty"`
 
 	Hashes Hashes `json:"-"`
@@ -35,7 +39,7 @@ func (p *Proof) reduceHashes() []interface{} {
 	a := make([]interface{}, 0, len(p.Hashes))
 	for _, h := range p.Hashes {
 		a = append(a, struct {
-			ID   uint   `json:"id"`
+			ID   string `json:"id"`
 			Hash string `json:"hash"`
 		}{
 			h.ID,
