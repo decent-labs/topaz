@@ -16,7 +16,7 @@ const (
 	appID  key = "appId"
 )
 
-func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, id string) {
+func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, id key) {
 	token, err := InitJWTAuthenticationBackend().GetToken(req)
 
 	if err != nil {
@@ -36,12 +36,12 @@ func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, id s
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok {
 		var resource interface{}
-		if resource = claims[id]; resource == nil {
+		if resource = claims[string(id)]; resource == nil {
 			rw.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 
-		if id == "userId" {
+		if id == userID {
 			uid, err := strconv.ParseUint(resource.(string), 10, 64)
 			if err != nil {
 				rw.WriteHeader(http.StatusUnauthorized)
@@ -53,7 +53,7 @@ func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, id s
 				rw.WriteHeader(http.StatusUnauthorized)
 				return
 			}
-		} else if id == "appId" {
+		} else if id == appID {
 			aid, err := strconv.ParseUint(resource.(string), 10, 64)
 			if err != nil {
 				rw.WriteHeader(http.StatusUnauthorized)
@@ -67,8 +67,8 @@ func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, id s
 			}
 		}
 
-		req.Header.Del(id)
-		req.Header.Add(id, resource.(string))
+		req.Header.Del(string(id))
+		req.Header.Add(string(id), resource.(string))
 		next(rw, req)
 	} else {
 		rw.WriteHeader(http.StatusUnauthorized)
@@ -77,10 +77,10 @@ func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, id s
 
 // Admin ...
 func Admin(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	auth(rw, req, next, "userId")
+	auth(rw, req, next, userID)
 }
 
 // App ...
 func App(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	auth(rw, req, next, "appId")
+	auth(rw, req, next, appID)
 }
