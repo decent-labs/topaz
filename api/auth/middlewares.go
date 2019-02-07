@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"context"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -9,7 +11,7 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
-func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, id string) {
+func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, rID models.AuthKey) {
 	token, err := InitJWTAuthenticationBackend().GetToken(req)
 
 	if err != nil {
@@ -27,53 +29,62 @@ func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, id s
 		return
 	}
 
-	if claims, ok := token.Claims.(jwt.MapClaims); ok {
-		var resource interface{}
-		if resource = claims[id]; resource == nil {
-			rw.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-
-		if id == "userId" {
-			u := new(models.User)
-			uid, err := strconv.ParseUint(resource.(string), 10, 64)
-			if err != nil {
-				rw.WriteHeader(http.StatusUnauthorized)
-				return
-			}
-			u.ID = uint(uid)
-			if err := u.FindUser(database.Manager); err != nil {
-				rw.WriteHeader(http.StatusUnauthorized)
-				return
-			}
-		} else if id == "appId" {
-			aid, err := strconv.ParseUint(resource.(string), 10, 64)
-			if err != nil {
-				rw.WriteHeader(http.StatusUnauthorized)
-				return
-			}
-			a := new(models.App)
-			a.ID = uint(aid)
-			if err := a.FindApp(database.Manager); err != nil {
-				rw.WriteHeader(http.StatusUnauthorized)
-				return
-			}
-		}
-
-		req.Header.Del(id)
-		req.Header.Add(id, resource.(string))
-		next(rw, req)
-	} else {
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
 		rw.WriteHeader(http.StatusUnauthorized)
+		return
 	}
+
+	res := claims[string(rID)]
+	if res == nil {
+		rw.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	r, err := strconv.ParseUint(res.(string), 10, 64)
+	if err != nil {
+		rw.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	ru := uint(r)
+
+	if err := verifyAuth(rID, ru); err != nil {
+		rw.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	ctx := context.WithValue(req.Context(), rID, ru)
+	next(rw, req.WithContext(ctx))
 }
 
 // Admin ...
 func Admin(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	auth(rw, req, next, "userId")
+	auth(rw, req, next, models.UserID)
 }
 
 // App ...
 func App(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	auth(rw, req, next, "appId")
+	auth(rw, req, next, models.AppID)
+}
+
+func verifyAuth(rID models.AuthKey, r uint) error {
+	switch rID {
+	case models.UserID:
+		return verifyUser(r)
+	case models.AppID:
+		return verifyApp(r)
+	}
+	return errors.New("unknown resource ID")
+}
+
+func verifyUser(r uint) error {
+	u := new(models.User)
+	u.ID = r
+	return u.FindUser(database.Manager)
+}
+
+func verifyApp(r uint) error {
+	a := new(models.App)
+	a.ID = r
+	return a.FindApp(database.Manager)
 }

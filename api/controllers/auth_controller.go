@@ -3,7 +3,6 @@ package controllers
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	"github.com/decentorganization/topaz/api/services"
 	"github.com/decentorganization/topaz/shared/models"
@@ -16,6 +15,7 @@ func AdminLogin(w http.ResponseWriter, r *http.Request) {
 	decoder.Decode(&requestUser)
 
 	responseStatus, token := services.AdminLogin(requestUser)
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(responseStatus)
 	w.Write(token)
@@ -28,6 +28,7 @@ func AdminRefreshToken(w http.ResponseWriter, r *http.Request, next http.Handler
 	decoder.Decode(&requestUser)
 
 	responseStatus, token := services.AdminRefreshToken(requestUser)
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(responseStatus)
 	w.Write(token)
@@ -35,8 +36,9 @@ func AdminRefreshToken(w http.ResponseWriter, r *http.Request, next http.Handler
 
 // AdminLogout returns the result of an attempted logout by an admin user
 func AdminLogout(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	err := services.AdminLogout(r)
 	w.Header().Set("Content-Type", "application/json")
+
+	err := services.AdminLogout(r)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {
@@ -46,13 +48,15 @@ func AdminLogout(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) 
 
 // AppLogin returns the result of an attempted login by an 'app'
 func AppLogin(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	uid := r.Context().Value(models.UserID).(uint)
+
 	requestApp := new(models.App)
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&requestApp)
+	requestApp.UserID = uid
 
-	userID, _ := strconv.Atoi(r.Header.Get("userId"))
-	requestApp.UserID = uint(userID)
 	responseStatus, token := services.AppLogin(requestApp)
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(responseStatus)
 	w.Write(token)
@@ -60,13 +64,15 @@ func AppLogin(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 
 // AppRefreshToken returns the result of an attempted token refresh by an 'app'
 func AppRefreshToken(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	aid := r.Context().Value(models.AppID).(uint)
+
 	requestApp := new(models.App)
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&requestApp)
+	requestApp.ID = aid
 
-	s, _ := strconv.ParseUint(r.Header.Get("appId"), 10, 32)
-	requestApp.ID = uint(s)
 	responseStatus, token := services.AppRefreshToken(requestApp)
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(responseStatus)
 	w.Write(token)
