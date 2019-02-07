@@ -7,12 +7,28 @@ import (
 	"github.com/urfave/negroni"
 )
 
-// SetAppsRoutes provisions routes for 'apps'
-func SetAppsRoutes(router *mux.Router) *mux.Router {
-	router.Handle("/apps",
-		negroni.New(
-			negroni.HandlerFunc(auth.Admin),
-			negroni.HandlerFunc(controllers.CreateApp),
-		)).Methods("POST")
-	return router
+// SetAppsRoutes provisions routes for 'apps'.
+// All methods scoped to user
+func SetAppsRoutes(r *mux.Router) *mux.Router {
+	s := r.PathPrefix("/apps").Subrouter()
+
+	// Create new app
+	s.Handle("", negroni.New(
+		negroni.HandlerFunc(auth.Admin),
+		negroni.HandlerFunc(controllers.CreateApp),
+	)).Methods("POST")
+
+	// Get all apps
+	s.Handle("", negroni.New(
+		negroni.HandlerFunc(auth.Admin),
+		negroni.HandlerFunc(controllers.GetApps),
+	)).Methods("GET")
+
+	// Get single app
+	s.Handle("/{id}", negroni.New(
+		negroni.HandlerFunc(auth.Admin),
+		negroni.HandlerFunc(controllers.GetApp),
+	)).Methods("GET")
+
+	return r
 }
