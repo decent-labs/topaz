@@ -47,30 +47,9 @@ func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, rID 
 	}
 	r := res.(string)
 
-	if rID == userID {
-		uid, err := strconv.ParseUint(r, 10, 64)
-		if err != nil {
-			rw.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-		u := new(models.User)
-		u.ID = uint(uid)
-		if err := u.FindUser(database.Manager); err != nil {
-			rw.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-	} else if rID == appID {
-		aid, err := strconv.ParseUint(r, 10, 64)
-		if err != nil {
-			rw.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-		a := new(models.App)
-		a.ID = uint(aid)
-		if err := a.FindApp(database.Manager); err != nil {
-			rw.WriteHeader(http.StatusUnauthorized)
-			return
-		}
+	if !verifyAuth(rID, r) {
+		rw.WriteHeader(http.StatusUnauthorized)
+		return
 	}
 
 	req.Header.Del(string(rID))
@@ -86,4 +65,49 @@ func Admin(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 // App ...
 func App(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	auth(rw, req, next, appID)
+}
+
+func verifyAuth(rID key, r string) bool {
+	if rID == userID {
+		return verifyUser(r)
+	} else if rID == appID {
+		return verifyApp(r)
+	}
+	return false
+}
+
+func verifyUser(r string) bool {
+	id, ok := parseID(r)
+	if !ok {
+		return false
+	}
+
+	u := new(models.User)
+	u.ID = id
+	if err := u.FindUser(database.Manager); err != nil {
+		return false
+	}
+	return true
+}
+
+func verifyApp(r string) bool {
+	id, ok := parseID(r)
+	if !ok {
+		return false
+	}
+
+	a := new(models.App)
+	a.ID = id
+	if err := a.FindApp(database.Manager); err != nil {
+		return false
+	}
+	return true
+}
+
+func parseID(r string) (uint, bool) {
+	id, err := strconv.ParseUint(r, 10, 64)
+	if err != nil {
+		return 0, false
+	}
+	return uint(id), true
 }
