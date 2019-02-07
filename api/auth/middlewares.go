@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"net/http"
-	"strconv"
 
 	"github.com/decentorganization/topaz/shared/database"
 	"github.com/decentorganization/topaz/shared/models"
@@ -41,19 +40,13 @@ func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, rID 
 		return
 	}
 
-	r, err := strconv.ParseUint(res.(string), 10, 64)
-	if err != nil {
-		rw.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-	ru := uint(r)
-
-	if err := verifyAuth(rID, ru); err != nil {
+	r := res.(string)
+	if err := verifyAuth(rID, r); err != nil {
 		rw.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	ctx := context.WithValue(req.Context(), rID, ru)
+	ctx := context.WithValue(req.Context(), rID, r)
 	next(rw, req.WithContext(ctx))
 }
 
@@ -67,7 +60,7 @@ func App(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	auth(rw, req, next, models.AppID)
 }
 
-func verifyAuth(rID models.AuthKey, r uint) error {
+func verifyAuth(rID models.AuthKey, r string) error {
 	switch rID {
 	case models.UserID:
 		return verifyUser(r)
@@ -77,13 +70,13 @@ func verifyAuth(rID models.AuthKey, r uint) error {
 	return errors.New("unknown resource ID")
 }
 
-func verifyUser(r uint) error {
+func verifyUser(r string) error {
 	u := new(models.User)
 	u.ID = r
 	return u.FindUser(database.Manager)
 }
 
-func verifyApp(r uint) error {
+func verifyApp(r string) error {
 	a := new(models.App)
 	a.ID = r
 	return a.FindApp(database.Manager)
