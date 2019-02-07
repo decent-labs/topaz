@@ -10,7 +10,7 @@ import (
 	"github.com/decentorganization/topaz/shared/models"
 )
 
-func Trust(appID uint, hash *models.Hash) (int, []byte) {
+func Trust(appID string, hash *models.Hash) (int, []byte) {
 	hb, err := hex.DecodeString(hash.HashHex)
 	if err != nil {
 		return http.StatusBadRequest, []byte("cannot decode hex hash")
@@ -42,7 +42,7 @@ func Trust(appID uint, hash *models.Hash) (int, []byte) {
 	return http.StatusOK, response
 }
 
-func TrustUpdate(appID uint, uuid string, hash *models.Hash) (int, []byte) {
+func TrustUpdate(appID string, uuid string, hash *models.Hash) (int, []byte) {
 	hb, err := hex.DecodeString(hash.HashHex)
 	if err != nil {
 		return http.StatusBadRequest, []byte("cannot decode hex hash")
@@ -79,7 +79,7 @@ func TrustUpdate(appID uint, uuid string, hash *models.Hash) (int, []byte) {
 	return http.StatusOK, response
 }
 
-func Verify(appID uint, uuid string) (int, []byte) {
+func Verify(appID string, uuid string) (int, []byte) {
 	o := models.Object{
 		AppID: appID,
 		UUID:  uuid,
@@ -107,7 +107,7 @@ func Verify(appID uint, uuid string) (int, []byte) {
 	return http.StatusOK, response
 }
 
-func Report(appID uint, start int, end int) (int, []byte) {
+func Report(appID string, start int, end int) (int, []byte) {
 	sa := new(models.App)
 	sa.ID = appID
 

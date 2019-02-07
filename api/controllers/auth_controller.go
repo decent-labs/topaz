@@ -48,7 +48,7 @@ func AdminLogout(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) 
 
 // AppLogin returns the result of an attempted login by an 'app'
 func AppLogin(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	uid := r.Context().Value(models.UserID).(uint)
+	uid := r.Context().Value(models.UserID).(string)
 
 	requestApp := new(models.App)
 	decoder := json.NewDecoder(r.Body)
@@ -64,7 +64,7 @@ func AppLogin(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 
 // AppRefreshToken returns the result of an attempted token refresh by an 'app'
 func AppRefreshToken(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	aid := r.Context().Value(models.AppID).(uint)
+	aid := r.Context().Value(models.AppID).(string)
 
 	requestApp := new(models.App)
 	decoder := json.NewDecoder(r.Body)
