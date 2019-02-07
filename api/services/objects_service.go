@@ -53,8 +53,8 @@ func TrustUpdate(appID string, uuid string, hash *models.Hash) (int, []byte) {
 	}
 
 	o := models.Object{
+		ID:    uuid,
 		AppID: appID,
-		UUID:  uuid,
 	}
 
 	if err := o.FindObject(database.Manager); err != nil {
@@ -81,8 +81,8 @@ func TrustUpdate(appID string, uuid string, hash *models.Hash) (int, []byte) {
 
 func Verify(appID string, uuid string) (int, []byte) {
 	o := models.Object{
+		ID:    uuid,
 		AppID: appID,
-		UUID:  uuid,
 	}
 
 	if err := o.FindObject(database.Manager); err != nil {

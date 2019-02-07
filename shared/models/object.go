@@ -3,7 +3,6 @@ package models
 import (
 	"time"
 
-	"github.com/gofrs/uuid"
 	"github.com/jinzhu/gorm"
 )
 
@@ -13,8 +12,6 @@ type Object struct {
 	UpdatedAt time.Time  `json:"updatedAt"`
 	DeletedAt *time.Time `sql:"index" json:"deletedAt"`
 
-	UUID string `json:"uuid"`
-
 	AppID string `json:"appId"`
 	App   *App   `json:"app,omitempty"`
 
@@ -22,15 +19,6 @@ type Object struct {
 }
 
 type Objects []Object
-
-func (o *Object) BeforeCreate(scope *gorm.Scope) error {
-	uuid, err := uuid.NewV4()
-	if err != nil {
-		return err
-	}
-	scope.SetColumn("uuid", uuid.String())
-	return nil
-}
 
 func (o *Object) CreateObject(db *gorm.DB) error {
 	return db.Create(&o).Error

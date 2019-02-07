@@ -48,8 +48,7 @@ CREATE TABLE objects (
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
     deleted_at TIMESTAMP,
-    app_id uuid REFERENCES apps(id),
-    uuid uuid NOT NULL
+    app_id uuid REFERENCES apps(id)
 );
 
 CREATE TABLE hashes (
@@ -58,7 +57,7 @@ CREATE TABLE hashes (
     updated_at TIMESTAMP NOT NULL,
     deleted_at TIMESTAMP,
     object_id uuid REFERENCES objects(id),
-    proof_id uuid,
+    proof_id uuid REFERENCES proofs(id),
     hash BYTEA NOT NULL,
     unix_timestamp INTEGER NOT NULL
 );
