@@ -16,7 +16,7 @@ const (
 	appID  key = "appId"
 )
 
-func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, id key) {
+func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, rID key) {
 	token, err := InitJWTAuthenticationBackend().GetToken(req)
 
 	if err != nil {
@@ -40,14 +40,15 @@ func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, id k
 		return
 	}
 
-	resource := claims[string(id)]
-	if resource == nil {
+	res := claims[string(rID)]
+	if res == nil {
 		rw.WriteHeader(http.StatusUnauthorized)
 		return
 	}
+	r := res.(string)
 
-	if id == userID {
-		uid, err := strconv.ParseUint(resource.(string), 10, 64)
+	if rID == userID {
+		uid, err := strconv.ParseUint(r, 10, 64)
 		if err != nil {
 			rw.WriteHeader(http.StatusUnauthorized)
 			return
@@ -58,8 +59,8 @@ func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, id k
 			rw.WriteHeader(http.StatusUnauthorized)
 			return
 		}
-	} else if id == appID {
-		aid, err := strconv.ParseUint(resource.(string), 10, 64)
+	} else if rID == appID {
+		aid, err := strconv.ParseUint(r, 10, 64)
 		if err != nil {
 			rw.WriteHeader(http.StatusUnauthorized)
 			return
@@ -72,8 +73,8 @@ func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, id k
 		}
 	}
 
-	req.Header.Del(string(id))
-	req.Header.Add(string(id), resource.(string))
+	req.Header.Del(string(rID))
+	req.Header.Add(string(rID), r)
 	next(rw, req)
 }
 
