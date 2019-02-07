@@ -33,3 +33,31 @@ func CreateApp(newApp *models.App) (int, []byte) {
 	r, _ := json.Marshal(a)
 	return http.StatusOK, r
 }
+
+func GetApps(uid string) (int, []byte) {
+	u := models.User{
+		ID: uid,
+	}
+
+	as := new(models.Apps)
+	if err := as.GetAppsForUser(&u, database.Manager); err != nil {
+		return http.StatusInternalServerError, []byte(err.Error())
+	}
+
+	r, _ := json.Marshal(as)
+	return http.StatusOK, r
+}
+
+func GetApp(uid string, aid string) (int, []byte) {
+	a := models.App{
+		ID:     aid,
+		UserID: uid,
+	}
+
+	if err := a.FindApp(database.Manager); err != nil {
+		return http.StatusInternalServerError, []byte(err.Error())
+	}
+
+	r, _ := json.Marshal(a)
+	return http.StatusOK, r
+}
