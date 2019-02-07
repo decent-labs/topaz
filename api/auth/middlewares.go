@@ -34,45 +34,47 @@ func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, id k
 		return
 	}
 
-	if claims, ok := token.Claims.(jwt.MapClaims); ok {
-		var resource interface{}
-		if resource = claims[string(id)]; resource == nil {
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		rw.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	resource := claims[string(id)]
+	if resource == nil {
+		rw.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	if id == userID {
+		uid, err := strconv.ParseUint(resource.(string), 10, 64)
+		if err != nil {
 			rw.WriteHeader(http.StatusUnauthorized)
 			return
 		}
-
-		if id == userID {
-			uid, err := strconv.ParseUint(resource.(string), 10, 64)
-			if err != nil {
-				rw.WriteHeader(http.StatusUnauthorized)
-				return
-			}
-			u := new(models.User)
-			u.ID = uint(uid)
-			if err := u.FindUser(database.Manager); err != nil {
-				rw.WriteHeader(http.StatusUnauthorized)
-				return
-			}
-		} else if id == appID {
-			aid, err := strconv.ParseUint(resource.(string), 10, 64)
-			if err != nil {
-				rw.WriteHeader(http.StatusUnauthorized)
-				return
-			}
-			a := new(models.App)
-			a.ID = uint(aid)
-			if err := a.FindApp(database.Manager); err != nil {
-				rw.WriteHeader(http.StatusUnauthorized)
-				return
-			}
+		u := new(models.User)
+		u.ID = uint(uid)
+		if err := u.FindUser(database.Manager); err != nil {
+			rw.WriteHeader(http.StatusUnauthorized)
+			return
 		}
-
-		req.Header.Del(string(id))
-		req.Header.Add(string(id), resource.(string))
-		next(rw, req)
-	} else {
-		rw.WriteHeader(http.StatusUnauthorized)
+	} else if id == appID {
+		aid, err := strconv.ParseUint(resource.(string), 10, 64)
+		if err != nil {
+			rw.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		a := new(models.App)
+		a.ID = uint(aid)
+		if err := a.FindApp(database.Manager); err != nil {
+			rw.WriteHeader(http.StatusUnauthorized)
+			return
+		}
 	}
+
+	req.Header.Del(string(id))
+	req.Header.Add(string(id), resource.(string))
+	next(rw, req)
 }
 
 // Admin ...
