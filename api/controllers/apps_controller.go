@@ -16,10 +16,10 @@ func NewApp(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&requestApp)
 	requestApp.UserID = uid
+	rs, a := services.CreateApp(ra)
 
-	responseStatus, app := services.NewApp(requestApp)
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(responseStatus)
-	w.Write(app)
+	w.WriteHeader(rs)
+	w.Write(a)
 }
