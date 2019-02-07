@@ -3,7 +3,6 @@ package controllers
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	"github.com/decentorganization/topaz/api/services"
 	"github.com/decentorganization/topaz/shared/models"
@@ -11,13 +10,15 @@ import (
 
 // NewApp allows a user to create a new entry in the 'apps' table
 func NewApp(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	uid := r.Context().Value(models.UserID).(uint)
+
 	requestApp := new(models.App)
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&requestApp)
+	requestApp.UserID = uid
 
-	userID, _ := strconv.Atoi(r.Header.Get("userId"))
-	requestApp.UserID = uint(userID)
 	responseStatus, app := services.NewApp(requestApp)
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(responseStatus)
 	w.Write(app)

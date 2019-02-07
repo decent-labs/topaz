@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"strconv"
@@ -52,9 +53,8 @@ func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, rID 
 		return
 	}
 
-	req.Header.Del(string(rID))
-	req.Header.Add(string(rID), res.(string))
-	next(rw, req)
+	ctx := context.WithValue(req.Context(), rID, ru)
+	next(rw, req.WithContext(ctx))
 }
 
 // Admin ...
