@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -38,15 +39,21 @@ func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, rID 
 		rw.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-	r := res.(string)
 
-	if !verifyAuth(rID, r) {
+	r, err := strconv.ParseUint(res.(string), 10, 64)
+	if err != nil {
+		rw.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	ru := uint(r)
+
+	if err := verifyAuth(rID, ru); err != nil {
 		rw.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
 	req.Header.Del(string(rID))
-	req.Header.Add(string(rID), r)
+	req.Header.Add(string(rID), res.(string))
 	next(rw, req)
 }
 
@@ -60,47 +67,24 @@ func App(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	auth(rw, req, next, models.AppID)
 }
 
-func verifyAuth(rID models.AuthKey, r string) bool {
-	if rID == models.UserID {
+func verifyAuth(rID models.AuthKey, r uint) error {
+	switch rID {
+	case models.UserID:
 		return verifyUser(r)
-	} else if rID == models.AppID {
+	case models.AppID:
 		return verifyApp(r)
 	}
-	return false
+	return errors.New("unknown resource ID")
 }
 
-func verifyUser(r string) bool {
-	id, ok := parseID(r)
-	if !ok {
-		return false
-	}
-
+func verifyUser(r uint) error {
 	u := new(models.User)
-	u.ID = id
-	if err := u.FindUser(database.Manager); err != nil {
-		return false
-	}
-	return true
+	u.ID = r
+	return u.FindUser(database.Manager)
 }
 
-func verifyApp(r string) bool {
-	id, ok := parseID(r)
-	if !ok {
-		return false
-	}
-
+func verifyApp(r uint) error {
 	a := new(models.App)
-	a.ID = id
-	if err := a.FindApp(database.Manager); err != nil {
-		return false
-	}
-	return true
-}
-
-func parseID(r string) (uint, bool) {
-	id, err := strconv.ParseUint(r, 10, 64)
-	if err != nil {
-		return 0, false
-	}
-	return uint(id), true
+	a.ID = r
+	return a.FindApp(database.Manager)
 }
