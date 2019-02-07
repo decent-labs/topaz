@@ -8,14 +8,14 @@ import (
 	"github.com/decentorganization/topaz/shared/models"
 )
 
-// NewApp allows a user to create a new entry in the 'apps' table
-func NewApp(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+func CreateApp(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	uid := r.Context().Value(models.UserID).(string)
 
-	requestApp := new(models.App)
-	decoder := json.NewDecoder(r.Body)
-	decoder.Decode(&requestApp)
-	requestApp.UserID = uid
+	ra := new(models.App)
+	d := json.NewDecoder(r.Body)
+	d.Decode(&ra)
+	ra.UserID = uid
+
 	rs, a := services.CreateApp(ra)
 
 

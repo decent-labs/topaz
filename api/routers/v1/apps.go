@@ -12,7 +12,7 @@ func SetAppsRoutes(router *mux.Router) *mux.Router {
 	router.Handle("/apps",
 		negroni.New(
 			negroni.HandlerFunc(auth.Admin),
-			negroni.HandlerFunc(controllers.NewApp),
+			negroni.HandlerFunc(controllers.CreateApp),
 		)).Methods("POST")
 	return router
 }
