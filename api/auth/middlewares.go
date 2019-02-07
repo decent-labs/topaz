@@ -9,6 +9,13 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
+type key string
+
+const (
+	userID key = "userId"
+	appID  key = "appId"
+)
+
 func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, id string) {
 	token, err := InitJWTAuthenticationBackend().GetToken(req)
 
