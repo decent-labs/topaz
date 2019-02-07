@@ -1,17 +1,24 @@
 package models
 
-import "github.com/jinzhu/gorm"
+import (
+	"time"
+
+	"github.com/jinzhu/gorm"
+)
 
 type App struct {
-	gorm.Model
+	ID        string     `gorm:"primary_key" json:"id"`
+	CreatedAt time.Time  `json:"createdAt"`
+	UpdatedAt time.Time  `json:"updatedAt"`
+	DeletedAt *time.Time `sql:"index" json:"deletedAt"`
 
 	Interval    int    `json:"interval"`
 	Name        string `json:"name"`
 	LastBatched *int64 `json:"-"`
 	EthAddress  string `json:"ethAddress"`
 
-	UserID uint  `json:"userId"`
-	User   *User `json:"user,omitempty"`
+	UserID string `json:"userId"`
+	User   *User  `json:"user,omitempty"`
 }
 
 type Apps []App

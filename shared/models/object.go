@@ -1,17 +1,22 @@
 package models
 
 import (
+	"time"
+
 	"github.com/gofrs/uuid"
 	"github.com/jinzhu/gorm"
 )
 
 type Object struct {
-	gorm.Model
+	ID        string     `gorm:"primary_key" json:"id"`
+	CreatedAt time.Time  `json:"createdAt"`
+	UpdatedAt time.Time  `json:"updatedAt"`
+	DeletedAt *time.Time `sql:"index" json:"deletedAt"`
 
 	UUID string `json:"uuid"`
 
-	AppID uint `json:"appId"`
-	App   *App `json:"app,omitempty"`
+	AppID string `json:"appId"`
+	App   *App   `json:"app,omitempty"`
 
 	Hashes Hashes `json:"hashes"`
 }

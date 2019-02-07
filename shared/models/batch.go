@@ -1,14 +1,21 @@
 package models
 
-import "github.com/jinzhu/gorm"
+import (
+	"time"
+
+	"github.com/jinzhu/gorm"
+)
 
 type Batch struct {
-	gorm.Model
+	ID        string     `gorm:"primary_key" json:"id"`
+	CreatedAt time.Time  `json:"createdAt"`
+	UpdatedAt time.Time  `json:"updatedAt"`
+	DeletedAt *time.Time `sql:"index" json:"deletedAt"`
 
 	UnixTimestamp int64 `json:"unixTimestamp"`
 
-	AppID uint `json:"appId"`
-	App   *App `json:"app,omitempty"`
+	AppID string `json:"appId"`
+	App   *App   `json:"app,omitempty"`
 }
 
 type Batches []Batch
