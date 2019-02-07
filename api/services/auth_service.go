@@ -3,7 +3,6 @@ package services
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	"github.com/decentorganization/topaz/api/auth"
 	"github.com/decentorganization/topaz/shared/database"
@@ -27,9 +26,7 @@ func AdminLogin(u *models.User) (int, []byte) {
 
 // AdminRefreshToken attempts to refresh a JWT for an admin user
 func AdminRefreshToken(u *models.User) (int, []byte) {
-	return okToken(
-		auth.InitJWTAuthenticationBackend().GenerateAdminToken(
-			strconv.FormatUint(uint64(u.ID), 10)))
+	return okToken(auth.InitJWTAuthenticationBackend().GenerateAdminToken(u.ID))
 }
 
 // AdminLogout attempts to logout an admin user
@@ -58,9 +55,7 @@ func AppLogin(a *models.App) (int, []byte) {
 
 // AppRefreshToken attempts to refresh a JWT for an 'app' user
 func AppRefreshToken(a *models.App) (int, []byte) {
-	return okToken(
-		auth.InitJWTAuthenticationBackend().GenerateAppToken(
-			strconv.FormatUint(uint64(a.ID), 10)))
+	return okToken(auth.InitJWTAuthenticationBackend().GenerateAppToken(a.ID))
 }
 
 func okToken(token string, err error) (int, []byte) {
