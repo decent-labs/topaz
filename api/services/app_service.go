@@ -9,8 +9,7 @@ import (
 	"github.com/decentorganization/topaz/shared/models"
 )
 
-// NewApp creates a new 'app' and attempts to store it in the database
-func NewApp(newApp *models.App) (int, []byte) {
+func CreateApp(newApp *models.App) (int, []byte) {
 	if len(newApp.Name) == 0 || newApp.Interval < 30 {
 		return http.StatusBadRequest, []byte("bad name or interval")
 	}
@@ -31,6 +30,34 @@ func NewApp(newApp *models.App) (int, []byte) {
 		return http.StatusInternalServerError, []byte(err.Error())
 	}
 
-	response, _ := json.Marshal(a)
-	return http.StatusOK, response
+	r, _ := json.Marshal(a)
+	return http.StatusOK, r
+}
+
+func GetApps(uid string) (int, []byte) {
+	u := models.User{
+		ID: uid,
+	}
+
+	as := new(models.Apps)
+	if err := as.GetAppsForUser(&u, database.Manager); err != nil {
+		return http.StatusInternalServerError, []byte(err.Error())
+	}
+
+	r, _ := json.Marshal(as)
+	return http.StatusOK, r
+}
+
+func GetApp(uid string, aid string) (int, []byte) {
+	a := models.App{
+		ID:     aid,
+		UserID: uid,
+	}
+
+	if err := a.FindApp(database.Manager); err != nil {
+		return http.StatusInternalServerError, []byte(err.Error())
+	}
+
+	r, _ := json.Marshal(a)
+	return http.StatusOK, r
 }

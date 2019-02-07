@@ -28,7 +28,7 @@ func (a *App) CreateApp(db *gorm.DB) error {
 }
 
 func (a *App) FindApp(db *gorm.DB) error {
-	return db.Where(a).First(&a).Error
+	return db.Where(&a).First(&a).Error
 }
 
 func (as *Apps) GetAppsToBatch(db *gorm.DB) error {
@@ -38,4 +38,8 @@ func (as *Apps) GetAppsToBatch(db *gorm.DB) error {
 
 func (a *App) UpdateApp(db *gorm.DB) error {
 	return db.Save(a).Error
+}
+
+func (as *Apps) GetAppsForUser(u *User, db *gorm.DB) error {
+	return db.Model(&u).Related(&as).Error
 }
