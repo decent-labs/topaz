@@ -2,6 +2,13 @@ package models
 
 import jwt "github.com/dgrijalva/jwt-go"
 
+type AuthKey string
+
+const (
+	UserID AuthKey = "userId"
+	AppID  AuthKey = "appId"
+)
+
 type Exception struct {
 	Message string `json:"message"`
 }

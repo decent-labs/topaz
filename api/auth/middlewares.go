@@ -9,14 +9,7 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
-type key string
-
-const (
-	userID key = "userId"
-	appID  key = "appId"
-)
-
-func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, rID key) {
+func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, rID models.AuthKey) {
 	token, err := InitJWTAuthenticationBackend().GetToken(req)
 
 	if err != nil {
@@ -59,18 +52,18 @@ func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, rID 
 
 // Admin ...
 func Admin(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	auth(rw, req, next, userID)
+	auth(rw, req, next, models.UserID)
 }
 
 // App ...
 func App(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	auth(rw, req, next, appID)
+	auth(rw, req, next, models.AppID)
 }
 
-func verifyAuth(rID key, r string) bool {
-	if rID == userID {
+func verifyAuth(rID models.AuthKey, r string) bool {
+	if rID == models.UserID {
 		return verifyUser(r)
-	} else if rID == appID {
+	} else if rID == models.AppID {
 		return verifyApp(r)
 	}
 	return false
