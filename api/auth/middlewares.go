@@ -35,12 +35,12 @@ func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, id s
 		}
 
 		if id == "userId" {
-			u := new(models.User)
 			uid, err := strconv.ParseUint(resource.(string), 10, 64)
 			if err != nil {
 				rw.WriteHeader(http.StatusUnauthorized)
 				return
 			}
+			u := new(models.User)
 			u.ID = uint(uid)
 			if err := u.FindUser(database.Manager); err != nil {
 				rw.WriteHeader(http.StatusUnauthorized)
