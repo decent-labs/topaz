@@ -40,24 +40,6 @@ func AdminLogout(r *http.Request) error {
 	return auth.InitJWTAuthenticationBackend().Logout(tokenString, token)
 }
 
-// AppLogin attempts to authenticate an 'app' user
-func AppLogin(a *models.App) (int, []byte) {
-	if a.ID == "" {
-		return http.StatusUnauthorized, []byte("")
-	}
-
-	if err := a.FindApp(database.Manager); err != nil {
-		return http.StatusUnauthorized, []byte("")
-	}
-
-	return AppRefreshToken(a)
-}
-
-// AppRefreshToken attempts to refresh a JWT for an 'app' user
-func AppRefreshToken(a *models.App) (int, []byte) {
-	return okToken(auth.InitJWTAuthenticationBackend().GenerateAppToken(a.ID))
-}
-
 func okToken(token string, err error) (int, []byte) {
 	if err != nil {
 		return http.StatusInternalServerError, []byte("")
