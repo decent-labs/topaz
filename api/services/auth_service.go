@@ -9,8 +9,8 @@ import (
 	"github.com/decentorganization/topaz/shared/models"
 )
 
-// AdminLogin attempts to authenticate an admin user
-func AdminLogin(u *models.User) (int, []byte) {
+// Login attempts to authenticate an admin user
+func Login(u *models.User) (int, []byte) {
 	suppliedPassword := u.Password
 
 	if err := u.GetUser(database.Manager); err != nil {
@@ -21,16 +21,26 @@ func AdminLogin(u *models.User) (int, []byte) {
 		return http.StatusUnauthorized, []byte("")
 	}
 
-	return AdminRefreshToken(u)
+	return RefreshToken(u)
 }
 
-// AdminRefreshToken attempts to refresh a JWT for an admin user
-func AdminRefreshToken(u *models.User) (int, []byte) {
-	return okToken(auth.InitJWTAuthenticationBackend().GenerateAdminToken(u.ID))
+// RefreshToken attempts to refresh a JWT for an admin user
+func RefreshToken(u *models.User) (int, []byte) {
+	token, err := auth.InitJWTAuthenticationBackend().GenerateToken(u.ID)
+	if err != nil {
+		return http.StatusInternalServerError, []byte("")
+	}
+
+	response, err := json.Marshal(models.TokenAuth{Token: token})
+	if err != nil {
+		return http.StatusInternalServerError, []byte("")
+	}
+
+	return http.StatusOK, response
 }
 
-// AdminLogout attempts to logout an admin user
-func AdminLogout(r *http.Request) error {
+// Logout attempts to logout an admin user
+func Logout(r *http.Request) error {
 	token, err := auth.InitJWTAuthenticationBackend().GetToken(r)
 	if err != nil {
 		return err
@@ -38,17 +48,4 @@ func AdminLogout(r *http.Request) error {
 
 	tokenString := r.Header.Get("Authorization")
 	return auth.InitJWTAuthenticationBackend().Logout(tokenString, token)
-}
-
-func okToken(token string, err error) (int, []byte) {
-	if err != nil {
-		return http.StatusInternalServerError, []byte("")
-	}
-
-	response, err := json.Marshal(models.TokenAuthentication{Token: token})
-	if err != nil {
-		return http.StatusInternalServerError, []byte("")
-	}
-
-	return http.StatusOK, response
 }
