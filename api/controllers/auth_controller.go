@@ -45,35 +45,3 @@ func AdminLogout(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) 
 		w.WriteHeader(http.StatusOK)
 	}
 }
-
-// AppLogin returns the result of an attempted login by an 'app'
-func AppLogin(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	uid := r.Context().Value(models.UserID).(string)
-
-	requestApp := new(models.App)
-	decoder := json.NewDecoder(r.Body)
-	decoder.Decode(&requestApp)
-	requestApp.UserID = uid
-
-	responseStatus, token := services.AppLogin(requestApp)
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(responseStatus)
-	w.Write(token)
-}
-
-// AppRefreshToken returns the result of an attempted token refresh by an 'app'
-func AppRefreshToken(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	aid := r.Context().Value(models.AppID).(string)
-
-	requestApp := new(models.App)
-	decoder := json.NewDecoder(r.Body)
-	decoder.Decode(&requestApp)
-	requestApp.ID = aid
-
-	responseStatus, token := services.AppRefreshToken(requestApp)
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(responseStatus)
-	w.Write(token)
-}
