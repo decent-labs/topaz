@@ -13,11 +13,11 @@ type Exception struct {
 	Message string `json:"message"`
 }
 
-type TokenAuthentication struct {
+type TokenAuth struct {
 	Token string `json:"token" form:"token"`
 }
 
-type AuthAdminClaims struct {
+type AuthClaims struct {
 	UserID string `json:"userId"`
 	jwt.StandardClaims
 }
