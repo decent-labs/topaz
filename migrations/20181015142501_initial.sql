@@ -20,7 +20,7 @@ CREATE TABLE apps (
     interval INTEGER NOT NULL,
     name CHARACTER varying(255) NOT NULL,
     last_batched INTEGER,
-    user_id uuid REFERENCES users(id),
+    user_id uuid REFERENCES users(id) NOT NULL,
     eth_address CHARACTER varying(255) NOT NULL
 );
 
@@ -29,7 +29,7 @@ CREATE TABLE batches (
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
     deleted_at TIMESTAMP,
-    app_id uuid REFERENCES apps(id),
+    app_id uuid REFERENCES apps(id) NOT NULL,
     unix_timestamp INTEGER NOT NULL
 );
 
@@ -38,7 +38,7 @@ CREATE TABLE proofs (
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
     deleted_at TIMESTAMP,
-    batch_id uuid REFERENCES batches(id),
+    batch_id uuid REFERENCES batches(id) NOT NULL,
     merkle_root CHARACTER varying(255) NOT NULL,
     eth_transaction CHARACTER varying(255) NOT NULL
 );
@@ -48,7 +48,7 @@ CREATE TABLE objects (
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
     deleted_at TIMESTAMP,
-    app_id uuid REFERENCES apps(id)
+    app_id uuid REFERENCES apps(id) NOT NULL
 );
 
 CREATE TABLE hashes (
@@ -56,7 +56,7 @@ CREATE TABLE hashes (
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
     deleted_at TIMESTAMP,
-    object_id uuid REFERENCES objects(id),
+    object_id uuid REFERENCES objects(id) NOT NULL,
     proof_id uuid REFERENCES proofs(id),
     hash BYTEA NOT NULL,
     unix_timestamp INTEGER NOT NULL
