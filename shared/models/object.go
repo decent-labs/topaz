@@ -23,3 +23,7 @@ type Objects []Object
 func (o *Object) CreateObject(db *gorm.DB) error {
 	return db.Create(&o).Error
 }
+
+func (os *Objects) GetObjects(a *App, db *gorm.DB) error {
+	return db.Model(&a).Related(&os).Error
+}
