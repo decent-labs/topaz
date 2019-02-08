@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"errors"
 	"net/http"
 
 	"github.com/decentorganization/topaz/shared/database"
@@ -10,7 +9,7 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
-func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, rID models.AuthKey) {
+func Auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	token, err := InitJWTAuthenticationBackend().GetToken(req)
 
 	if err != nil {
@@ -34,50 +33,18 @@ func auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc, rID 
 		return
 	}
 
-	res := claims[string(rID)]
+	res := claims[string(models.UserID)]
 	if res == nil {
 		rw.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	r := res.(string)
-	if err := verifyAuth(rID, r); err != nil {
+	u := models.User{ID: res.(string)}
+	if err := u.FindUser(database.Manager); err != nil {
 		rw.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	ctx := context.WithValue(req.Context(), rID, r)
+	ctx := context.WithValue(req.Context(), models.UserID, u.ID)
 	next(rw, req.WithContext(ctx))
-}
-
-// Admin ...
-func Admin(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	auth(rw, req, next, models.UserID)
-}
-
-// App ...
-func App(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	auth(rw, req, next, models.AppID)
-}
-
-func verifyAuth(rID models.AuthKey, r string) error {
-	switch rID {
-	case models.UserID:
-		return verifyUser(r)
-	case models.AppID:
-		return verifyApp(r)
-	}
-	return errors.New("unknown resource ID")
-}
-
-func verifyUser(r string) error {
-	u := new(models.User)
-	u.ID = r
-	return u.FindUser(database.Manager)
-}
-
-func verifyApp(r string) error {
-	a := new(models.App)
-	a.ID = r
-	return a.FindApp(database.Manager)
 }

@@ -6,23 +6,17 @@ type AuthKey string
 
 const (
 	UserID AuthKey = "userId"
-	AppID  AuthKey = "appId"
 )
 
 type Exception struct {
 	Message string `json:"message"`
 }
 
-type TokenAuthentication struct {
+type TokenAuth struct {
 	Token string `json:"token" form:"token"`
 }
 
-type AuthAdminClaims struct {
+type AuthClaims struct {
 	UserID string `json:"userId"`
-	jwt.StandardClaims
-}
-
-type AuthAppClaims struct {
-	AppID string `json:"appId"`
 	jwt.StandardClaims
 }

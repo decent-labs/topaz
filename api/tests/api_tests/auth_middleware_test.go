@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/decentorganization/topaz/api/auth"
-	"github.com/decentorganization/topaz/api/routers"
+	"github.com/decentorganization/topaz/api/routers/v1"
 	"github.com/decentorganization/topaz/api/services"
 	"github.com/decentorganization/topaz/api/settings"
 	"github.com/stretchr/testify/assert"
@@ -35,7 +35,7 @@ func (s *MiddlewaresTestSuite) SetUpSuite(c *C) {
 func (s *MiddlewaresTestSuite) SetUpTest(c *C) {
 	authBackend := auth.InitJWTAuthenticationBackend()
 	assert.NotNil(t, authBackend)
-	token, _ = authBackend.GenerateAdminToken("1234")
+	token, _ = authBackend.GenerateToken("1234")
 
 	router := routers.InitRoutes()
 	server = negroni.Classic()
@@ -90,7 +90,7 @@ func (s *MiddlewaresTestSuite) TestAdminAfterAdminLogout(c *C) {
 
 	requestLogout, _ := http.NewRequest("GET", resource, nil)
 	requestLogout.Header.Set("Authorization", fmt.Sprintf("Bearer %v", token))
-	services.AdminLogout(requestLogout)
+	services.Logout(requestLogout)
 
 	response := httptest.NewRecorder()
 	request, _ := http.NewRequest("GET", resource, nil)

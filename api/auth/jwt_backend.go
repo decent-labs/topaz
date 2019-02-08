@@ -43,35 +43,17 @@ func InitJWTAuthenticationBackend() *JWTAuthenticationBackend {
 	return authBackendInstance
 }
 
-// GenerateAdminToken ...
-func (backend *JWTAuthenticationBackend) GenerateAdminToken(userID string) (string, error) {
-	claims := models.AuthAdminClaims{
-		UserID:         userID,
-		StandardClaims: generateStandardClaims(userID),
+// GenerateToken ...
+func (backend *JWTAuthenticationBackend) GenerateToken(userID string) (string, error) {
+	claims := models.AuthClaims{
+		UserID: userID,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Hour * time.Duration(settings.Get().JWTExpirationDelta)).Unix(),
+			IssuedAt:  time.Now().Unix(),
+			Subject:   userID,
+		},
 	}
 
-	return backend.generateToken(claims)
-}
-
-// GenerateAppToken ...
-func (backend *JWTAuthenticationBackend) GenerateAppToken(appID string) (string, error) {
-	claims := models.AuthAppClaims{
-		AppID:          appID,
-		StandardClaims: generateStandardClaims(appID),
-	}
-
-	return backend.generateToken(claims)
-}
-
-func generateStandardClaims(resourceID string) jwt.StandardClaims {
-	return jwt.StandardClaims{
-		ExpiresAt: time.Now().Add(time.Hour * time.Duration(settings.Get().JWTExpirationDelta)).Unix(),
-		IssuedAt:  time.Now().Unix(),
-		Subject:   resourceID,
-	}
-}
-
-func (backend *JWTAuthenticationBackend) generateToken(claims jwt.Claims) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodRS512, claims)
 
 	tokenString, err := token.SignedString(backend.privateKey)

@@ -8,72 +8,40 @@ import (
 	"github.com/decentorganization/topaz/shared/models"
 )
 
-// AdminLogin returns the result of an attempted login by an admin user
-func AdminLogin(w http.ResponseWriter, r *http.Request) {
+// Login returns the result of an attempted login by an admin user
+func Login(w http.ResponseWriter, r *http.Request) {
 	requestUser := new(models.User)
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&requestUser)
 
-	responseStatus, token := services.AdminLogin(requestUser)
+	responseStatus, token := services.Login(requestUser)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(responseStatus)
 	w.Write(token)
 }
 
-// AdminRefreshToken returns the result of an attempted token refresh by an admin user
-func AdminRefreshToken(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+// RefreshToken returns the result of an attempted token refresh by an admin user
+func RefreshToken(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	requestUser := new(models.User)
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&requestUser)
 
-	responseStatus, token := services.AdminRefreshToken(requestUser)
+	responseStatus, token := services.RefreshToken(requestUser)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(responseStatus)
 	w.Write(token)
 }
 
-// AdminLogout returns the result of an attempted logout by an admin user
-func AdminLogout(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+// Logout returns the result of an attempted logout by an admin user
+func Logout(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	w.Header().Set("Content-Type", "application/json")
 
-	err := services.AdminLogout(r)
+	err := services.Logout(r)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {
 		w.WriteHeader(http.StatusOK)
 	}
-}
-
-// AppLogin returns the result of an attempted login by an 'app'
-func AppLogin(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	uid := r.Context().Value(models.UserID).(string)
-
-	requestApp := new(models.App)
-	decoder := json.NewDecoder(r.Body)
-	decoder.Decode(&requestApp)
-	requestApp.UserID = uid
-
-	responseStatus, token := services.AppLogin(requestApp)
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(responseStatus)
-	w.Write(token)
-}
-
-// AppRefreshToken returns the result of an attempted token refresh by an 'app'
-func AppRefreshToken(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	aid := r.Context().Value(models.AppID).(string)
-
-	requestApp := new(models.App)
-	decoder := json.NewDecoder(r.Body)
-	decoder.Decode(&requestApp)
-	requestApp.ID = aid
-
-	responseStatus, token := services.AppRefreshToken(requestApp)
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(responseStatus)
-	w.Write(token)
 }

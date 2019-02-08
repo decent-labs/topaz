@@ -11,7 +11,7 @@ import (
 func SetTestRoutes(router *mux.Router) *mux.Router {
 	router.Handle("/test/hello",
 		negroni.New(
-			negroni.HandlerFunc(auth.Admin),
+			negroni.HandlerFunc(auth.Auth),
 			negroni.HandlerFunc(controllers.TestController),
 		)).Methods("GET")
 

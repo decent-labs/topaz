@@ -75,7 +75,7 @@ func (suite *AuthenticationServicesTestSuite) TestAdminRefreshToken(c *C) {
 		Password: "testing",
 	}
 	authBackend := authentication.InitJWTAuthenticationBackend()
-	tokenString, err := authBackend.GenerateAdminToken(user.UUID)
+	tokenString, err := authBackend.GenerateToken(user.UUID)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return authBackend.PublicKey, nil
 	})
@@ -97,7 +97,7 @@ func (suite *AuthenticationServicesTestSuite) TestLogout(c *C) {
 		Password: "testing",
 	}
 	authBackend := auth.InitJWTAuthenticationBackend()
-	tokenString, err := authentication.GenerateAdminToken(user.UUID)
+	tokenString, err := authentication.GenerateToken(user.UUID)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return authBackend.PublicKey, nil
 	})
