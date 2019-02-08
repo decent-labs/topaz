@@ -7,21 +7,21 @@ import (
 	"github.com/urfave/negroni"
 )
 
-// SetAuthenticationRoutes ...
-func SetAuthRoutes(router *mux.Router) *mux.Router {
-	sadmin := router.PathPrefix("/auth/admin").Subrouter()
+// SetAuthRoutes ...
+func SetAuthRoutes(r *mux.Router) *mux.Router {
+	s := r.PathPrefix("/auth").Subrouter()
 
-	sadmin.HandleFunc("/token", controllers.AdminLogin).Methods("POST")
-	sadmin.Handle("/refresh-token",
-		negroni.New(
-			negroni.HandlerFunc(auth.Auth),
-			negroni.HandlerFunc(controllers.AdminRefreshToken),
-		)).Methods("GET")
-	sadmin.Handle("/logout",
-		negroni.New(
-			negroni.HandlerFunc(auth.Auth),
-			negroni.HandlerFunc(controllers.AdminLogout),
-		)).Methods("GET")
+	s.HandleFunc("/login", controllers.Login).Methods("POST")
 
-	return router
+	s.Handle("/refresh-token", negroni.New(
+		negroni.HandlerFunc(auth.Auth),
+		negroni.HandlerFunc(controllers.RefreshToken),
+	)).Methods("GET")
+
+	s.Handle("/logout", negroni.New(
+		negroni.HandlerFunc(auth.Auth),
+		negroni.HandlerFunc(controllers.Logout),
+	)).Methods("GET")
+
+	return r
 }
