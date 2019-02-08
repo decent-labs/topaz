@@ -27,3 +27,7 @@ func (o *Object) CreateObject(db *gorm.DB) error {
 func (os *Objects) GetObjects(a *App, db *gorm.DB) error {
 	return db.Model(&a).Related(&os).Error
 }
+
+func (o *Object) GetObject(a *App, db *gorm.DB) error {
+	return db.Model(&a).Related(&o).Error
+}
