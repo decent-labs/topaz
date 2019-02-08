@@ -31,3 +31,13 @@ func GetObjects(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	w.WriteHeader(h)
 	w.Write(ros)
 }
+
+func GetObject(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	uid, o := buildContext(r)
+	o.ID = mux.Vars(r)["id"]
+	h, ro := services.GetObject(&o, uid)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(h)
+	w.Write(ro)
+}
