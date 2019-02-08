@@ -16,7 +16,7 @@ func CreateApp(newApp *models.App) (int, []byte) {
 
 	addr, err := ethereum.Deploy()
 	if err != nil {
-		return http.StatusInternalServerError, []byte(err.Error())
+		return http.StatusInternalServerError, []byte("")
 	}
 
 	a := models.App{
@@ -27,7 +27,7 @@ func CreateApp(newApp *models.App) (int, []byte) {
 	}
 
 	if err := a.CreateApp(database.Manager); err != nil {
-		return http.StatusInternalServerError, []byte(err.Error())
+		return http.StatusInternalServerError, []byte("")
 	}
 
 	r, _ := json.Marshal(a)
@@ -41,7 +41,7 @@ func GetApps(uid string) (int, []byte) {
 
 	as := new(models.Apps)
 	if err := as.GetAppsForUser(&u, database.Manager); err != nil {
-		return http.StatusInternalServerError, []byte(err.Error())
+		return http.StatusUnauthorized, []byte("")
 	}
 
 	r, _ := json.Marshal(as)
@@ -55,7 +55,7 @@ func GetApp(uid string, aid string) (int, []byte) {
 	}
 
 	if err := a.FindApp(database.Manager); err != nil {
-		return http.StatusInternalServerError, []byte(err.Error())
+		return http.StatusUnauthorized, []byte("")
 	}
 
 	r, _ := json.Marshal(a)

@@ -47,7 +47,7 @@ func GetObjects(o *models.Object, uid string) (int, []byte) {
 
 	os := new(models.Objects)
 	if err := os.GetObjects(&a, database.Manager); err != nil {
-		return http.StatusInternalServerError, []byte("")
+		return http.StatusUnauthorized, []byte("")
 	}
 
 	r, err := json.Marshal(&os)
@@ -65,7 +65,7 @@ func GetObject(o *models.Object, uid string) (int, []byte) {
 	}
 
 	if err := o.GetObject(&a, database.Manager); err != nil {
-		return http.StatusInternalServerError, []byte("")
+		return http.StatusUnauthorized, []byte("")
 	}
 
 	r, err := json.Marshal(&o)
