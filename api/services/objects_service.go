@@ -57,3 +57,21 @@ func GetObjects(o *models.Object, uid string) (int, []byte) {
 
 	return http.StatusOK, r
 }
+
+func GetObject(o *models.Object, uid string) (int, []byte) {
+	a := models.App{ID: o.AppID}
+	if err := authObject(&a, uid); err != nil {
+		return http.StatusUnauthorized, []byte("")
+	}
+
+	if err := o.GetObject(&a, database.Manager); err != nil {
+		return http.StatusInternalServerError, []byte("")
+	}
+
+	r, err := json.Marshal(&o)
+	if err != nil {
+		return http.StatusInternalServerError, []byte("")
+	}
+
+	return http.StatusOK, r
+}
