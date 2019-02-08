@@ -23,18 +23,7 @@ func SetAuthenticationRoutes(router *mux.Router) *mux.Router {
 			negroni.HandlerFunc(controllers.AdminLogout),
 		)).Methods("GET")
 
-	sapp := router.PathPrefix("/auth/app").Subrouter()
 
-	sapp.Handle("/token",
-		negroni.New(
-			negroni.HandlerFunc(auth.Admin),
-			negroni.HandlerFunc(controllers.AppLogin),
-		)).Methods("POST")
-	sapp.Handle("/refresh-token",
-		negroni.New(
-			negroni.HandlerFunc(auth.App),
-			negroni.HandlerFunc(controllers.AppRefreshToken),
-		)).Methods("GET")
 
 	return router
 }
