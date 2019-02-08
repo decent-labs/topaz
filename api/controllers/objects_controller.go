@@ -1,38 +1,33 @@
 package controllers
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/decentorganization/topaz/api/services"
 	"github.com/decentorganization/topaz/shared/models"
+	"github.com/gorilla/mux"
 )
 
-func CreateObject(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+func buildContext(r *http.Request) (string, models.Object) {
 	uid := r.Context().Value(models.UserID).(string)
+	o := models.Object{AppID: mux.Vars(r)["appId"]}
+	return uid, o
+}
 
-	ro := new(models.Object)
-	d := json.NewDecoder(r.Body)
-	d.Decode(&ro)
-
-	h, o := services.CreateObject(ro, uid)
+func CreateObject(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	uid, o := buildContext(r)
+	h, ro := services.CreateObject(&o, uid)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(h)
-	w.Write(o)
+	w.Write(ro)
 }
 
 func GetObjects(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	uid := r.Context().Value(models.UserID).(string)
-
-	ro := new(models.Object)
-	d := json.NewDecoder(r.Body)
-	d.Decode(&ro)
-
-	h, os := services.GetObjects(ro, uid)
+	uid, o := buildContext(r)
+	h, ros := services.GetObjects(&o, uid)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(h)
-	w.Write(os)
+	w.Write(ros)
 }
-
