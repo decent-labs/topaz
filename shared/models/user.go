@@ -25,12 +25,10 @@ func (u *User) CreateUser(db *gorm.DB) error {
 
 // GetUser ...
 func (u *User) GetUser(db *gorm.DB) error {
-	if err := db.Where("email = ?", u.Email).First(&u).Error; err != nil {
-		return err
-	}
-	return nil
+	return db.First(&u).Error
 }
 
-func (u *User) FindUser(db *gorm.DB) error {
-	return db.First(&u).Error
+// GetUserWithEmail ...
+func (u *User) GetUserWithEmail(db *gorm.DB) error {
+	return db.Where(&User{Email: u.Email}).First(&u).Error
 }

@@ -13,7 +13,7 @@ import (
 func Login(u *models.User) (int, []byte) {
 	suppliedPassword := u.Password
 
-	if err := u.GetUser(database.Manager); err != nil {
+	if err := u.GetUserWithEmail(database.Manager); err != nil {
 		return http.StatusUnauthorized, []byte("")
 	}
 
