@@ -20,10 +20,7 @@ type User struct {
 
 // CreateUser ...
 func (u *User) CreateUser(db *gorm.DB) error {
-	if err := db.Create(&u).Error; err != nil {
-		return err
-	}
-	return nil
+	return db.Create(&u).Error
 }
 
 // GetUser ...
