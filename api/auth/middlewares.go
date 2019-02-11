@@ -9,6 +9,7 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
+// Auth ...
 func Auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	token, err := InitJWTAuthenticationBackend().GetToken(req)
 
@@ -40,7 +41,7 @@ func Auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	}
 
 	u := models.User{ID: res.(string)}
-	if err := u.FindUser(database.Manager); err != nil {
+	if err := u.GetUser(database.Manager); err != nil {
 		rw.WriteHeader(http.StatusUnauthorized)
 		return
 	}

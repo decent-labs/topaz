@@ -13,7 +13,7 @@ import (
 func Login(u *models.User) (int, []byte) {
 	suppliedPassword := u.Password
 
-	if err := u.GetUser(database.Manager); err != nil {
+	if err := u.GetUserWithEmail(database.Manager); err != nil {
 		return http.StatusUnauthorized, []byte("")
 	}
 
@@ -31,7 +31,7 @@ func RefreshToken(u *models.User) (int, []byte) {
 		return http.StatusInternalServerError, []byte("")
 	}
 
-	response, err := json.Marshal(models.TokenAuth{Token: token})
+	response, err := json.Marshal(&models.TokenAuth{Token: token})
 	if err != nil {
 		return http.StatusInternalServerError, []byte("")
 	}
