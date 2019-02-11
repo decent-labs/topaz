@@ -28,7 +28,11 @@ func CreateApp(a *models.App, ra *models.App) (int, []byte) {
 		return http.StatusInternalServerError, []byte("")
 	}
 
-	r, _ := json.Marshal(&a)
+	r, err := json.Marshal(&a)
+	if err != nil {
+		return http.StatusInternalServerError, []byte("")
+	}
+
 	return http.StatusOK, r
 }
 
@@ -38,7 +42,11 @@ func GetApp(a *models.App) (int, []byte) {
 		return http.StatusUnauthorized, []byte("")
 	}
 
-	r, _ := json.Marshal(&a)
+	r, err := json.Marshal(&a)
+	if err != nil {
+		return http.StatusInternalServerError, []byte("")
+	}
+
 	return http.StatusOK, r
 }
 
@@ -49,6 +57,10 @@ func GetApps(a *models.App) (int, []byte) {
 		return http.StatusUnauthorized, []byte("")
 	}
 
-	r, _ := json.Marshal(&as)
+	r, err := json.Marshal(&as)
+	if err != nil {
+		return http.StatusInternalServerError, []byte("")
+	}
+
 	return http.StatusOK, r
 }
