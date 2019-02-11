@@ -8,16 +8,27 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func buildContext(r *http.Request) (string, models.Object) {
-	uid := r.Context().Value(models.UserID).(string)
-	o := models.Object{AppID: mux.Vars(r)["appId"]}
-	return uid, o
+func buildObjectContext(r *http.Request, oid string) *models.Object {
+	o := models.Object{
+		App: &models.App{
+			ID: mux.Vars(r)["appId"],
+			User: &models.User{
+				ID: r.Context().Value(models.UserID).(string),
+			},
+		},
+	}
+
+	if oid != "" {
+		o.ID = oid
+	}
+
+	return &o
 }
 
 // CreateObject ...
 func CreateObject(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	uid, o := buildContext(r)
-	h, ro := services.CreateObject(&o, uid)
+	o := buildObjectContext(r, "")
+	h, ro := services.CreateObject(o)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(h)
@@ -26,8 +37,8 @@ func CreateObject(w http.ResponseWriter, r *http.Request, next http.HandlerFunc)
 
 // GetObjects ...
 func GetObjects(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	uid, o := buildContext(r)
-	h, ros := services.GetObjects(&o, uid)
+	o := buildObjectContext(r, "")
+	h, ros := services.GetObjects(o)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(h)
@@ -36,9 +47,8 @@ func GetObjects(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 
 // GetObject ...
 func GetObject(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	uid, o := buildContext(r)
-	o.ID = mux.Vars(r)["id"]
-	h, ro := services.GetObject(&o, uid)
+	o := buildObjectContext(r, mux.Vars(r)["id"])
+	h, ro := services.GetObject(o)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(h)

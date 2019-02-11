@@ -2,28 +2,29 @@ package services
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 
 	"github.com/decentorganization/topaz/shared/database"
 	"github.com/decentorganization/topaz/shared/models"
 )
 
-func authObject(a *models.App, uid string) error {
-	if err := a.FindApp(database.Manager); err != nil {
-		return errors.New("")
+func authObject(o *models.Object) bool {
+	uid := o.App.User.ID
+
+	if err := o.App.GetApp(database.Manager); err != nil {
+		return false
 	}
 
-	if a.UserID != uid {
-		return errors.New("")
+	if o.App.User.ID != uid {
+		return false
 	}
 
-	return nil
+	return true
 }
 
-func CreateObject(o *models.Object, uid string) (int, []byte) {
-	a := models.App{ID: o.AppID}
-	if err := authObject(&a, uid); err != nil {
+// CreateObject ...
+func CreateObject(o *models.Object) (int, []byte) {
+	if ok := authObject(o); !ok {
 		return http.StatusUnauthorized, []byte("")
 	}
 
@@ -39,14 +40,14 @@ func CreateObject(o *models.Object, uid string) (int, []byte) {
 	return http.StatusOK, r
 }
 
-func GetObjects(o *models.Object, uid string) (int, []byte) {
-	a := models.App{ID: o.AppID}
-	if err := authObject(&a, uid); err != nil {
+// GetObjects ...
+func GetObjects(o *models.Object) (int, []byte) {
+	if ok := authObject(o); !ok {
 		return http.StatusUnauthorized, []byte("")
 	}
 
 	os := new(models.Objects)
-	if err := os.GetObjects(&a, database.Manager); err != nil {
+	if err := os.GetObjects(o, database.Manager); err != nil {
 		return http.StatusUnauthorized, []byte("")
 	}
 
@@ -58,13 +59,13 @@ func GetObjects(o *models.Object, uid string) (int, []byte) {
 	return http.StatusOK, r
 }
 
-func GetObject(o *models.Object, uid string) (int, []byte) {
-	a := models.App{ID: o.AppID}
-	if err := authObject(&a, uid); err != nil {
+// GetObject ...
+func GetObject(o *models.Object) (int, []byte) {
+	if ok := authObject(o); !ok {
 		return http.StatusUnauthorized, []byte("")
 	}
 
-	if err := o.GetObject(&a, database.Manager); err != nil {
+	if err := o.GetObject(database.Manager); err != nil {
 		return http.StatusUnauthorized, []byte("")
 	}
 
