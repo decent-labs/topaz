@@ -31,7 +31,7 @@ func RefreshToken(u *models.User) (int, []byte) {
 		return http.StatusInternalServerError, []byte("")
 	}
 
-	response, err := json.Marshal(models.TokenAuth{Token: token})
+	response, err := json.Marshal(&models.TokenAuth{Token: token})
 	if err != nil {
 		return http.StatusInternalServerError, []byte("")
 	}

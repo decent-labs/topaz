@@ -30,7 +30,7 @@ func NewUser(newUser *models.User) (int, []byte) {
 		return http.StatusInternalServerError, []byte("")
 	}
 
-	response, _ := json.Marshal(u)
+	response, _ := json.Marshal(&u)
 	return http.StatusOK, response
 }
 
