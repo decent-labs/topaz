@@ -9,6 +9,7 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
+// Auth ...
 func Auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	token, err := InitJWTAuthenticationBackend().GetToken(req)
 

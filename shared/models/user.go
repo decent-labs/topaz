@@ -6,6 +6,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// User ...
 type User struct {
 	ID        string     `gorm:"primary_key" json:"id"`
 	CreatedAt time.Time  `json:"createdAt"`
@@ -17,6 +18,7 @@ type User struct {
 	Password string `json:"password"`
 }
 
+// CreateUser ...
 func (u *User) CreateUser(db *gorm.DB) error {
 	if err := db.Create(&u).Error; err != nil {
 		return err
@@ -24,6 +26,7 @@ func (u *User) CreateUser(db *gorm.DB) error {
 	return nil
 }
 
+// GetUser ...
 func (u *User) GetUser(db *gorm.DB) error {
 	if err := db.Where("email = ?", u.Email).First(&u).Error; err != nil {
 		return err
