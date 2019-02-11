@@ -40,6 +40,24 @@ func CreateObject(o *models.Object) (int, []byte) {
 	return http.StatusOK, r
 }
 
+// GetObject ...
+func GetObject(o *models.Object) (int, []byte) {
+	if ok := authObject(o); !ok {
+		return http.StatusUnauthorized, []byte("")
+	}
+
+	if err := o.GetObject(database.Manager); err != nil {
+		return http.StatusUnauthorized, []byte("")
+	}
+
+	r, err := json.Marshal(&o)
+	if err != nil {
+		return http.StatusInternalServerError, []byte("")
+	}
+
+	return http.StatusOK, r
+}
+
 // GetObjects ...
 func GetObjects(o *models.Object) (int, []byte) {
 	if ok := authObject(o); !ok {
@@ -52,24 +70,6 @@ func GetObjects(o *models.Object) (int, []byte) {
 	}
 
 	r, err := json.Marshal(&os)
-	if err != nil {
-		return http.StatusInternalServerError, []byte("")
-	}
-
-	return http.StatusOK, r
-}
-
-// GetObject ...
-func GetObject(o *models.Object) (int, []byte) {
-	if ok := authObject(o); !ok {
-		return http.StatusUnauthorized, []byte("")
-	}
-
-	if err := o.GetObject(database.Manager); err != nil {
-		return http.StatusUnauthorized, []byte("")
-	}
-
-	r, err := json.Marshal(&o)
 	if err != nil {
 		return http.StatusInternalServerError, []byte("")
 	}
