@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 
@@ -8,23 +9,33 @@ import (
 	"github.com/decentorganization/topaz/shared/models"
 )
 
-func authObject(o *models.Object) bool {
-	uid := o.App.User.ID
-
-	if err := o.App.GetApp(database.Manager); err != nil {
-		return false
+func objectAuthContext(u models.User, aid string, oid string) (*models.Object, bool) {
+	a := models.App{
+		ID:   aid,
+		User: &u,
 	}
 
-	if o.App.User.ID != uid {
-		return false
+	if err := a.GetApp(database.Manager); err != nil {
+		return nil, false
 	}
 
-	return true
+	o := models.Object{App: &a}
+
+	if oid != "" {
+		o.ID = oid
+
+		if err := o.GetObject(database.Manager); err != nil {
+			return nil, false
+		}
+	}
+
+	return &o, true
 }
 
 // CreateObject ...
-func CreateObject(o *models.Object) (int, []byte) {
-	if ok := authObject(o); !ok {
+func CreateObject(ctx context.Context, aid string) (int, []byte) {
+	o, ok := objectAuthContext(ctx.Value(models.AuthUser).(models.User), aid, "")
+	if !ok {
 		return http.StatusUnauthorized, []byte("")
 	}
 
@@ -41,12 +52,9 @@ func CreateObject(o *models.Object) (int, []byte) {
 }
 
 // GetObject ...
-func GetObject(o *models.Object) (int, []byte) {
-	if ok := authObject(o); !ok {
-		return http.StatusUnauthorized, []byte("")
-	}
-
-	if err := o.GetObject(database.Manager); err != nil {
+func GetObject(ctx context.Context, aid string, oid string) (int, []byte) {
+	o, ok := objectAuthContext(ctx.Value(models.AuthUser).(models.User), aid, oid)
+	if !ok {
 		return http.StatusUnauthorized, []byte("")
 	}
 
@@ -59,8 +67,9 @@ func GetObject(o *models.Object) (int, []byte) {
 }
 
 // GetObjects ...
-func GetObjects(o *models.Object) (int, []byte) {
-	if ok := authObject(o); !ok {
+func GetObjects(ctx context.Context, aid string) (int, []byte) {
+	o, ok := objectAuthContext(ctx.Value(models.AuthUser).(models.User), aid, "")
+	if !ok {
 		return http.StatusUnauthorized, []byte("")
 	}
 
