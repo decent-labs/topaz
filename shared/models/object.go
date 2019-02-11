@@ -27,12 +27,12 @@ func (o *Object) CreateObject(db *gorm.DB) error {
 	return db.Create(&o).Error
 }
 
-// GetObjects ...
-func (os *Objects) GetObjects(o *Object, db *gorm.DB) error {
-	return db.Model(&o.App).Related(&os).Error
-}
-
 // GetObject ...
 func (o *Object) GetObject(db *gorm.DB) error {
 	return db.Model(&o.App).Related(&o).Error
+}
+
+// GetObjects ...
+func (os *Objects) GetObjects(o *Object, db *gorm.DB) error {
+	return db.Model(&o.App).Related(&os).Error
 }
