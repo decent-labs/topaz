@@ -23,10 +23,10 @@ type Hash struct {
 	Hash          []byte `json:"-"`
 	UnixTimestamp int64  `json:"unixTimestamp"`
 
-	ObjectID *string `json:"-"`
+	ObjectID *string `json:"objectId"`
 	Object   *Object `json:"-"`
-	ProofID  *string `json:"-"`
-	Proof    *Proof  `json:"proof"`
+	ProofID  *string `json:"proofId"`
+	Proof    *Proof  `json:"-"`
 }
 
 // Hashes ...

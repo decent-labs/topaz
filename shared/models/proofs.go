@@ -20,7 +20,7 @@ type Proof struct {
 	ValidStructure bool   `json:"validStructure" gorm:"-"`
 
 	BatchID string `json:"batchId"`
-	Batch   *Batch `json:"batch,omitempty"`
+	Batch   *Batch `json:"-"`
 
 	Hashes Hashes `json:"-"`
 }
