@@ -30,8 +30,9 @@ func (a *App) CreateApp(db *gorm.DB) error {
 	return db.Create(&a).Error
 }
 
-func (a *App) FindApp(db *gorm.DB) error {
-	return db.Where(&a).First(&a).Error
+// GetApp ...
+func (a *App) GetApp(db *gorm.DB) error {
+	return db.Model(&a.User).Related(&a).Error
 }
 
 

@@ -48,13 +48,9 @@ func GetApps(uid string) (int, []byte) {
 	return http.StatusOK, r
 }
 
-func GetApp(uid string, aid string) (int, []byte) {
-	a := models.App{
-		ID:     aid,
-		UserID: uid,
-	}
-
-	if err := a.FindApp(database.Manager); err != nil {
+// GetApp ...
+func GetApp(a *models.App) (int, []byte) {
+	if err := a.GetApp(database.Manager); err != nil {
 		return http.StatusUnauthorized, []byte("")
 	}
 
