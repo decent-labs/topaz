@@ -25,18 +25,17 @@ func buildAppContext(r *http.Request, aid string) *models.App {
 
 // CreateApp ...
 func CreateApp(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	uid := r.Context().Value(models.UserID).(string)
+	a := buildAppContext(r, "")
 
 	ra := new(models.App)
 	d := json.NewDecoder(r.Body)
 	d.Decode(&ra)
-	ra.UserID = uid
 
-	rs, a := services.CreateApp(ra)
+	rs, ar := services.CreateApp(a, ra)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(rs)
-	w.Write(a)
+	w.Write(ar)
 }
 
 // GetApps ...

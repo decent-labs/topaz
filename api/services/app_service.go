@@ -9,8 +9,9 @@ import (
 	"github.com/decentorganization/topaz/shared/models"
 )
 
-func CreateApp(newApp *models.App) (int, []byte) {
-	if len(newApp.Name) == 0 || newApp.Interval < 30 {
+// CreateApp ...
+func CreateApp(a *models.App, ra *models.App) (int, []byte) {
+	if len(ra.Name) == 0 || ra.Interval < 30 {
 		return http.StatusBadRequest, []byte("bad name or interval")
 	}
 
@@ -19,12 +20,9 @@ func CreateApp(newApp *models.App) (int, []byte) {
 		return http.StatusInternalServerError, []byte("")
 	}
 
-	a := models.App{
-		UserID:     newApp.UserID,
-		Name:       newApp.Name,
-		Interval:   newApp.Interval,
-		EthAddress: addr,
-	}
+	a.Name = ra.Name
+	a.Interval = ra.Interval
+	a.EthAddress = addr
 
 	if err := a.CreateApp(database.Manager); err != nil {
 		return http.StatusInternalServerError, []byte("")
