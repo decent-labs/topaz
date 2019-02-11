@@ -6,6 +6,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// Batch ...
 type Batch struct {
 	ID        string     `gorm:"primary_key" json:"id"`
 	CreatedAt time.Time  `json:"createdAt"`
@@ -15,14 +16,10 @@ type Batch struct {
 	UnixTimestamp int64 `json:"unixTimestamp"`
 
 	AppID string `json:"appId"`
-	App   *App   `json:"app,omitempty"`
+	App   *App   `json:"-"`
 }
 
-type Batches []Batch
-
+// CreateBatch ...
 func (b *Batch) CreateBatch(db *gorm.DB) error {
-	if err := db.Create(&b).Error; err != nil {
-		return err
-	}
-	return nil
+	return db.Create(&b).Error
 }

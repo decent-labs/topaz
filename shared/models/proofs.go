@@ -8,6 +8,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// Proof ...
 type Proof struct {
 	ID        string     `gorm:"primary_key" json:"id"`
 	CreatedAt time.Time  `json:"createdAt"`
@@ -24,6 +25,7 @@ type Proof struct {
 	Hashes Hashes `json:"-"`
 }
 
+// MarshalJSON ...
 func (p *Proof) MarshalJSON() ([]byte, error) {
 	type Alias Proof
 	return json.Marshal(&struct {
@@ -35,24 +37,12 @@ func (p *Proof) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func (p *Proof) reduceHashes() []interface{} {
-	a := make([]interface{}, 0, len(p.Hashes))
-	for _, h := range p.Hashes {
-		a = append(a, struct {
-			ID   string `json:"id"`
-			Hash string `json:"hash"`
-		}{
-			h.ID,
-			h.TransformHashToHex(),
-		})
-	}
-	return a
-}
-
+// CreateProof ...
 func (p *Proof) CreateProof(db *gorm.DB) error {
 	return db.Create(&p).Error
 }
 
+// CheckValidity ...
 func (p *Proof) CheckValidity() error {
 	cur, err := p.Hashes.GetMerkleRoot()
 	if err != nil {
@@ -73,4 +63,18 @@ func (p *Proof) CheckValidity() error {
 
 	p.ValidStructure = validRoot && validTree
 	return nil
+}
+
+func (p *Proof) reduceHashes() []interface{} {
+	a := make([]interface{}, 0, len(p.Hashes))
+	for _, h := range p.Hashes {
+		a = append(a, struct {
+			ID   string `json:"id"`
+			Hash string `json:"hash"`
+		}{
+			h.ID,
+			h.TransformHashToHex(),
+		})
+	}
+	return a
 }
