@@ -14,7 +14,7 @@ type Object struct {
 	DeletedAt *time.Time `sql:"index" json:"deletedAt"`
 
 	AppID string `json:"appId"`
-	App   *App   `json:"app,omitempty"`
+	App   *App   `json:"-"`
 
 	Hashes Hashes `json:"-"`
 }

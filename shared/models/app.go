@@ -19,7 +19,7 @@ type App struct {
 	EthAddress  string `json:"ethAddress"`
 
 	UserID string `json:"userId"`
-	User   *User  `json:"user,omitempty"`
+	User   *User  `json:"-"`
 }
 
 // Apps ...
