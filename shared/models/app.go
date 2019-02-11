@@ -6,6 +6,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// App ...
 type App struct {
 	ID        string     `gorm:"primary_key" json:"id"`
 	CreatedAt time.Time  `json:"createdAt"`
@@ -21,8 +22,10 @@ type App struct {
 	User   *User  `json:"user,omitempty"`
 }
 
+// Apps ...
 type Apps []App
 
+// CreateApp ...
 func (a *App) CreateApp(db *gorm.DB) error {
 	return db.Create(&a).Error
 }
@@ -31,11 +34,16 @@ func (a *App) FindApp(db *gorm.DB) error {
 	return db.Where(&a).First(&a).Error
 }
 
+
+// For Batching
+
+// GetAppsToBatch ...
 func (as *Apps) GetAppsToBatch(db *gorm.DB) error {
 	clause := "last_batched is null or (extract(epoch from now()) - last_batched >= interval)"
 	return db.Where(clause).Find(&as).Error
 }
 
+// UpdateApp ...
 func (a *App) UpdateApp(db *gorm.DB) error {
 	return db.Save(a).Error
 }

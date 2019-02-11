@@ -10,6 +10,8 @@ import (
 	"github.com/decentorganization/topaz/shared/models"
 )
 
+
+// CreateApp ...
 func CreateApp(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	uid := r.Context().Value(models.UserID).(string)
 
@@ -25,6 +27,7 @@ func CreateApp(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	w.Write(a)
 }
 
+// GetApps ...
 func GetApps(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	uid := r.Context().Value(models.UserID).(string)
 
@@ -35,6 +38,7 @@ func GetApps(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	w.Write(as)
 }
 
+// GetApp ...
 func GetApp(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	uid := r.Context().Value(models.UserID).(string)
 	aid := mux.Vars(r)["id"]

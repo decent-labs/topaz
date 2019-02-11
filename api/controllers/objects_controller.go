@@ -14,6 +14,7 @@ func buildContext(r *http.Request) (string, models.Object) {
 	return uid, o
 }
 
+// CreateObject ...
 func CreateObject(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	uid, o := buildContext(r)
 	h, ro := services.CreateObject(&o, uid)
@@ -23,6 +24,7 @@ func CreateObject(w http.ResponseWriter, r *http.Request, next http.HandlerFunc)
 	w.Write(ro)
 }
 
+// GetObjects ...
 func GetObjects(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	uid, o := buildContext(r)
 	h, ros := services.GetObjects(&o, uid)
@@ -32,6 +34,7 @@ func GetObjects(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	w.Write(ros)
 }
 
+// GetObject ...
 func GetObject(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	uid, o := buildContext(r)
 	o.ID = mux.Vars(r)["id"]
