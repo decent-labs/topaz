@@ -36,5 +36,5 @@ func NewUser(newUser *models.User) (int, []byte) {
 
 // EditUser ...
 func EditUser(requestUser *models.User) (int, []byte) {
-	return http.StatusOK, []byte("")
+	return http.StatusNotImplemented, []byte("")
 }
