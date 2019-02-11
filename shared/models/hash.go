@@ -75,6 +75,16 @@ func (h *Hash) CreateHash(db *gorm.DB) error {
 	return db.Create(&h).Error
 }
 
+// GetHash ...
+func (h *Hash) GetHash(db *gorm.DB) error {
+	return db.Model(&h.Object).Related(&h).Error
+}
+
+// GetHashes ...
+func (hs *Hashes) GetHashes(h *Hash, db *gorm.DB) error {
+	return db.Model(&h.Object).Related(&hs).Error
+}
+
 // GetHashesByApp ...
 func (hs *Hashes) GetHashesByApp(db *gorm.DB, app *App) error {
 	return db.
