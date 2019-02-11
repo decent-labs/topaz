@@ -10,6 +10,19 @@ import (
 	"github.com/decentorganization/topaz/shared/models"
 )
 
+func buildAppContext(r *http.Request, aid string) *models.App {
+	a := models.App{
+		User: &models.User{
+			ID: r.Context().Value(models.UserID).(string),
+		},
+	}
+
+	if aid != "" {
+		a.ID = aid
+	}
+
+	return &a
+}
 
 // CreateApp ...
 func CreateApp(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
