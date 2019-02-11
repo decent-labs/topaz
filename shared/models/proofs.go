@@ -13,7 +13,7 @@ type Proof struct {
 	ID        string     `gorm:"primary_key" json:"id"`
 	CreatedAt time.Time  `json:"createdAt"`
 	UpdatedAt time.Time  `json:"updatedAt"`
-	DeletedAt *time.Time `sql:"index" json:"deletedAt"`
+	DeletedAt *time.Time `sql:"index" json:"deletedAt,omitempty"`
 
 	MerkleRoot     string `json:"merkleRoot"`
 	EthTransaction string `json:"ethTransaction"`
