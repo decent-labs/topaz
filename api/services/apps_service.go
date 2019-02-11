@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 
@@ -9,8 +10,27 @@ import (
 	"github.com/decentorganization/topaz/shared/models"
 )
 
+func appAuthContext(u models.User, aid string) (*models.App, bool) {
+	a := models.App{User: &u}
+
+	if aid != "" {
+		a.ID = aid
+
+		if err := a.GetApp(database.Manager); err != nil {
+			return nil, false
+		}
+	}
+
+	return &a, true
+}
+
 // CreateApp ...
-func CreateApp(a *models.App, ra *models.App) (int, []byte) {
+func CreateApp(ctx context.Context, ra *models.App) (int, []byte) {
+	a, ok := appAuthContext(ctx.Value(models.AuthUser).(models.User), "")
+	if !ok {
+		return http.StatusUnauthorized, []byte("")
+	}
+
 	if len(ra.Name) == 0 || ra.Interval < 30 {
 		return http.StatusBadRequest, []byte("bad name or interval")
 	}
@@ -37,7 +57,12 @@ func CreateApp(a *models.App, ra *models.App) (int, []byte) {
 }
 
 // GetApp ...
-func GetApp(a *models.App) (int, []byte) {
+func GetApp(ctx context.Context, aid string) (int, []byte) {
+	a, ok := appAuthContext(ctx.Value(models.AuthUser).(models.User), aid)
+	if !ok {
+		return http.StatusUnauthorized, []byte("")
+	}
+
 	if err := a.GetApp(database.Manager); err != nil {
 		return http.StatusUnauthorized, []byte("")
 	}
@@ -51,7 +76,12 @@ func GetApp(a *models.App) (int, []byte) {
 }
 
 // GetApps ...
-func GetApps(a *models.App) (int, []byte) {
+func GetApps(ctx context.Context) (int, []byte) {
+	a, ok := appAuthContext(ctx.Value(models.AuthUser).(models.User), "")
+	if !ok {
+		return http.StatusUnauthorized, []byte("")
+	}
+
 	as := new(models.Apps)
 	if err := as.GetApps(a, database.Manager); err != nil {
 		return http.StatusUnauthorized, []byte("")

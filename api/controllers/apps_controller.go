@@ -9,29 +9,13 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func buildAppContext(r *http.Request, aid string) *models.App {
-	a := models.App{
-		User: &models.User{
-			ID: r.Context().Value(models.UserID).(string),
-		},
-	}
-
-	if aid != "" {
-		a.ID = aid
-	}
-
-	return &a
-}
-
 // CreateApp ...
 func CreateApp(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	a := buildAppContext(r, "")
-
 	ra := new(models.App)
 	d := json.NewDecoder(r.Body)
 	d.Decode(&ra)
 
-	rs, ar := services.CreateApp(a, ra)
+	rs, ar := services.CreateApp(r.Context(), ra)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(rs)
@@ -40,9 +24,7 @@ func CreateApp(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 
 // GetApps ...
 func GetApps(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	a := buildAppContext(r, "")
-
-	rs, as := services.GetApps(a)
+	rs, as := services.GetApps(r.Context())
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(rs)
@@ -51,9 +33,7 @@ func GetApps(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 
 // GetApp ...
 func GetApp(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	a := buildAppContext(r, mux.Vars(r)["id"])
-
-	rs, ra := services.GetApp(a)
+	rs, ra := services.GetApp(r.Context(), mux.Vars(r)["id"])
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(rs)
