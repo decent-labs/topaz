@@ -17,7 +17,7 @@ func NewUser(newUser *models.User) (int, []byte) {
 
 	hp, err := auth.HashPassword(newUser.Password)
 	if err != nil {
-		return http.StatusInternalServerError, []byte(err.Error())
+		return http.StatusInternalServerError, []byte("")
 	}
 
 	u := models.User{
@@ -27,7 +27,7 @@ func NewUser(newUser *models.User) (int, []byte) {
 	}
 
 	if err := u.CreateUser(database.Manager); err != nil {
-		return http.StatusInternalServerError, []byte(err.Error())
+		return http.StatusInternalServerError, []byte("")
 	}
 
 	response, _ := json.Marshal(u)

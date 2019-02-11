@@ -9,53 +9,44 @@ import (
 	"github.com/decentorganization/topaz/shared/models"
 )
 
-func CreateApp(newApp *models.App) (int, []byte) {
-	if len(newApp.Name) == 0 || newApp.Interval < 30 {
+// CreateApp ...
+func CreateApp(a *models.App, ra *models.App) (int, []byte) {
+	if len(ra.Name) == 0 || ra.Interval < 30 {
 		return http.StatusBadRequest, []byte("bad name or interval")
 	}
 
 	addr, err := ethereum.Deploy()
 	if err != nil {
-		return http.StatusInternalServerError, []byte(err.Error())
+		return http.StatusInternalServerError, []byte("")
 	}
 
-	a := models.App{
-		UserID:     newApp.UserID,
-		Name:       newApp.Name,
-		Interval:   newApp.Interval,
-		EthAddress: addr,
-	}
+	a.Name = ra.Name
+	a.Interval = ra.Interval
+	a.EthAddress = addr
 
 	if err := a.CreateApp(database.Manager); err != nil {
-		return http.StatusInternalServerError, []byte(err.Error())
+		return http.StatusInternalServerError, []byte("")
 	}
 
 	r, _ := json.Marshal(a)
 	return http.StatusOK, r
 }
 
-func GetApps(uid string) (int, []byte) {
-	u := models.User{
-		ID: uid,
-	}
-
+// GetApps ...
+func GetApps(a *models.App) (int, []byte) {
 	as := new(models.Apps)
-	if err := as.GetAppsForUser(&u, database.Manager); err != nil {
-		return http.StatusInternalServerError, []byte(err.Error())
+	if err := as.GetApps(a, database.Manager); err != nil {
+		return http.StatusUnauthorized, []byte("")
 	}
 
 	r, _ := json.Marshal(as)
 	return http.StatusOK, r
 }
 
-func GetApp(uid string, aid string) (int, []byte) {
-	a := models.App{
-		ID:     aid,
-		UserID: uid,
-	}
-
-	if err := a.FindApp(database.Manager); err != nil {
-		return http.StatusInternalServerError, []byte(err.Error())
+// GetApp ...
+func GetApp(a *models.App) (int, []byte) {
+	if err := a.GetApp(database.Manager); err != nil {
+		return http.StatusUnauthorized, []byte("")
 	}
 
 	r, _ := json.Marshal(a)

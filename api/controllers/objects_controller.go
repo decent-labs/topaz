@@ -2,56 +2,55 @@ package controllers
 
 import (
 	"net/http"
+
+	"github.com/decentorganization/topaz/api/services"
+	"github.com/decentorganization/topaz/shared/models"
+	"github.com/gorilla/mux"
 )
 
-func Trust(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	// aid := r.Context().Value(models.AppID).(string)
+func buildObjectContext(r *http.Request, oid string) *models.Object {
+	o := models.Object{
+		App: &models.App{
+			ID: mux.Vars(r)["appId"],
+			User: &models.User{
+				ID: r.Context().Value(models.UserID).(string),
+			},
+		},
+	}
 
-	// rh := new(models.Hash)
-	// d := json.NewDecoder(r.Body)
-	// d.Decode(&rh)
+	if oid != "" {
+		o.ID = oid
+	}
 
-	// rs, o := services.Trust(aid, rh)
-
-	// w.Header().Set("Content-Type", "application/json")
-	// w.WriteHeader(rs)
-	// w.Write(o)
+	return &o
 }
 
-func TrustUpdate(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	// aid := r.Context().Value(models.AppID).(string)
-	// uuid := path.Base(r.URL.Path)
+// CreateObject ...
+func CreateObject(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	o := buildObjectContext(r, "")
+	h, ro := services.CreateObject(o)
 
-	// rh := new(models.Hash)
-	// d := json.NewDecoder(r.Body)
-	// d.Decode(&rh)
-
-	// rs, h := services.TrustUpdate(aid, uuid, rh)
-
-	// w.Header().Set("Content-Type", "application/json")
-	// w.WriteHeader(rs)
-	// w.Write(h)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(h)
+	w.Write(ro)
 }
 
-func Verify(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	// aid := r.Context().Value(models.AppID).(string)
-	// o := path.Base(r.URL.Path)
+// GetObjects ...
+func GetObjects(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	o := buildObjectContext(r, "")
+	h, ros := services.GetObjects(o)
 
-	// rs, os := services.Verify(aid, o)
-
-	// w.Header().Set("Content-Type", "application/json")
-	// w.WriteHeader(rs)
-	// w.Write(os)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(h)
+	w.Write(ros)
 }
 
-func Report(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	// aid := r.Context().Value(models.AppID).(string)
-	// s, _ := strconv.Atoi(path.Base(path.Dir(r.URL.Path)))
-	// e, _ := strconv.Atoi(path.Base(r.URL.Path))
+// GetObject ...
+func GetObject(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	o := buildObjectContext(r, mux.Vars(r)["id"])
+	h, ro := services.GetObject(o)
 
-	// rs, os := services.Report(aid, s, e)
-
-	// w.Header().Set("Content-Type", "application/json")
-	// w.WriteHeader(rs)
-	// w.Write(os)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(h)
+	w.Write(ro)
 }

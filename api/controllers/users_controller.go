@@ -8,6 +8,7 @@ import (
 	"github.com/decentorganization/topaz/shared/models"
 )
 
+// NewUser ...
 func NewUser(w http.ResponseWriter, r *http.Request) {
 	requestUser := new(models.User)
 	decoder := json.NewDecoder(r.Body)
@@ -20,6 +21,7 @@ func NewUser(w http.ResponseWriter, r *http.Request) {
 	w.Write(user)
 }
 
+// EditUser ...
 func EditUser(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	requestUser := new(models.User)
 	decoder := json.NewDecoder(r.Body)

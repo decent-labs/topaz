@@ -8,30 +8,26 @@ import (
 )
 
 // SetObjectsRoutes provisions routes for 'object' activity
-func SetObjectsRoutes(router *mux.Router) *mux.Router {
-	router.Handle("/trust",
-		negroni.New(
-			negroni.HandlerFunc(auth.Auth),
-			negroni.HandlerFunc(controllers.Trust),
-		)).Methods("POST")
+func SetObjectsRoutes(r *mux.Router) *mux.Router {
+	s := r.PathPrefix("/apps/{appId}/objects").Subrouter()
 
-	router.Handle("/trust/{uuid}",
-		negroni.New(
-			negroni.HandlerFunc(auth.Auth),
-			negroni.HandlerFunc(controllers.TrustUpdate),
-		)).Methods("POST")
+	// Create new object
+	s.Handle("", negroni.New(
+		negroni.HandlerFunc(auth.Auth),
+		negroni.HandlerFunc(controllers.CreateObject),
+	)).Methods("POST")
 
-	router.Handle("/verify/{hash}",
-		negroni.New(
-			negroni.HandlerFunc(auth.Auth),
-			negroni.HandlerFunc(controllers.Verify),
-		)).Methods("GET")
+	// Get an object
+	s.Handle("/{id}", negroni.New(
+		negroni.HandlerFunc(auth.Auth),
+		negroni.HandlerFunc(controllers.GetObject),
+	)).Methods("GET")
 
-	router.Handle("/report/{start}/{end}",
-		negroni.New(
-			negroni.HandlerFunc(auth.Auth),
-			negroni.HandlerFunc(controllers.Report),
-		)).Methods("GET")
+	// Get all objects
+	s.Handle("", negroni.New(
+		negroni.HandlerFunc(auth.Auth),
+		negroni.HandlerFunc(controllers.GetObjects),
+	)).Methods("GET")
 
-	return router
+	return r
 }
