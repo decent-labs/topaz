@@ -4,10 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/gorilla/mux"
-
 	"github.com/decentorganization/topaz/api/services"
 	"github.com/decentorganization/topaz/shared/models"
+	"github.com/gorilla/mux"
 )
 
 func buildAppContext(r *http.Request, aid string) *models.App {
