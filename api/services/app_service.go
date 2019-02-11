@@ -34,13 +34,10 @@ func CreateApp(newApp *models.App) (int, []byte) {
 	return http.StatusOK, r
 }
 
-func GetApps(uid string) (int, []byte) {
-	u := models.User{
-		ID: uid,
-	}
-
+// GetApps ...
+func GetApps(a *models.App) (int, []byte) {
 	as := new(models.Apps)
-	if err := as.GetAppsForUser(&u, database.Manager); err != nil {
+	if err := as.GetApps(a, database.Manager); err != nil {
 		return http.StatusUnauthorized, []byte("")
 	}
 

@@ -35,6 +35,10 @@ func (a *App) GetApp(db *gorm.DB) error {
 	return db.Model(&a.User).Related(&a).Error
 }
 
+// GetApps ...
+func (as *Apps) GetApps(a *App, db *gorm.DB) error {
+	return db.Model(&a.User).Related(&as).Error
+}
 
 // For Batching
 
@@ -47,8 +51,4 @@ func (as *Apps) GetAppsToBatch(db *gorm.DB) error {
 // UpdateApp ...
 func (a *App) UpdateApp(db *gorm.DB) error {
 	return db.Save(a).Error
-}
-
-func (as *Apps) GetAppsForUser(u *User, db *gorm.DB) error {
-	return db.Model(&u).Related(&as).Error
 }
