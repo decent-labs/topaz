@@ -46,6 +46,6 @@ func Auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 		return
 	}
 
-	ctx := context.WithValue(req.Context(), models.AuthUser, u)
+	ctx := context.WithValue(req.Context(), models.AuthUser, &u)
 	next(rw, req.WithContext(ctx))
 }
