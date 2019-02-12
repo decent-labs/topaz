@@ -21,7 +21,7 @@ type App struct {
 	UserID string `json:"userId"`
 	User   *User  `json:"-"`
 
-	Batches Batches `json:"-"`
+	Proofs Proofs `json:"-"`
 }
 
 // Apps ...
