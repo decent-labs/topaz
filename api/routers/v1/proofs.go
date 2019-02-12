@@ -9,7 +9,7 @@ import (
 
 // SetProofsRoutes ...
 func SetProofsRoutes(r *mux.Router) *mux.Router {
-	s := r.PathPrefix("/apps/{appId}/batches/{batchId}/proofs").Subrouter()
+	s := r.PathPrefix("/apps/{appId}/proofs").Subrouter()
 
 	// Get all proofs
 	s.Handle("", negroni.New(

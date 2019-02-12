@@ -19,18 +19,9 @@ CREATE TABLE apps (
     deleted_at TIMESTAMP,
     interval INTEGER NOT NULL,
     name CHARACTER varying(255) NOT NULL,
-    last_batched INTEGER,
+    last_proofed INTEGER,
     user_id uuid REFERENCES users(id) NOT NULL,
     eth_address CHARACTER varying(255) NOT NULL
-);
-
-CREATE TABLE batches (
-    id uuid PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
-    created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL,
-    deleted_at TIMESTAMP,
-    app_id uuid REFERENCES apps(id) NOT NULL,
-    unix_timestamp INTEGER NOT NULL
 );
 
 CREATE TABLE proofs (
@@ -38,9 +29,10 @@ CREATE TABLE proofs (
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
     deleted_at TIMESTAMP,
-    batch_id uuid REFERENCES batches(id) NOT NULL,
+    app_id uuid REFERENCES apps(id) NOT NULL,
     merkle_root CHARACTER varying(255) NOT NULL,
-    eth_transaction CHARACTER varying(255) NOT NULL
+    eth_transaction CHARACTER varying(255) NOT NULL,
+    unix_timestamp INTEGER NOT NULL
 );
 
 CREATE TABLE objects (
@@ -64,4 +56,4 @@ CREATE TABLE hashes (
 
 -- +migrate Down
 
-DROP TABLE objects, batches, apps, users, proofs, hashes;
+DROP TABLE objects, apps, users, proofs, hashes;

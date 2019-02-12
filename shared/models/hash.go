@@ -1,15 +1,11 @@
 package models
 
 import (
-	"bytes"
-	"encoding/hex"
 	"encoding/json"
 	"time"
 
-	"github.com/cbergoon/merkletree"
+	"github.com/decentorganization/topaz/api/crypto"
 	"github.com/jinzhu/gorm"
-
-	multihash "github.com/multiformats/go-multihash"
 )
 
 // Hash ...
@@ -40,7 +36,7 @@ func (h *Hash) MarshalJSON() ([]byte, error) {
 		HashHex string `json:"hash"`
 	}{
 		Alias:   (*Alias)(h),
-		HashHex: h.TransformHashToHex(),
+		HashHex: crypto.TransformHashToHex(h.Hash),
 	})
 }
 
@@ -59,30 +55,14 @@ func (h *Hash) GetHash(db *gorm.DB) error {
 	return db.Model(&h.Object).Related(&h).Error
 }
 
-// TransformHashToHex ...
-func (h *Hash) TransformHashToHex() string {
-	return hex.EncodeToString(h.Hash)
-}
-
-// CalculateHash ...
-func (h Hash) CalculateHash() ([]byte, error) {
-	return h.Hash, nil
-}
-
-// Equals ...
-func (h Hash) Equals(other merkletree.Content) (bool, error) {
-	return bytes.Compare(h.Hash, other.(Hash).Hash) == 0, nil
-
-}
-
-// GetMerkleRoot ...
-func (hs *Hashes) GetMerkleRoot() (string, error) {
-	t, err := makeMerkleTree(hs)
-	if err != nil {
-		return "", err
+// MakeMerkleLeafs ...
+func (hs *Hashes) MakeMerkleLeafs() crypto.MerkleLeafs {
+	var ms crypto.MerkleLeafs
+	for _, h := range *hs {
+		m := crypto.MerkleLeaf{Hash: h.Hash}
+		ms = append(ms, m)
 	}
-
-	return getReadableHash(t.MerkleRoot())
+	return ms
 }
 
 // GetHashesByApp ...
@@ -97,47 +77,12 @@ func (hs *Hashes) GetHashesByApp(db *gorm.DB, app *App) error {
 		Error
 }
 
-// UpdateProof ...
-func (hs Hashes) UpdateProof(db *gorm.DB, proofID *string) error {
+// UpdateWithProof ...
+func (hs Hashes) UpdateWithProof(db *gorm.DB, proofID *string) error {
 	ids := make([]string, len(hs))
 	for i, h := range hs {
 		ids[i] = h.ID
 	}
 
 	return db.Model(Hash{}).Where("id IN (?)", ids).Updates(Hash{ProofID: proofID}).Error
-}
-
-// GetHashesByTimestamps ...
-func (hs *Hashes) GetHashesByTimestamps(db *gorm.DB, app *App, start int, end int) error {
-	return db.
-		Table("hashes").
-		Joins("join objects on objects.id = hashes.object_id").
-		Joins("join apps on apps.id = objects.app_id").
-		Where("apps.id = (?)", app.ID).
-		Where("hashes.unix_timestamp BETWEEN (?) AND (?)", start, end).
-		Find(&hs).
-		Error
-}
-
-func getReadableHash(digest []byte) (string, error) {
-	mhBuf, err := multihash.Encode(digest, multihash.SHA2_256)
-	if err != nil {
-		return "", err
-	}
-
-	mh, err := multihash.Cast(mhBuf)
-	if err != nil {
-		return "", err
-	}
-
-	return mh.B58String(), nil
-}
-
-func makeMerkleTree(hs *Hashes) (*merkletree.MerkleTree, error) {
-	var list []merkletree.Content
-	for _, obj := range *hs {
-		list = append(list, obj)
-	}
-
-	return merkletree.NewTree(list)
 }

@@ -10,8 +10,8 @@ import (
 )
 
 // GetProofs ...
-func GetProofs(u *models.User, aid string, bid string) (int, []byte) {
-	p, ok := authorization.AuthorizeProofs(u, aid, bid)
+func GetProofs(u *models.User, aid string) (int, []byte) {
+	p, ok := authorization.AuthorizeProofs(u, aid)
 	if !ok {
 		return http.StatusUnauthorized, []byte("")
 	}
@@ -30,8 +30,8 @@ func GetProofs(u *models.User, aid string, bid string) (int, []byte) {
 }
 
 // GetProof ...
-func GetProof(u *models.User, aid string, bid string, pid string) (int, []byte) {
-	p, ok := authorization.AuthorizeProofs(u, aid, bid)
+func GetProof(u *models.User, aid string, pid string) (int, []byte) {
+	p, ok := authorization.AuthorizeProofs(u, aid)
 	if !ok {
 		return http.StatusUnauthorized, []byte("")
 	}
