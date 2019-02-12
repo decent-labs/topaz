@@ -44,6 +44,21 @@ func (h *Hash) MarshalJSON() ([]byte, error) {
 	})
 }
 
+// CreateHash ...
+func (h *Hash) CreateHash(db *gorm.DB) error {
+	return db.Create(&h).Error
+}
+
+// GetHashes ...
+func (hs *Hashes) GetHashes(h *Hash, db *gorm.DB) error {
+	return db.Model(&h.Object).Related(&hs).Error
+}
+
+// GetHash ...
+func (h *Hash) GetHash(db *gorm.DB) error {
+	return db.Model(&h.Object).Related(&h).Error
+}
+
 // TransformHashToHex ...
 func (h *Hash) TransformHashToHex() string {
 	return hex.EncodeToString(h.Hash)
@@ -68,21 +83,6 @@ func (hs *Hashes) GetMerkleRoot() (string, error) {
 	}
 
 	return getReadableHash(t.MerkleRoot())
-}
-
-// CreateHash ...
-func (h *Hash) CreateHash(db *gorm.DB) error {
-	return db.Create(&h).Error
-}
-
-// GetHash ...
-func (h *Hash) GetHash(db *gorm.DB) error {
-	return db.Model(&h.Object).Related(&h).Error
-}
-
-// GetHashes ...
-func (hs *Hashes) GetHashes(h *Hash, db *gorm.DB) error {
-	return db.Model(&h.Object).Related(&hs).Error
 }
 
 // GetHashesByApp ...
