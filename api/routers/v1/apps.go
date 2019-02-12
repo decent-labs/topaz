@@ -17,16 +17,16 @@ func SetAppsRoutes(r *mux.Router) *mux.Router {
 		negroni.HandlerFunc(controllers.CreateApp),
 	)).Methods("POST")
 
-	// Get single app
-	s.Handle("/{id}", negroni.New(
-		negroni.HandlerFunc(authentication.Auth),
-		negroni.HandlerFunc(controllers.GetApp),
-	)).Methods("GET")
-
 	// Get all apps
 	s.Handle("", negroni.New(
 		negroni.HandlerFunc(authentication.Auth),
 		negroni.HandlerFunc(controllers.GetApps),
+	)).Methods("GET")
+
+	// Get single app
+	s.Handle("/{id}", negroni.New(
+		negroni.HandlerFunc(authentication.Auth),
+		negroni.HandlerFunc(controllers.GetApp),
 	)).Methods("GET")
 
 	return r
