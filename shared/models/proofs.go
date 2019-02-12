@@ -1,7 +1,6 @@
 package models
 
 import (
-	"encoding/json"
 	"strings"
 	"time"
 
@@ -27,18 +26,6 @@ type Proof struct {
 
 // Proofs ...
 type Proofs []Proof
-
-// MarshalJSON ...
-func (p *Proof) MarshalJSON() ([]byte, error) {
-	type Alias Proof
-	return json.Marshal(&struct {
-		*Alias
-		Hashes []interface{} `json:"hashes"`
-	}{
-		Alias:  (*Alias)(p),
-		Hashes: p.reduceHashes(),
-	})
-}
 
 // CreateProof ...
 func (p *Proof) CreateProof(db *gorm.DB) error {
@@ -78,16 +65,3 @@ func (p *Proof) CheckValidity() error {
 	return nil
 }
 
-func (p *Proof) reduceHashes() []interface{} {
-	a := make([]interface{}, 0, len(p.Hashes))
-	for _, h := range p.Hashes {
-		a = append(a, struct {
-			ID   string `json:"id"`
-			Hash string `json:"hash"`
-		}{
-			h.ID,
-			h.TransformHashToHex(),
-		})
-	}
-	return a
-}
