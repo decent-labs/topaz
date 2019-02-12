@@ -4,12 +4,16 @@ import (
 	"net/http"
 
 	"github.com/decentorganization/topaz/api/services"
+	"github.com/decentorganization/topaz/shared/models"
 	"github.com/gorilla/mux"
 )
 
 // CreateObject ...
 func CreateObject(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	h, o := services.CreateObject(r.Context(), mux.Vars(r)["appId"])
+	h, o := services.CreateObject(
+		r.Context().Value(models.AuthUser).(*models.User),
+		mux.Vars(r)["appId"],
+	)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(h)
@@ -18,7 +22,10 @@ func CreateObject(w http.ResponseWriter, r *http.Request, next http.HandlerFunc)
 
 // GetObjects ...
 func GetObjects(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	h, os := services.GetObjects(r.Context(), mux.Vars(r)["appId"])
+	h, os := services.GetObjects(
+		r.Context().Value(models.AuthUser).(*models.User),
+		mux.Vars(r)["appId"],
+	)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(h)
@@ -27,7 +34,11 @@ func GetObjects(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 
 // GetObject ...
 func GetObject(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	h, o := services.GetObject(r.Context(), mux.Vars(r)["appId"], mux.Vars(r)["id"])
+	h, o := services.GetObject(
+		r.Context().Value(models.AuthUser).(*models.User),
+		mux.Vars(r)["appId"],
+		mux.Vars(r)["id"],
+	)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(h)

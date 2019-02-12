@@ -1,32 +1,18 @@
 package services
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 
+	"github.com/decentorganization/topaz/api/authorization"
 	"github.com/decentorganization/topaz/shared/database"
 	"github.com/decentorganization/topaz/shared/ethereum"
 	"github.com/decentorganization/topaz/shared/models"
 )
 
-func appAuthContext(u models.User, aid string) (*models.App, bool) {
-	a := models.App{User: &u}
-
-	if aid != "" {
-		a.ID = aid
-
-		if err := a.GetApp(database.Manager); err != nil {
-			return nil, false
-		}
-	}
-
-	return &a, true
-}
-
 // CreateApp ...
-func CreateApp(ctx context.Context, ra *models.App) (int, []byte) {
-	a, ok := appAuthContext(ctx.Value(models.AuthUser).(models.User), "")
+func CreateApp(u *models.User, ra *models.App) (int, []byte) {
+	a, ok := authorization.AuthorizeApps(u)
 	if !ok {
 		return http.StatusUnauthorized, []byte("")
 	}
@@ -57,12 +43,13 @@ func CreateApp(ctx context.Context, ra *models.App) (int, []byte) {
 }
 
 // GetApp ...
-func GetApp(ctx context.Context, aid string) (int, []byte) {
-	a, ok := appAuthContext(ctx.Value(models.AuthUser).(models.User), aid)
+func GetApp(u *models.User, aid string) (int, []byte) {
+	a, ok := authorization.AuthorizeApps(u)
 	if !ok {
 		return http.StatusUnauthorized, []byte("")
 	}
 
+	a.ID = aid
 	if err := a.GetApp(database.Manager); err != nil {
 		return http.StatusUnauthorized, []byte("")
 	}
@@ -76,8 +63,8 @@ func GetApp(ctx context.Context, aid string) (int, []byte) {
 }
 
 // GetApps ...
-func GetApps(ctx context.Context) (int, []byte) {
-	a, ok := appAuthContext(ctx.Value(models.AuthUser).(models.User), "")
+func GetApps(u *models.User) (int, []byte) {
+	a, ok := authorization.AuthorizeApps(u)
 	if !ok {
 		return http.StatusUnauthorized, []byte("")
 	}
