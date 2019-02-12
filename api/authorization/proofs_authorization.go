@@ -6,7 +6,7 @@ import (
 )
 
 // AuthorizeProofs ...
-func AuthorizeProofs(u *models.User, aid string, bid string) (*models.Proof, bool) {
+func AuthorizeProofs(u *models.User, aid string) (*models.Proof, bool) {
 	a := models.App{
 		ID:   aid,
 		User: u,
@@ -16,16 +16,7 @@ func AuthorizeProofs(u *models.User, aid string, bid string) (*models.Proof, boo
 		return nil, false
 	}
 
-	b := models.Batch{
-		ID:  bid,
-		App: &a,
-	}
-
-	if err := b.GetBatch(database.Manager); err != nil {
-		return nil, false
-	}
-
-	p := models.Proof{Batch: &b}
+	p := models.Proof{App: &a}
 
 	return &p, true
 }
