@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"strconv"
 	"time"
@@ -18,16 +17,17 @@ func mainLoop() {
 	}
 
 	for _, a := range *apps {
-		hashes := new(models.Hashes)
-		if err := hashes.GetHashesByApp(database.Manager, app); err != nil {
+		hs := new(models.Hashes)
+		if err := hs.GetHashesByApp(database.Manager, &a); err != nil {
 			continue
 		}
 
-		if len(*hashes) = 0 {
+		if len(*hs) == 0 {
 			continue
 		}
-	
-		root, err := hs.GetMerkleRoot()
+
+		ms := hs.MakeMerkleLeafs()
+		root, err := ms.GetMerkleRoot()
 		if err != nil {
 			continue
 		}
@@ -39,9 +39,9 @@ func mainLoop() {
 
 		ut := time.Now().Unix()
 		a.LastProofed = &ut
-		
+
 		p := models.Proof{
-			App:            a,
+			App:            &a,
 			MerkleRoot:     root,
 			EthTransaction: tx,
 			UnixTimestamp:  ut,
@@ -51,7 +51,7 @@ func mainLoop() {
 			continue
 		}
 
-		if err := hashes.UpdateProof(database.Manager, &p.ID); err != nil {
+		if err := hs.UpdateWithProof(database.Manager, &p.ID); err != nil {
 			continue
 		}
 	}
