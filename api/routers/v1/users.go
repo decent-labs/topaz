@@ -7,7 +7,7 @@ import (
 	"github.com/urfave/negroni"
 )
 
-// SetUsersRoutes provisions routes for 'user' activity
+// SetUsersRoutes ...
 func SetUsersRoutes(r *mux.Router) *mux.Router {
 	s := r.PathPrefix("/users").Subrouter()
 

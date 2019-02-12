@@ -4,7 +4,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// InitRoutes provisions our router with routes for various models
+// InitRoutes ...
 func InitRoutes() *mux.Router {
 	r := mux.NewRouter()
 	s := r.PathPrefix("/api/v1/").Subrouter()
@@ -14,5 +14,6 @@ func InitRoutes() *mux.Router {
 	s = SetObjectsRoutes(s)
 	s = SetHashesRoutes(s)
 	s = SetBatchesRoutes(s)
+	s = SetProofsRoutes(s)
 	return r
 }

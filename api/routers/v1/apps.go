@@ -7,7 +7,7 @@ import (
 	"github.com/urfave/negroni"
 )
 
-// SetAppsRoutes provisions routes for 'apps'.
+// SetAppsRoutes ...
 func SetAppsRoutes(r *mux.Router) *mux.Router {
 	s := r.PathPrefix("/apps").Subrouter()
 

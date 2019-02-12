@@ -7,20 +7,20 @@ import (
 	"github.com/urfave/negroni"
 )
 
-// SetBatchesRoutes ...
-func SetBatchesRoutes(r *mux.Router) *mux.Router {
-	s := r.PathPrefix("/apps/{appId}/batches").Subrouter()
+// SetProofsRoutes ...
+func SetProofsRoutes(r *mux.Router) *mux.Router {
+	s := r.PathPrefix("/apps/{appId}/batches/{batchId}/proofs").Subrouter()
 
-	// Get all batches
+	// Get all proofs
 	s.Handle("", negroni.New(
 		negroni.HandlerFunc(authentication.Auth),
-		negroni.HandlerFunc(controllers.GetBatches),
+		negroni.HandlerFunc(controllers.GetProofs),
 	)).Methods("GET")
 
-	// Get a batch
+	// Get a proof
 	s.Handle("/{id}", negroni.New(
 		negroni.HandlerFunc(authentication.Auth),
-		negroni.HandlerFunc(controllers.GetBatch),
+		negroni.HandlerFunc(controllers.GetProof),
 	)).Methods("GET")
 
 	return r
