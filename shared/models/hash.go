@@ -77,7 +77,7 @@ func (h Hash) Equals(other merkletree.Content) (bool, error) {
 
 // GetMerkleRoot ...
 func (hs *Hashes) GetMerkleRoot() (string, error) {
-	t, err := makeMerkleTree(hs)
+	t, err := hs.makeMerkleTree()
 	if err != nil {
 		return "", err
 	}
@@ -133,7 +133,7 @@ func getReadableHash(digest []byte) (string, error) {
 	return mh.B58String(), nil
 }
 
-func makeMerkleTree(hs *Hashes) (*merkletree.MerkleTree, error) {
+func (hs *Hashes) makeMerkleTree() (*merkletree.MerkleTree, error) {
 	var list []merkletree.Content
 	for _, obj := range *hs {
 		list = append(list, obj)
