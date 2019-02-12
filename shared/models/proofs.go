@@ -45,6 +45,16 @@ func (p *Proof) CreateProof(db *gorm.DB) error {
 	return db.Create(&p).Error
 }
 
+// GetProofs ...
+func (ps *Proofs) GetProofs(p *Proof, db *gorm.DB) error {
+	return db.Model(&p.Batch).Related(&ps).Error
+}
+
+// GetProof ...
+func (p *Proof) GetProof(db *gorm.DB) error {
+	return db.Model(&p.Batch).Related(&p).Error
+}
+
 // CheckValidity ...
 func (p *Proof) CheckValidity() error {
 	cur, err := p.Hashes.GetMerkleRoot()
