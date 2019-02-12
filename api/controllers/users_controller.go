@@ -8,28 +8,31 @@ import (
 	"github.com/decentorganization/topaz/shared/models"
 )
 
-// NewUser ...
-func NewUser(w http.ResponseWriter, r *http.Request) {
-	requestUser := new(models.User)
-	decoder := json.NewDecoder(r.Body)
-	decoder.Decode(&requestUser)
+// CreateUser ...
+func CreateUser(w http.ResponseWriter, r *http.Request) {
+	ru := new(models.User)
+	d := json.NewDecoder(r.Body)
+	d.Decode(&ru)
 
-	responseStatus, user := services.NewUser(requestUser)
+	rs, u := services.CreateUser(ru)
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(responseStatus)
-	w.Write(user)
+	w.WriteHeader(rs)
+	w.Write(u)
 }
 
 // EditUser ...
 func EditUser(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	requestUser := new(models.User)
-	decoder := json.NewDecoder(r.Body)
-	decoder.Decode(&requestUser)
+	ru := new(models.User)
+	d := json.NewDecoder(r.Body)
+	d.Decode(&ru)
 
-	responseStatus, user := services.EditUser(requestUser)
+	rs, u := services.EditUser(
+		r.Context().Value(models.AuthUser).(*models.User),
+		ru,
+	)
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(responseStatus)
-	w.Write(user)
+	w.WriteHeader(rs)
+	w.Write(u)
 }
