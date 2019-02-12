@@ -17,6 +17,8 @@ type Batch struct {
 
 	AppID string `json:"appId"`
 	App   *App   `json:"-"`
+
+	Proofs Proofs `json:"-"`
 }
 
 // Batches ...

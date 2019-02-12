@@ -25,6 +25,9 @@ type Proof struct {
 	Hashes Hashes `json:"-"`
 }
 
+// Proofs ...
+type Proofs []Proof
+
 // MarshalJSON ...
 func (p *Proof) MarshalJSON() ([]byte, error) {
 	type Alias Proof
