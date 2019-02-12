@@ -15,9 +15,9 @@ import (
 // Hash ...
 type Hash struct {
 	ID        string     `gorm:"primary_key" json:"id"`
-	CreatedAt time.Time  `json:"createdAt"`
-	UpdatedAt time.Time  `json:"updatedAt"`
-	DeletedAt *time.Time `sql:"index" json:"deletedAt,omitempty"`
+	CreatedAt time.Time  `json:"-"`
+	UpdatedAt time.Time  `json:"-"`
+	DeletedAt *time.Time `sql:"index" json:"-"`
 
 	HashHex       string `json:"hash" gorm:"-"`
 	Hash          []byte `json:"-"`
