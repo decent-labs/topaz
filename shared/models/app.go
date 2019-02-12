@@ -42,10 +42,10 @@ func (a *App) GetApp(db *gorm.DB) error {
 	return db.Model(&a.User).Related(&a).Error
 }
 
-// For Batching
+// For proofing
 
-// GetAppsToBatch ...
-func (as *Apps) GetAppsToBatch(db *gorm.DB) error {
+// GetAppsToProof ...
+func (as *Apps) GetAppsToProof(db *gorm.DB) error {
 	clause := "last_proofed is null or (extract(epoch from now()) - last_proofed >= interval)"
 	return db.Where(clause).Find(&as).Error
 }
