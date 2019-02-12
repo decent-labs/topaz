@@ -8,7 +8,6 @@ import (
 )
 
 // SetAppsRoutes provisions routes for 'apps'.
-// All methods scoped to user
 func SetAppsRoutes(r *mux.Router) *mux.Router {
 	s := r.PathPrefix("/apps").Subrouter()
 
