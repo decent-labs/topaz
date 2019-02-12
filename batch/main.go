@@ -29,7 +29,7 @@ func makeBatch(a models.App) (models.Batch, error) {
 		return b, err
 	}
 
-	a.LastBatched = &ut
+	a.LastProofed = &ut
 	if err := a.UpdateApp(database.Manager); err != nil {
 		return b, err
 	}

@@ -15,7 +15,7 @@ type App struct {
 
 	Interval    int    `json:"interval"`
 	Name        string `json:"name"`
-	LastBatched *int64 `json:"-"`
+	LastProofed *int64 `json:"-"`
 	EthAddress  string `json:"ethAddress"`
 
 	UserID string `json:"userId"`
@@ -46,7 +46,7 @@ func (a *App) GetApp(db *gorm.DB) error {
 
 // GetAppsToBatch ...
 func (as *Apps) GetAppsToBatch(db *gorm.DB) error {
-	clause := "last_batched is null or (extract(epoch from now()) - last_batched >= interval)"
+	clause := "last_proofed is null or (extract(epoch from now()) - last_proofed >= interval)"
 	return db.Where(clause).Find(&as).Error
 }
 

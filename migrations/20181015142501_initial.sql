@@ -19,7 +19,7 @@ CREATE TABLE apps (
     deleted_at TIMESTAMP,
     interval INTEGER NOT NULL,
     name CHARACTER varying(255) NOT NULL,
-    last_batched INTEGER,
+    last_proofed INTEGER,
     user_id uuid REFERENCES users(id) NOT NULL,
     eth_address CHARACTER varying(255) NOT NULL
 );
