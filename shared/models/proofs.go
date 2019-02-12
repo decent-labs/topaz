@@ -1,7 +1,6 @@
 package models
 
 import (
-	"strings"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -41,27 +40,3 @@ func (ps *Proofs) GetProofs(p *Proof, db *gorm.DB) error {
 func (p *Proof) GetProof(db *gorm.DB) error {
 	return db.Model(&p.App).Related(&p).Error
 }
-
-// CheckValidity ...
-func (p *Proof) CheckValidity() error {
-	cur, err := p.Hashes.GetMerkleRoot()
-	if err != nil {
-		return err
-	}
-
-	validRoot := strings.Compare(cur, p.MerkleRoot) == 0
-
-	t, err := makeMerkleTree(&p.Hashes)
-	if err != nil {
-		return err
-	}
-
-	validTree, err := t.VerifyTree()
-	if err != nil {
-		return err
-	}
-
-	p.ValidStructure = validRoot && validTree
-	return nil
-}
-
