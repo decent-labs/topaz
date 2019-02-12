@@ -107,18 +107,6 @@ func (hs Hashes) UpdateProof(db *gorm.DB, proofID *string) error {
 	return db.Model(Hash{}).Where("id IN (?)", ids).Updates(Hash{ProofID: proofID}).Error
 }
 
-// GetHashesByTimestamps ...
-func (hs *Hashes) GetHashesByTimestamps(db *gorm.DB, app *App, start int, end int) error {
-	return db.
-		Table("hashes").
-		Joins("join objects on objects.id = hashes.object_id").
-		Joins("join apps on apps.id = objects.app_id").
-		Where("apps.id = (?)", app.ID).
-		Where("hashes.unix_timestamp BETWEEN (?) AND (?)", start, end).
-		Find(&hs).
-		Error
-}
-
 func getReadableHash(digest []byte) (string, error) {
 	mhBuf, err := multihash.Encode(digest, multihash.SHA2_256)
 	if err != nil {
