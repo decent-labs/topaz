@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/decentorganization/topaz/api/auth"
+	"github.com/decentorganization/topaz/api/authentication"
 	"github.com/decentorganization/topaz/shared/database"
 	"github.com/decentorganization/topaz/shared/models"
 )
@@ -15,7 +15,7 @@ func NewUser(newUser *models.User) (int, []byte) {
 		return http.StatusBadRequest, []byte("bad email, password, or name")
 	}
 
-	hp, err := auth.HashPassword(newUser.Password)
+	hp, err := authentication.HashPassword(newUser.Password)
 	if err != nil {
 		return http.StatusInternalServerError, []byte("")
 	}

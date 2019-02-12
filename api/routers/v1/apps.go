@@ -1,7 +1,7 @@
 package routers
 
 import (
-	"github.com/decentorganization/topaz/api/auth"
+	"github.com/decentorganization/topaz/api/authentication"
 	"github.com/decentorganization/topaz/api/controllers"
 	"github.com/gorilla/mux"
 	"github.com/urfave/negroni"
@@ -14,19 +14,19 @@ func SetAppsRoutes(r *mux.Router) *mux.Router {
 
 	// Create new app
 	s.Handle("", negroni.New(
-		negroni.HandlerFunc(auth.Auth),
+		negroni.HandlerFunc(authentication.Auth),
 		negroni.HandlerFunc(controllers.CreateApp),
 	)).Methods("POST")
 
 	// Get single app
 	s.Handle("/{id}", negroni.New(
-		negroni.HandlerFunc(auth.Auth),
+		negroni.HandlerFunc(authentication.Auth),
 		negroni.HandlerFunc(controllers.GetApp),
 	)).Methods("GET")
 
 	// Get all apps
 	s.Handle("", negroni.New(
-		negroni.HandlerFunc(auth.Auth),
+		negroni.HandlerFunc(authentication.Auth),
 		negroni.HandlerFunc(controllers.GetApps),
 	)).Methods("GET")
 
