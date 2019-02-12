@@ -7,26 +7,26 @@ import (
 	"github.com/urfave/negroni"
 )
 
-// SetAppsRoutes provisions routes for 'apps'.
-func SetAppsRoutes(r *mux.Router) *mux.Router {
-	s := r.PathPrefix("/apps").Subrouter()
+// SetHashesRoutes provisions routes for 'hashes' activity
+func SetHashesRoutes(r *mux.Router) *mux.Router {
+	s := r.PathPrefix("/apps/{appId}/objects/{objectId}/hashes").Subrouter()
 
-	// Create new app
+	// Create new hash
 	s.Handle("", negroni.New(
 		negroni.HandlerFunc(authentication.Auth),
-		negroni.HandlerFunc(controllers.CreateApp),
+		negroni.HandlerFunc(controllers.CreateHash),
 	)).Methods("POST")
 
-	// Get all apps
+	// Get all hashes
 	s.Handle("", negroni.New(
 		negroni.HandlerFunc(authentication.Auth),
-		negroni.HandlerFunc(controllers.GetApps),
+		negroni.HandlerFunc(controllers.GetHashes),
 	)).Methods("GET")
 
-	// Get single app
+	// Get an hash
 	s.Handle("/{id}", negroni.New(
 		negroni.HandlerFunc(authentication.Auth),
-		negroni.HandlerFunc(controllers.GetApp),
+		negroni.HandlerFunc(controllers.GetHash),
 	)).Methods("GET")
 
 	return r

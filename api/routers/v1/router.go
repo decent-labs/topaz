@@ -12,5 +12,6 @@ func InitRoutes() *mux.Router {
 	s = SetUsersRoutes(s)
 	s = SetAppsRoutes(s)
 	s = SetObjectsRoutes(s)
+	s = SetHashesRoutes(s)
 	return r
 }
