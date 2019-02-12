@@ -14,5 +14,6 @@ func InitRoutes() *mux.Router {
 	s = SetObjectsRoutes(s)
 	s = SetHashesRoutes(s)
 	s = SetBatchesRoutes(s)
+	s = SetProofsRoutes(s)
 	return r
 }
