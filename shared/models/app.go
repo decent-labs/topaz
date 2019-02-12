@@ -30,14 +30,14 @@ func (a *App) CreateApp(db *gorm.DB) error {
 	return db.Create(&a).Error
 }
 
-// GetApp ...
-func (a *App) GetApp(db *gorm.DB) error {
-	return db.Model(&a.User).Related(&a).Error
-}
-
 // GetApps ...
 func (as *Apps) GetApps(a *App, db *gorm.DB) error {
 	return db.Model(&a.User).Related(&as).Error
+}
+
+// GetApp ...
+func (a *App) GetApp(db *gorm.DB) error {
+	return db.Model(&a.User).Related(&a).Error
 }
 
 // For Batching

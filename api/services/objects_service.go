@@ -28,26 +28,6 @@ func CreateObject(u *models.User, aid string) (int, []byte) {
 	return http.StatusOK, r
 }
 
-// GetObject ...
-func GetObject(u *models.User, aid string, oid string) (int, []byte) {
-	o, ok := authorization.AuthorizeObjects(u, aid)
-	if !ok {
-		return http.StatusUnauthorized, []byte("")
-	}
-
-	o.ID = oid
-	if err := o.GetObject(database.Manager); err != nil {
-		return http.StatusUnauthorized, []byte("")
-	}
-
-	r, err := json.Marshal(&o)
-	if err != nil {
-		return http.StatusInternalServerError, []byte("")
-	}
-
-	return http.StatusOK, r
-}
-
 // GetObjects ...
 func GetObjects(u *models.User, aid string) (int, []byte) {
 	o, ok := authorization.AuthorizeObjects(u, aid)
@@ -61,6 +41,26 @@ func GetObjects(u *models.User, aid string) (int, []byte) {
 	}
 
 	r, err := json.Marshal(&os)
+	if err != nil {
+		return http.StatusInternalServerError, []byte("")
+	}
+
+	return http.StatusOK, r
+}
+
+// GetObject ...
+func GetObject(u *models.User, aid string, oid string) (int, []byte) {
+	o, ok := authorization.AuthorizeObjects(u, aid)
+	if !ok {
+		return http.StatusUnauthorized, []byte("")
+	}
+
+	o.ID = oid
+	if err := o.GetObject(database.Manager); err != nil {
+		return http.StatusUnauthorized, []byte("")
+	}
+
+	r, err := json.Marshal(&o)
 	if err != nil {
 		return http.StatusInternalServerError, []byte("")
 	}

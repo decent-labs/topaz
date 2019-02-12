@@ -42,26 +42,6 @@ func CreateApp(u *models.User, ra *models.App) (int, []byte) {
 	return http.StatusOK, r
 }
 
-// GetApp ...
-func GetApp(u *models.User, aid string) (int, []byte) {
-	a, ok := authorization.AuthorizeApps(u)
-	if !ok {
-		return http.StatusUnauthorized, []byte("")
-	}
-
-	a.ID = aid
-	if err := a.GetApp(database.Manager); err != nil {
-		return http.StatusUnauthorized, []byte("")
-	}
-
-	r, err := json.Marshal(&a)
-	if err != nil {
-		return http.StatusInternalServerError, []byte("")
-	}
-
-	return http.StatusOK, r
-}
-
 // GetApps ...
 func GetApps(u *models.User) (int, []byte) {
 	a, ok := authorization.AuthorizeApps(u)
@@ -75,6 +55,26 @@ func GetApps(u *models.User) (int, []byte) {
 	}
 
 	r, err := json.Marshal(&as)
+	if err != nil {
+		return http.StatusInternalServerError, []byte("")
+	}
+
+	return http.StatusOK, r
+}
+
+// GetApp ...
+func GetApp(u *models.User, aid string) (int, []byte) {
+	a, ok := authorization.AuthorizeApps(u)
+	if !ok {
+		return http.StatusUnauthorized, []byte("")
+	}
+
+	a.ID = aid
+	if err := a.GetApp(database.Manager); err != nil {
+		return http.StatusUnauthorized, []byte("")
+	}
+
+	r, err := json.Marshal(&a)
 	if err != nil {
 		return http.StatusInternalServerError, []byte("")
 	}
