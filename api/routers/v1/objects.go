@@ -7,7 +7,7 @@ import (
 	"github.com/urfave/negroni"
 )
 
-// SetObjectsRoutes provisions routes for 'object' activity
+// SetObjectsRoutes ...
 func SetObjectsRoutes(r *mux.Router) *mux.Router {
 	s := r.PathPrefix("/apps/{appId}/objects").Subrouter()
 

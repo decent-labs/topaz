@@ -7,7 +7,7 @@ import (
 	"github.com/urfave/negroni"
 )
 
-// SetBatchesRoutes provisions routes for 'hashes' activity
+// SetBatchesRoutes ...
 func SetBatchesRoutes(r *mux.Router) *mux.Router {
 	s := r.PathPrefix("/apps/{appId}/batches").Subrouter()
 

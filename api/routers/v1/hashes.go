@@ -7,7 +7,7 @@ import (
 	"github.com/urfave/negroni"
 )
 
-// SetHashesRoutes provisions routes for 'hashes' activity
+// SetHashesRoutes ...
 func SetHashesRoutes(r *mux.Router) *mux.Router {
 	s := r.PathPrefix("/apps/{appId}/objects/{objectId}/hashes").Subrouter()
 
