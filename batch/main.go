@@ -11,57 +11,46 @@ import (
 	"github.com/decentorganization/topaz/shared/models"
 )
 
-func getAppsToBatch() (models.Apps, error) {
+func getAppsToProof() (*models.Apps, error) {
 	apps := new(models.Apps)
-	err := apps.GetAppsToBatch(database.Manager)
-	return *apps, err
+	err := apps.GetAppsToProof(database.Manager)
+	return apps, err
 }
 
-func makeBatch(a models.App) (models.Batch, error) {
+func getHashesToProof(app *models.App) (*models.Hashes, error) {
+	hashes := new(models.Hashes)
+	err := hashes.GetHashesByApp(database.Manager, app)
+	return hashes, err
+}
+
+func makeProof(hashes *models.Hashes, app *models.App, root string, tx string) (*models.Proof, error) {
 	ut := time.Now().Unix()
 
-	b := models.Batch{
-		AppID:         a.ID,
-		UnixTimestamp: ut,
+	app.LastProofed = &ut
+
+	if err := app.UpdateApp(database.Manager); err != nil {
+		return nil, err
 	}
 
-	if err := b.CreateBatch(database.Manager); err != nil {
-		return b, err
-	}
-
-	a.LastProofed = &ut
-	if err := a.UpdateApp(database.Manager); err != nil {
-		return b, err
-	}
-
-	return b, nil
-}
-
-func getHashesToBatch(app models.App) (models.Hashes, error) {
-	hashes := new(models.Hashes)
-	err := hashes.GetHashesByApp(database.Manager, &app)
-	return *hashes, err
-}
-
-func makeProof(hashes models.Hashes, batch models.Batch, root string, tx string) (models.Proof, error) {
 	p := models.Proof{
-		BatchID:        batch.ID,
+		AppID:          app.ID,
 		MerkleRoot:     root,
 		EthTransaction: tx,
+		UnixTimestamp:  ut,
 	}
 
 	if err := p.CreateProof(database.Manager); err != nil {
-		return p, err
+		return nil, err
 	}
 
 	if err := hashes.UpdateProof(database.Manager, &p.ID); err != nil {
-		return p, err
+		return nil, err
 	}
 
-	return p, nil
+	return &p, nil
 }
 
-func newHashesFlow(a models.App, hs models.Hashes) {
+func newHashesFlow(a *models.App, hs *models.Hashes) {
 	root, err := hs.GetMerkleRoot()
 	if err != nil {
 		fmt.Errorf("couldn't create hash tree: " + err.Error())
@@ -74,45 +63,29 @@ func newHashesFlow(a models.App, hs models.Hashes) {
 		return
 	}
 
-	b, err := makeBatch(a)
-	if err != nil {
-		fmt.Errorf("didn't create batch record: " + err.Error())
-		return
-	}
-
-	_, err = makeProof(hs, b, root, tx)
+	_, err = makeProof(hs, a, root, tx)
 	if err != nil {
 		fmt.Errorf("couldn't create proof: " + err.Error())
 		return
 	}
 }
 
-func noHashesFlow(a models.App) {
-	_, err := makeBatch(a)
-	if err != nil {
-		fmt.Errorf("didn't create batch record: " + err.Error())
-		return
-	}
-}
-
 func mainLoop() {
-	apps, err := getAppsToBatch()
+	apps, err := getAppsToProof()
 	if err != nil {
-		fmt.Errorf("didn't get apps to batch: " + err.Error())
+		fmt.Errorf("didn't get apps to proof: " + err.Error())
 		return
 	}
 
-	for _, a := range apps {
-		hashes, err := getHashesToBatch(a)
+	for _, a := range *apps {
+		hashes, err := getHashesToProof(&a)
 		if err != nil {
-			fmt.Errorf("couldn't get objects to bacth: " + err.Error())
+			fmt.Errorf("couldn't get objects to proof: " + err.Error())
 			return
 		}
 
-		if len(hashes) > 0 {
-			newHashesFlow(a, hashes)
-		} else {
-			noHashesFlow(a)
+		if len(*hashes) > 0 {
+			newHashesFlow(&a, hashes)
 		}
 	}
 }
