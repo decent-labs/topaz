@@ -12,24 +12,27 @@ import (
 	multihash "github.com/multiformats/go-multihash"
 )
 
+// Hash ...
 type Hash struct {
 	ID        string     `gorm:"primary_key" json:"id"`
 	CreatedAt time.Time  `json:"createdAt"`
 	UpdatedAt time.Time  `json:"updatedAt"`
-	DeletedAt *time.Time `sql:"index" json:"deletedAt"`
+	DeletedAt *time.Time `sql:"index" json:"deletedAt,omitempty"`
 
 	HashHex       string `json:"hash" gorm:"-"`
 	Hash          []byte `json:"-"`
 	UnixTimestamp int64  `json:"unixTimestamp"`
 
-	ObjectID *string `json:"-"`
+	ObjectID *string `json:"objectId"`
 	Object   *Object `json:"-"`
-	ProofID  *string `json:"-"`
-	Proof    *Proof  `json:"proof"`
+	ProofID  *string `json:"proofId"`
+	Proof    *Proof  `json:"-"`
 }
 
+// Hashes ...
 type Hashes []Hash
 
+// MarshalJSON ...
 func (h *Hash) MarshalJSON() ([]byte, error) {
 	type Alias Hash
 	return json.Marshal(&struct {
@@ -41,19 +44,23 @@ func (h *Hash) MarshalJSON() ([]byte, error) {
 	})
 }
 
+// TransformHashToHex ...
 func (h *Hash) TransformHashToHex() string {
 	return hex.EncodeToString(h.Hash)
 }
 
+// CalculateHash ...
 func (h Hash) CalculateHash() ([]byte, error) {
 	return h.Hash, nil
 }
 
+// Equals ...
 func (h Hash) Equals(other merkletree.Content) (bool, error) {
 	return bytes.Compare(h.Hash, other.(Hash).Hash) == 0, nil
 
 }
 
+// GetMerkleRoot ...
 func (hs *Hashes) GetMerkleRoot() (string, error) {
 	t, err := makeMerkleTree(hs)
 	if err != nil {
@@ -63,10 +70,12 @@ func (hs *Hashes) GetMerkleRoot() (string, error) {
 	return getReadableHash(t.MerkleRoot())
 }
 
+// CreateHash ...
 func (h *Hash) CreateHash(db *gorm.DB) error {
 	return db.Create(&h).Error
 }
 
+// GetHashesByApp ...
 func (hs *Hashes) GetHashesByApp(db *gorm.DB, app *App) error {
 	return db.
 		Table("hashes").
@@ -78,6 +87,7 @@ func (hs *Hashes) GetHashesByApp(db *gorm.DB, app *App) error {
 		Error
 }
 
+// UpdateProof ...
 func (hs Hashes) UpdateProof(db *gorm.DB, proofID *string) error {
 	ids := make([]string, len(hs))
 	for i, h := range hs {
@@ -87,6 +97,7 @@ func (hs Hashes) UpdateProof(db *gorm.DB, proofID *string) error {
 	return db.Model(Hash{}).Where("id IN (?)", ids).Updates(Hash{ProofID: proofID}).Error
 }
 
+// GetHashesByTimestamps ...
 func (hs *Hashes) GetHashesByTimestamps(db *gorm.DB, app *App, start int, end int) error {
 	return db.
 		Table("hashes").

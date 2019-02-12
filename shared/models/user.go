@@ -11,7 +11,7 @@ type User struct {
 	ID        string     `gorm:"primary_key" json:"id"`
 	CreatedAt time.Time  `json:"createdAt"`
 	UpdatedAt time.Time  `json:"updatedAt"`
-	DeletedAt *time.Time `sql:"index" json:"deletedAt"`
+	DeletedAt *time.Time `sql:"index" json:"deletedAt,omitempty"`
 
 	Name     string `json:"name"`
 	Email    string `json:"email"`
