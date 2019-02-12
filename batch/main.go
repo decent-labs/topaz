@@ -28,12 +28,8 @@ func makeProof(hashes *models.Hashes, app *models.App, root string, tx string) (
 
 	app.LastProofed = &ut
 
-	if err := app.UpdateApp(database.Manager); err != nil {
-		return nil, err
-	}
-
 	p := models.Proof{
-		AppID:          app.ID,
+		App:            app,
 		MerkleRoot:     root,
 		EthTransaction: tx,
 		UnixTimestamp:  ut,

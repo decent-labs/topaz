@@ -49,8 +49,3 @@ func (as *Apps) GetAppsToProof(db *gorm.DB) error {
 	clause := "last_proofed is null or (extract(epoch from now()) - last_proofed >= interval)"
 	return db.Where(clause).Find(&as).Error
 }
-
-// UpdateApp ...
-func (a *App) UpdateApp(db *gorm.DB) error {
-	return db.Save(a).Error
-}
