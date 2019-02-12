@@ -17,10 +17,10 @@ type Proof struct {
 
 	MerkleRoot     string `json:"merkleRoot"`
 	EthTransaction string `json:"ethTransaction"`
-	ValidStructure bool   `json:"validStructure" gorm:"-"`
+	UnixTimestamp  int64  `json:"unixTimestamp"`
 
-	BatchID string `json:"batchId"`
-	Batch   *Batch `json:"-"`
+	AppID string `json:"appId"`
+	App   *App   `json:"-"`
 
 	Hashes Hashes `json:"-"`
 }
