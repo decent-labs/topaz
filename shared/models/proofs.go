@@ -34,12 +34,12 @@ func (p *Proof) CreateProof(db *gorm.DB) error {
 
 // GetProofs ...
 func (ps *Proofs) GetProofs(p *Proof, db *gorm.DB) error {
-	return db.Model(&p.Batch).Related(&ps).Error
+	return db.Model(&p.App).Related(&ps).Error
 }
 
 // GetProof ...
 func (p *Proof) GetProof(db *gorm.DB) error {
-	return db.Model(&p.Batch).Related(&p).Error
+	return db.Model(&p.App).Related(&p).Error
 }
 
 // CheckValidity ...
