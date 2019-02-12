@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/decentorganization/topaz/api/auth"
+	"github.com/decentorganization/topaz/api/authentication"
 	"github.com/decentorganization/topaz/shared/database"
 	"github.com/decentorganization/topaz/shared/models"
 )
@@ -17,7 +17,7 @@ func Login(u *models.User) (int, []byte) {
 		return http.StatusUnauthorized, []byte("")
 	}
 
-	if auth := auth.InitJWTAuthenticationBackend().Authenticate(suppliedPassword, u.Password); auth == false {
+	if ok := authentication.InitJWTAuthenticationBackend().Authenticate(suppliedPassword, u.Password); !ok {
 		return http.StatusUnauthorized, []byte("")
 	}
 
@@ -26,7 +26,7 @@ func Login(u *models.User) (int, []byte) {
 
 // RefreshToken attempts to refresh a JWT for an admin user
 func RefreshToken(u *models.User) (int, []byte) {
-	token, err := auth.InitJWTAuthenticationBackend().GenerateToken(u.ID)
+	token, err := authentication.InitJWTAuthenticationBackend().GenerateToken(u.ID)
 	if err != nil {
 		return http.StatusInternalServerError, []byte("")
 	}
@@ -41,11 +41,11 @@ func RefreshToken(u *models.User) (int, []byte) {
 
 // Logout attempts to logout an admin user
 func Logout(r *http.Request) error {
-	token, err := auth.InitJWTAuthenticationBackend().GetToken(r)
+	token, err := authentication.InitJWTAuthenticationBackend().GetToken(r)
 	if err != nil {
 		return err
 	}
 
 	tokenString := r.Header.Get("Authorization")
-	return auth.InitJWTAuthenticationBackend().Logout(tokenString, token)
+	return authentication.InitJWTAuthenticationBackend().Logout(tokenString, token)
 }

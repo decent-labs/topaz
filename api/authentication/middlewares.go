@@ -1,4 +1,4 @@
-package auth
+package authentication
 
 import (
 	"context"
@@ -34,7 +34,7 @@ func Auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 		return
 	}
 
-	res := claims[string(models.UserID)]
+	res := claims[string(models.AuthUser)]
 	if res == nil {
 		rw.WriteHeader(http.StatusUnauthorized)
 		return
@@ -46,6 +46,6 @@ func Auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 		return
 	}
 
-	ctx := context.WithValue(req.Context(), models.UserID, u.ID)
+	ctx := context.WithValue(req.Context(), models.AuthUser, &u)
 	next(rw, req.WithContext(ctx))
 }

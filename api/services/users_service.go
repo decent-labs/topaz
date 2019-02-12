@@ -4,25 +4,25 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/decentorganization/topaz/api/auth"
+	"github.com/decentorganization/topaz/api/authentication"
 	"github.com/decentorganization/topaz/shared/database"
 	"github.com/decentorganization/topaz/shared/models"
 )
 
-// NewUser creates a new 'User' in the database
-func NewUser(newUser *models.User) (int, []byte) {
-	if len(newUser.Email) == 0 || len(newUser.Password) == 0 || len(newUser.Name) == 0 {
+// CreateUser ...
+func CreateUser(ru *models.User) (int, []byte) {
+	if len(ru.Email) == 0 || len(ru.Password) == 0 || len(ru.Name) == 0 {
 		return http.StatusBadRequest, []byte("bad email, password, or name")
 	}
 
-	hp, err := auth.HashPassword(newUser.Password)
+	hp, err := authentication.HashPassword(ru.Password)
 	if err != nil {
 		return http.StatusInternalServerError, []byte("")
 	}
 
 	u := models.User{
-		Name:     newUser.Name,
-		Email:    newUser.Email,
+		Name:     ru.Name,
+		Email:    ru.Email,
 		Password: hp,
 	}
 
@@ -35,6 +35,6 @@ func NewUser(newUser *models.User) (int, []byte) {
 }
 
 // EditUser ...
-func EditUser(requestUser *models.User) (int, []byte) {
+func EditUser(r *models.User, ru *models.User) (int, []byte) {
 	return http.StatusNotImplemented, []byte("")
 }
