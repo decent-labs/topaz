@@ -16,7 +16,6 @@ type App struct {
 	Interval    int    `json:"interval"`
 	Name        string `json:"name"`
 	LastProofed *int64 `json:"-"`
-	EthAddress  string `json:"ethAddress"`
 
 	UserID string `json:"userId"`
 	User   *User  `json:"-"`
