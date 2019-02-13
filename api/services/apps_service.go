@@ -6,7 +6,6 @@ import (
 
 	"github.com/decentorganization/topaz/api/authorization"
 	"github.com/decentorganization/topaz/shared/database"
-	"github.com/decentorganization/topaz/shared/ethereum"
 	"github.com/decentorganization/topaz/shared/models"
 )
 
@@ -21,14 +20,8 @@ func CreateApp(u *models.User, ra *models.App) (int, []byte) {
 		return http.StatusBadRequest, []byte("bad name or interval")
 	}
 
-	addr, err := ethereum.Deploy()
-	if err != nil {
-		return http.StatusInternalServerError, []byte("")
-	}
-
 	a.Name = ra.Name
 	a.Interval = ra.Interval
-	a.EthAddress = addr
 
 	if err := a.CreateApp(database.Manager); err != nil {
 		return http.StatusInternalServerError, []byte("")

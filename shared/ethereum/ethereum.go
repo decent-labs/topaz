@@ -10,6 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/joho/godotenv"
 	multihash "github.com/multiformats/go-multihash"
 )
 
@@ -56,6 +57,11 @@ func Deploy() (string, error) {
 }
 
 func init() {
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("couldn't load dotenv: %s", err.Error())
+	}
+
 	conn := fmt.Sprintf("%s:%s", os.Getenv("GETH_HOST"), os.Getenv("GETH_PORT"))
 	bc, err := ethclient.Dial(conn)
 	if err != nil {
