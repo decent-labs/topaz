@@ -3,10 +3,10 @@ package services
 import (
 	"encoding/json"
 	"net/http"
+	"os"
 
 	"github.com/decentorganization/topaz/api/authorization"
 	"github.com/decentorganization/topaz/shared/database"
-	"github.com/decentorganization/topaz/shared/ethereum"
 	"github.com/decentorganization/topaz/shared/models"
 )
 
@@ -21,9 +21,9 @@ func CreateApp(u *models.User, ra *models.App) (int, []byte) {
 		return http.StatusBadRequest, []byte("bad name or interval")
 	}
 
-	addr, err := ethereum.Deploy()
-	if err != nil {
-		return http.StatusInternalServerError, []byte("")
+	addr := os.Getenv("ETH_CONTRACT_ADDRESS")
+	if addr == "" {
+		return http.StatusInternalServerError, []byte("Ethereum contract not set")
 	}
 
 	a.Name = ra.Name
