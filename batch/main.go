@@ -32,7 +32,13 @@ func mainLoop() {
 			continue
 		}
 
-		tx, err := ethereum.Store(a.EthAddress, root)
+		addr := os.Getenv("ETH_CONTRACT_ADDRESS")
+		if addr == "" {
+			fmt.Println("Ethereum contract address not set")
+			continue
+		}
+
+		tx, err := ethereum.Store(addr, root)
 		if err != nil {
 			continue
 		}
