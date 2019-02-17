@@ -1,4 +1,4 @@
-package routers
+package routerV1
 
 import (
 	"github.com/decentorganization/topaz/api/authentication"
@@ -7,26 +7,26 @@ import (
 	"github.com/urfave/negroni"
 )
 
-// SetHashesRoutes ...
-func SetHashesRoutes(r *mux.Router) *mux.Router {
-	s := r.PathPrefix("/apps/{appId}/objects/{objectId}/hashes").Subrouter()
+// SetObjectsRoutes ...
+func SetObjectsRoutes(r *mux.Router) *mux.Router {
+	s := r.PathPrefix("/apps/{appId}/objects").Subrouter()
 
-	// Create new hash
+	// Create new object
 	s.Handle("", negroni.New(
 		negroni.HandlerFunc(authentication.Auth),
-		negroni.HandlerFunc(controllers.CreateHash),
+		negroni.HandlerFunc(controllers.CreateObject),
 	)).Methods("POST")
 
-	// Get all hashes
+	// Get all objects
 	s.Handle("", negroni.New(
 		negroni.HandlerFunc(authentication.Auth),
-		negroni.HandlerFunc(controllers.GetHashes),
+		negroni.HandlerFunc(controllers.GetObjects),
 	)).Methods("GET")
 
-	// Get an hash
+	// Get an object
 	s.Handle("/{id}", negroni.New(
 		negroni.HandlerFunc(authentication.Auth),
-		negroni.HandlerFunc(controllers.GetHash),
+		negroni.HandlerFunc(controllers.GetObject),
 	)).Methods("GET")
 
 	return r
