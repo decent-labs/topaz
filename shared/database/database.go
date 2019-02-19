@@ -34,7 +34,7 @@ func init() {
 		log.Fatalf("couldn't even pretend to open database connection: %s", err.Error())
 	}
 
-	Manager.LogMode(true)
+	Manager.LogMode(os.Getenv("GO_ENV") != "production")
 
 	if err := Manager.DB().Ping(); err != nil {
 		log.Fatal(err)
