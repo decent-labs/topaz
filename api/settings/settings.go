@@ -13,6 +13,7 @@ var environments = map[string]string{
 	"tests":         "api/settings/tests.json",
 }
 
+// Settings ...
 type Settings struct {
 	PrivateKeyPath     string
 	PublicKeyPath      string
@@ -22,6 +23,7 @@ type Settings struct {
 var settings = Settings{}
 var env = "preproduction"
 
+// Init ...
 func Init() {
 	env = os.Getenv("GO_ENV")
 	if env == "" {
@@ -31,6 +33,7 @@ func Init() {
 	LoadSettingsByEnv(env)
 }
 
+// LoadSettingsByEnv ...
 func LoadSettingsByEnv(env string) {
 	content, err := ioutil.ReadFile(environments[env])
 	if err != nil {
@@ -43,10 +46,12 @@ func LoadSettingsByEnv(env string) {
 	}
 }
 
+// GetEnvironment ...
 func GetEnvironment() string {
 	return env
 }
 
+// Get ...
 func Get() Settings {
 	if &settings == nil {
 		Init()
@@ -54,6 +59,7 @@ func Get() Settings {
 	return settings
 }
 
+// IsTestEnvironment ...
 func IsTestEnvironment() bool {
 	return env == "tests"
 }
