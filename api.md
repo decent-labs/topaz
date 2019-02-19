@@ -2,9 +2,15 @@
 
 To get up and running with Topaz API as quickly as possible, follow this guide.
 
-You'll create a new account, log in, create a new app, generate a token for that app, and use it to interact with Topaz.
+You'll create a new account, log in, create a new app, create objects, create hashes, and view proofs.
 
-# User Registration
+## Note
+
+All API requests should be prefixed with `/v1`, indicating that you're targeting version 1 of our API.
+
+Topaz API will follow Semantic Versioning (https://semver.org), so expect that any breaking changes will be versioned under a new route prefix.
+
+# Users
 
 ## Create your new account
 
@@ -30,23 +36,20 @@ You'll create a new account, log in, create a new app, generate a token for that
 
 ```json
 {
-    "ID": 3,
-    "CreatedAt": "2018-12-18T15:15:01.069166-05:00",
-    "UpdatedAt": "2018-12-18T15:15:01.069166-05:00",
-    "DeletedAt": null,
+    "id": "3210c665-2dab-41b8-b688-83a73fc2f127",
     "name": "Adam Gall",
     "email": "adam@topaz.io",
-    "password": "$2a$14$AZ3T4SiWjN4Yf3wALygXVusRm17LYTJ5FtFKI4625auYXKC9DigI6"
+    "password": "$2a$14$AZ3T4S..."
 }
 ```
 
-# User Authentication
+# Authentication
 
 ## Log in to your new account
 
 ### Request
 
-`POST /auth/admin/token`
+`POST /auth/login`
 
 #### Headers
 
@@ -65,15 +68,53 @@ You'll create a new account, log in, create a new app, generate a token for that
 
 ```json
 {
-    "token": "eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIzIiwiZXhwIjoxNTQ1NDI1MTY0LCJpYXQiOjE1NDUxNjU5NjQsInN1YiI6IjMifQ.ZpArTvZig7f9Tj9Ztb-K3IzpPE4rP15wb1_fl8FtaUGXuHYhiS9X4XomPP6WqUYRDd1QHlUBaw3Xd36aPYsRd5sNBSeyf4fv23iYAV5zzmpl5mylyZDSu-9aN7ttYTqxgd9bu5ck_nppFGmmM3cTnkTqsUoVJR-TlSpc7pTNvScX_RyZ8gk-KrDQq9xGEOZw3WQ48FcN0pLZlnu6_e84-OTwpIAoSvxIWYZyr-3i3DCl1ZzxsFJeX0Cu9Txs3dbTq6tisHTnJPpf9vqxS38Koc-PLkVEzmckIu3yavKJH7FbEB1ZImNZPRLbxGEZh9Mce0TG9drafIw7X4nvLfpY7g"
+    "token": "eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9..."
 }
 ```
 
-You'll need this token to create new apps, and create new app tokens, as described below.
+You'll need this token access the rest of the API, as described below.
 
-# App Creation
+## Refresh your user authentication token
 
-## Create a new app context
+Use this request to refresh your app token, if you haven't used it for some amount of time and it stops working. It can be used to generate a new token.
+
+### Request
+
+`POST /auth/refresh-token`
+
+#### Headers
+
+* `'Authorization: Bearer eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9...'`
+
+### Response
+
+```json
+{
+    "token": "eyJhbGciOiJSUzUXMiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+## Log out of your account
+
+Hit this endpoing to blacklist your current API key
+
+### Request
+
+`POST /auth/logout`
+
+#### Headers
+
+* `'Authorization: Bearer eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9...'`
+
+You'll receive an empty `200` response if all goes well.
+
+# Apps
+
+## Create a new app
+
+To create a new app, post to the `/apps` endpoint. You'll need to name the app, and pass in an "interval", in seconds. This interval represents the amount of time between blockchain transactions that will occur as you're adding hashes to objects in this app.
+
+In effect, it's the "resolution" at which you're comfortable proving that your data exists.
 
 ### Request
 
@@ -82,7 +123,7 @@ You'll need this token to create new apps, and create new app tokens, as describ
 #### Headers
 
 * `'Content-Type: application/json'`
-* `'Authorization: Bearer eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIzIiwiZXhwIjoxNTQ1NDI1MTY0LCJpYXQiOjE1NDUxNjU5NjQsInN1YiI6IjMifQ.ZpArTvZig7f9Tj9Ztb-K3IzpPE4rP15wb1_fl8FtaUGXuHYhiS9X4XomPP6WqUYRDd1QHlUBaw3Xd36aPYsRd5sNBSeyf4fv23iYAV5zzmpl5mylyZDSu-9aN7ttYTqxgd9bu5ck_nppFGmmM3cTnkTqsUoVJR-TlSpc7pTNvScX_RyZ8gk-KrDQq9xGEOZw3WQ48FcN0pLZlnu6_e84-OTwpIAoSvxIWYZyr-3i3DCl1ZzxsFJeX0Cu9Txs3dbTq6tisHTnJPpf9vqxS38Koc-PLkVEzmckIu3yavKJH7FbEB1ZImNZPRLbxGEZh9Mce0TG9drafIw7X4nvLfpY7g'`
+* `'Authorization: Bearer eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9...'`
 
 #### Body
 
@@ -97,351 +138,308 @@ You'll need this token to create new apps, and create new app tokens, as describ
 
 ```json
 {
-    "ID": 1,
-    "CreatedAt": "2018-12-18T16:03:33.113418-05:00",
-    "UpdatedAt": "2018-12-18T16:03:33.113418-05:00",
-    "DeletedAt": null,
+    "id": "d122b8de-c48f-4586-a2b6-42cb337341b6",
     "interval": 3600,
     "name": "Supply Chain Workflow",
-    "ethAddress": "0x8aba912417dE237b7Df401C437cCad0846a2ef76",
-    "userId": 1
+    "userId": "3210c665-2dab-41b8-b688-83a73fc2f127"
 }
 ```
 
-Take note of this App's `ID`: `1`, which will be used to generate an app-specific token, as described in the next section.
+## Get all apps
 
-# App Authentication
-
-## Create a new app token
+This endpoint will return all apps registered for a user
 
 ### Request
 
-`POST /auth/app/token`
+`GET /apps`
 
 #### Headers
 
 * `'Content-Type: application/json'`
-* `'Authorization: Bearer eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIzIiwiZXhwIjoxNTQ1NDI1MTY0LCJpYXQiOjE1NDUxNjU5NjQsInN1YiI6IjMifQ.ZpArTvZig7f9Tj9Ztb-K3IzpPE4rP15wb1_fl8FtaUGXuHYhiS9X4XomPP6WqUYRDd1QHlUBaw3Xd36aPYsRd5sNBSeyf4fv23iYAV5zzmpl5mylyZDSu-9aN7ttYTqxgd9bu5ck_nppFGmmM3cTnkTqsUoVJR-TlSpc7pTNvScX_RyZ8gk-KrDQq9xGEOZw3WQ48FcN0pLZlnu6_e84-OTwpIAoSvxIWYZyr-3i3DCl1ZzxsFJeX0Cu9Txs3dbTq6tisHTnJPpf9vqxS38Koc-PLkVEzmckIu3yavKJH7FbEB1ZImNZPRLbxGEZh9Mce0TG9drafIw7X4nvLfpY7g'`
-
-#### Body
-
-```json
-{
-	"ID": 1
-}
-```
-
-### Response
-
-```json
-{
-    "token": "eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6IjIiLCJleHAiOjE1NDU0MjY2MTEsImlhdCI6MTU0NTE2NzQxMSwic3ViIjoiMiJ9.L6fYvVSp1WNmazPk4Rwo7pLxiXIJiYv0U5vc2hhHWf7zk7f3L7kCsVwE7EJUFFINqneQ0EW5gklBthEaVWl3Ven10dvnpGNgL5MtlXyzdXnRf5duc2qeVBLRUD8V8JJsAt28EVBu-rU27thWAtod0kLgDnSmaoOmqEAF4uizD5dvOcKAH9-rLwEDsiYFrsO8AI23Wdjcg_w7AVYz_lZteZXk9J5KKEmohv3a6nlOblFdHBGrsv8kgnyX4OYB9wfJOXCvuD5a_WGbfjX590iVe9pR7Z7WaYUd5gmRSe0uhOWRYpT5O72rQcvcv-FT0pa59SFM6HZb1kYQJGE5RRg_fw"
-}
-```
-
-This token will be used for all subsequent calls to Topaz API, in order to use the power of public blockchains to timestamp and report on data within a specific app context.
-
-# App Usage
-
-## Trust your data
-
-Use the `/trust` endpoint to send a hash of your business-valuable data to Topaz to be processed. The POST status code is used for new objects which have not yet been seen by Topaz, and does not require a `UUID` parameter.
-
-### Request
-
-`POST /trust`
-
-#### Headers
-
-* `'Authorization: Bearer eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6IjIiLCJleHAiOjE1NDU0MjY2MTEsImlhdCI6MTU0NTE2NzQxMSwic3ViIjoiMiJ9.L6fYvVSp1WNmazPk4Rwo7pLxiXIJiYv0U5vc2hhHWf7zk7f3L7kCsVwE7EJUFFINqneQ0EW5gklBthEaVWl3Ven10dvnpGNgL5MtlXyzdXnRf5duc2qeVBLRUD8V8JJsAt28EVBu-rU27thWAtod0kLgDnSmaoOmqEAF4uizD5dvOcKAH9-rLwEDsiYFrsO8AI23Wdjcg_w7AVYz_lZteZXk9J5KKEmohv3a6nlOblFdHBGrsv8kgnyX4OYB9wfJOXCvuD5a_WGbfjX590iVe9pR7Z7WaYUd5gmRSe0uhOWRYpT5O72rQcvcv-FT0pa59SFM6HZb1kYQJGE5RRg_fw'`
-
-#### Body
-
-```json
-{
-	"hash": "17fee8f6b4c18e3ceb93362e67551aadb3b5772264e6c7523613f87f10342592"
-}
-```
-
-### Response
-
-```json
-{
-    "ID": 71,
-    "CreatedAt": "2018-12-18T16:16:53.061753-05:00",
-    "UpdatedAt": "2018-12-18T16:16:53.061753-05:00",
-    "DeletedAt": null,
-    "uuid": "cb01ed8c-2fb4-4b42-b449-0e24c4782c83",
-    "hash": "17fee8f6b4c18e3ceb93362e67551aadb3b5772264e6c7523613f87f10342592",
-    "unixTimestamp": 1545167813,
-    "appId": 1,
-    "proofId": null
-}
-```
-
-## Update your previously trusted data
-
-Use the `/trust` endpoint to send a hash of your business-valuable data to Topaz to be processed. The PUT/PATCH status codes are used for existing objects which have already been previously trusted by Topaz, and require the UUID of the object to be passed to the endpoint.
-
-### Request
-
-`PUT/PATCH /trust`
-
-#### Headers
-
-* `'Authorization: Bearer eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6IjIiLCJleHAiOjE1NDU0MjY2MTEsImlhdCI6MTU0NTE2NzQxMSwic3ViIjoiMiJ9.L6fYvVSp1WNmazPk4Rwo7pLxiXIJiYv0U5vc2hhHWf7zk7f3L7kCsVwE7EJUFFINqneQ0EW5gklBthEaVWl3Ven10dvnpGNgL5MtlXyzdXnRf5duc2qeVBLRUD8V8JJsAt28EVBu-rU27thWAtod0kLgDnSmaoOmqEAF4uizD5dvOcKAH9-rLwEDsiYFrsO8AI23Wdjcg_w7AVYz_lZteZXk9J5KKEmohv3a6nlOblFdHBGrsv8kgnyX4OYB9wfJOXCvuD5a_WGbfjX590iVe9pR7Z7WaYUd5gmRSe0uhOWRYpT5O72rQcvcv-FT0pa59SFM6HZb1kYQJGE5RRg_fw'`
-
-#### Body
-
-```json
-{
-    "uuid": "cb01ed8c-2fb4-4b42-b449-0e24c4782c83",
-	"hash": "85cf5d1d911e1dde12d8f701b85c69591e1e19e1b1c642d54b4a57fc6a5fbee7"
-}
-```
-
-### Response
-
-```json
-{
-    "ID": 72,
-    "CreatedAt": "2018-12-18T16:16:53.061753-05:00",
-    "UpdatedAt": "2018-12-18T16:16:53.061753-05:00",
-    "DeletedAt": null,
-    "uuid": "cb01ed8c-2fb4-4b42-b449-0e24c4782c83",
-    "hash": "85cf5d1d911e1dde12d8f701b85c69591e1e19e1b1c642d54b4a57fc6a5fbee7",
-    "unixTimestamp": 1545169876,
-    "appId": 1,
-    "proofId": null
-}
-```
-
-## Verify your data
-
-Use the `/verify` endpoint to check whether or not a particular hash of data has been seen by Topaz API.
-
-### Request
-
-`GET /verify/{hash}`
-
-example: `/verify/17fee8f6b4c18e3ceb93362e67551aadb3b5772264e6c7523613f87f10342592`
-
-#### Headers
-
-* `'Authorization: Bearer eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6IjIiLCJleHAiOjE1NDU0MjY2MTEsImlhdCI6MTU0NTE2NzQxMSwic3ViIjoiMiJ9.L6fYvVSp1WNmazPk4Rwo7pLxiXIJiYv0U5vc2hhHWf7zk7f3L7kCsVwE7EJUFFINqneQ0EW5gklBthEaVWl3Ven10dvnpGNgL5MtlXyzdXnRf5duc2qeVBLRUD8V8JJsAt28EVBu-rU27thWAtod0kLgDnSmaoOmqEAF4uizD5dvOcKAH9-rLwEDsiYFrsO8AI23Wdjcg_w7AVYz_lZteZXk9J5KKEmohv3a6nlOblFdHBGrsv8kgnyX4OYB9wfJOXCvuD5a_WGbfjX590iVe9pR7Z7WaYUd5gmRSe0uhOWRYpT5O72rQcvcv-FT0pa59SFM6HZb1kYQJGE5RRg_fw'`
+* `'Authorization: Bearer eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9...'`
 
 ### Response
 
 ```json
 [
     {
-        "ID": 71,
-        "CreatedAt": "2018-12-18T16:16:53.061753Z",
-        "UpdatedAt": "2018-12-18T16:25:14.690197Z",
-        "DeletedAt": null,
-        "uuid": "cb01ed8c-2fb4-4b42-b449-0e24c4782c83",
-        "hash": "17fee8f6b4c18e3ceb93362e67551aadb3b5772264e6c7523613f87f10342592",
-        "unixTimestamp": 1545167813,
-        "appId": 1,
-        "proofId": 24,
-        "proof": {
-            "ID": 24,
-            "CreatedAt": "2018-12-18T16:25:14.67507Z",
-            "UpdatedAt": "2018-12-18T16:25:14.67507Z",
-            "DeletedAt": null,
-            "merkleRoot": "QmYoB7DqNkQ5aaSuJYVeNATeWYdaSk3trugK7X6SwGKBdp",
-            "ethTransaction": "0xd4fd388f808993612627644add6d4ade7591865be858b009741f010c2ca2a852",
-            "validStructure": true,
-            "batchId": 8894,
-            "batch": {
-                "ID": 8894,
-                "CreatedAt": "2018-12-18T16:25:14.657868Z",
-                "UpdatedAt": "2018-12-18T16:25:14.657868Z",
-                "DeletedAt": null,
-                "unixTimestamp": 1545168314,
-                "appId": 1
-            },
-            "objects": [
-                {
-                    "ID": 71,
-                    "CreatedAt": "2018-12-18T16:16:53.061753Z",
-                    "UpdatedAt": "2018-12-18T16:25:14.690197Z",
-                    "DeletedAt": null,
-                    "uuid": "cb01ed8c-2fb4-4b42-b449-0e24c4782c83",
-                    "hash": "17fee8f6b4c18e3ceb93362e67551aadb3b5772264e6c7523613f87f10342592",
-                    "unixTimestamp": 1545167813,
-                    "appId": 1,
-                    "proofId": 24
-                }
-            ]
-        }
-    }
-]
-```
-
-## Trace your data
-
-Use the `/trace` endpoint to track the changes of a UUID over time
-
-### Request
-
-`GET /trace/{uuid}`
-
-example: `/trace/cb01ed8c-2fb4-4b42-b449-0e24c4782c83`
-
-#### Headers
-
-* `'Authorization: Bearer eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6IjIiLCJleHAiOjE1NDU0MjY2MTEsImlhdCI6MTU0NTE2NzQxMSwic3ViIjoiMiJ9.L6fYvVSp1WNmazPk4Rwo7pLxiXIJiYv0U5vc2hhHWf7zk7f3L7kCsVwE7EJUFFINqneQ0EW5gklBthEaVWl3Ven10dvnpGNgL5MtlXyzdXnRf5duc2qeVBLRUD8V8JJsAt28EVBu-rU27thWAtod0kLgDnSmaoOmqEAF4uizD5dvOcKAH9-rLwEDsiYFrsO8AI23Wdjcg_w7AVYz_lZteZXk9J5KKEmohv3a6nlOblFdHBGrsv8kgnyX4OYB9wfJOXCvuD5a_WGbfjX590iVe9pR7Z7WaYUd5gmRSe0uhOWRYpT5O72rQcvcv-FT0pa59SFM6HZb1kYQJGE5RRg_fw'`
-
-### Response
-
-```json
-[
-    {
-        "ID": 71,
-        "CreatedAt": "2018-12-18T16:16:53.061753Z",
-        "UpdatedAt": "2018-12-18T16:25:14.690197Z",
-        "DeletedAt": null,
-        "uuid": "cb01ed8c-2fb4-4b42-b449-0e24c4782c83",
-        "hash": "17fee8f6b4c18e3ceb93362e67551aadb3b5772264e6c7523613f87f10342592",
-        "unixTimestamp": 1545167813,
-        "appId": 1,
-        "proofId": 24,
-        "proof": {
-            "ID": 24,
-            "CreatedAt": "2018-12-18T16:25:14.67507Z",
-            "UpdatedAt": "2018-12-18T16:25:14.67507Z",
-            "DeletedAt": null,
-            "merkleRoot": "QmYoB7DqNkQ5aaSuJYVeNATeWYdaSk3trugK7X6SwGKBdp",
-            "ethTransaction": "0xd4fd388f808993612627644add6d4ade7591865be858b009741f010c2ca2a852",
-            "validStructure": true,
-            "batchId": 8894,
-            "batch": {
-                "ID": 8894,
-                "CreatedAt": "2018-12-18T16:25:14.657868Z",
-                "UpdatedAt": "2018-12-18T16:25:14.657868Z",
-                "DeletedAt": null,
-                "unixTimestamp": 1545168314,
-                "appId": 1
-            },
-            "objects": [
-                {
-                    "ID": 71,
-                    "CreatedAt": "2018-12-18T16:16:53.061753Z",
-                    "UpdatedAt": "2018-12-18T16:25:14.690197Z",
-                    "DeletedAt": null,
-                    "uuid": "cb01ed8c-2fb4-4b42-b449-0e24c4782c83",
-                    "hash": "17fee8f6b4c18e3ceb93362e67551aadb3b5772264e6c7523613f87f10342592",
-                    "unixTimestamp": 1545167813,
-                    "appId": 1,
-                    "proofId": 24
-                }
-            ]
-        }
+        "id": "d122b8de-c48f-4586-a2b6-42cb337341b6",
+        "interval": 3600,
+        "name": "Supply Chain Workflow",
+        "userId": "3210c665-2dab-41b8-b688-83a73fc2f127"
     },
     {
-        "ID": 72,
-        "CreatedAt": "2018-12-18T21:51:16.061753-05:00",
-        "UpdatedAt": "2018-12-18T21:51:16.061753-05:00",
-        "DeletedAt": null,
-        "uuid": "cb01ed8c-2fb4-4b42-b449-0e24c4782c83",
-        "hash": "85cf5d1d911e1dde12d8f701b85c69591e1e19e1b1c642d54b4a57fc6a5fbee7",
-        "unixTimestamp": 1545169876,
-        "appId": 1,
-        "proofId": 25,
-        "proof": {
-            "ID": 25,
-            "CreatedAt": "2018-12-18T21:16:00.00007Z",
-            "UpdatedAt": "2018-12-18T21:16:00.00007Z",
-            "DeletedAt": null,
-            "merkleRoot": "QmYoB7DqNkQ5aaSuJYVeNATeWYdaSk3trugK7X6SwGKBdp",
-            "ethTransaction": "0x1a62c1fbbeb49946cb13337971056aa0e58c46a77192d8eb4bc5f23a64200fbe",
-            "validStructure": true,
-            "batchId": 8895,
-            "batch": {
-                "ID": 8895,
-                "CreatedAt": "2018-12-18T21:16:00.00007Z",
-                "UpdatedAt": "2018-12-18T21:16:00.00007Z",
-                "DeletedAt": null,
-                "unixTimestamp": 1545168314,
-                "appId": 1
-            },
-            "objects": [
-                {
-                    "ID": 72,
-                    "CreatedAt": "2018-12-18T21:51:16.061753-05:00",
-                    "UpdatedAt": "2018-12-18T21:51:16.061753-05:00",
-                    "DeletedAt": null,
-                    "uuid": "cb01ed8c-2fb4-4b42-b449-0e24c4782c83",
-                    "hash": "85cf5d1d911e1dde12d8f701b85c69591e1e19e1b1c642d54b4a57fc6a5fbee7",
-                    "unixTimestamp": 1545169876,
-                    "appId": 1,
-                    "proofId": 25,
-                }
-            ]
-        }
+        "id": "1780363b-8dd9-48d0-963a-3fb7e13130f8",
+        "interval": 3600,
+        "name": "Supply Chain Workflow 2",
+        "userId": "3210c665-2dab-41b8-b688-83a73fc2f127"
     }
 ]
 ```
 
-## Report on your data
+## Get a single app
 
-Run time-based reports with the `/report` endpoint.
+This endpoint will return details about a single app, given the `appId` passed in as the request parameter
 
 ### Request
 
-`POST /report`
+`GET /apps/{appId}`
 
 #### Headers
 
 * `'Content-Type: application/json'`
-* `'Authorization: Bearer eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6IjIiLCJleHAiOjE1NDU0MjY2MTEsImlhdCI6MTU0NTE2NzQxMSwic3ViIjoiMiJ9.L6fYvVSp1WNmazPk4Rwo7pLxiXIJiYv0U5vc2hhHWf7zk7f3L7kCsVwE7EJUFFINqneQ0EW5gklBthEaVWl3Ven10dvnpGNgL5MtlXyzdXnRf5duc2qeVBLRUD8V8JJsAt28EVBu-rU27thWAtod0kLgDnSmaoOmqEAF4uizD5dvOcKAH9-rLwEDsiYFrsO8AI23Wdjcg_w7AVYz_lZteZXk9J5KKEmohv3a6nlOblFdHBGrsv8kgnyX4OYB9wfJOXCvuD5a_WGbfjX590iVe9pR7Z7WaYUd5gmRSe0uhOWRYpT5O72rQcvcv-FT0pa59SFM6HZb1kYQJGE5RRg_fw'`
+* `'Authorization: Bearer eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9...'`
 
-#### Body
-
-Use Unix timestamps to create a range in which to run reports.
+### Response
 
 ```json
 {
-	"start": 0,
-	"end": 1545167814
+    "id": "d122b8de-c48f-4586-a2b6-42cb337341b6",
+    "interval": 3600,
+    "name": "Supply Chain Workflow",
+    "userId": "3210c665-2dab-41b8-b688-83a73fc2f127"
 }
 ```
+
+# Objects
+
+Objects are created within the context of an app, so all requests in this section are prefixed with `/apps/{appId}`.
+
+## Create a new object
+
+This endpoint doesn't take any body data in its request.
+
+### Request
+
+`POST /apps/{appId}/objects`
+
+#### Headers
+
+* `'Content-Type: application/json'`
+* `'Authorization: Bearer eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9...'`
+
+### Response
+
+```json
+{
+    "id": "566f8a83-bdf9-4397-8ca4-698c29ca656d",
+    "appId": "d122b8de-c48f-4586-a2b6-42cb337341b6"
+}
+```
+
+## Get all objects
+
+This endpoint will return all objects registered for an app
+
+### Request
+
+`GET /apps/{appId}/objects`
+
+#### Headers
+
+* `'Content-Type: application/json'`
+* `'Authorization: Bearer eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9...'`
 
 ### Response
 
 ```json
 [
     {
-        "ID": 72,
-        "CreatedAt": "2018-12-18T21:51:16.061753-05:00",
-        "UpdatedAt": "2018-12-18T21:51:16.061753-05:00",
-        "DeletedAt": null,
-        "uuid": "cb01ed8c-2fb4-4b42-b449-0e24c4782c83",
-        "hash": "85cf5d1d911e1dde12d8f701b85c69591e1e19e1b1c642d54b4a57fc6a5fbee7",
-        "unixTimestamp": 1545169876,
-        "appId": 1,
-        "proofId": 25,
-        "proof": {
-            "ID": 25,
-            "CreatedAt": "2018-12-18T21:16:00.00007Z",
-            "UpdatedAt": "2018-12-18T21:16:00.00007Z",
-            "DeletedAt": null,
-            "merkleRoot": "QmYoB7DqNkQ5aaSuJYVeNATeWYdaSk3trugK7X6SwGKBdp",
-            "ethTransaction": "0x1a62c1fbbeb49946cb13337971056aa0e58c46a77192d8eb4bc5f23a64200fbe",
-            "validStructure": true,
-            "batchId": 8895,
-            "batch": {
-                "ID": 8895,
-                "CreatedAt": "2018-12-18T21:16:00.00007Z",
-                "UpdatedAt": "2018-12-18T21:16:00.00007Z",
-                "DeletedAt": null,
-                "unixTimestamp": 1545168314,
-                "appId": 1
-            }
-        }
+        "id": "566f8a83-bdf9-4397-8ca4-698c29ca656d",
+        "appId": "d122b8de-c48f-4586-a2b6-42cb337341b6"
+    },
+    {
+        "id": "64e6b247-4043-46d7-bc62-3d5372995551",
+        "appId": "d122b8de-c48f-4586-a2b6-42cb337341b6"
     }
 ]
 ```
 
-This response returns an array of objects which were sent to Topaz API in the given timeframe. Nested within the objects are their corresponding on-chain proofs (who's merkle root is the key identifier which is stored on-chain), and all of the objects which contributed to that specific proof.
+## Get a single object
+
+This endpoint will return details about a single object, given the `objectId` passed in as the request parameter
+
+### Request
+
+`GET /apps/{appId}/objects/{objectId}`
+
+#### Headers
+
+* `'Content-Type: application/json'`
+* `'Authorization: Bearer eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9...'`
+
+### Response
+
+```json
+{
+    "id": "566f8a83-bdf9-4397-8ca4-698c29ca656d",
+    "appId": "d122b8de-c48f-4586-a2b6-42cb337341b6"
+}
+```
+
+# Hashes
+
+Hashes are created within the context of an object, so all requests in this section are prefixed with `/apps/{appId}/objects/{objectId}`.
+
+## Create a new hash
+
+This endpoint inputs a json object in it's body which defines a `data` property. This `data` should be a hex-encoded SHA256 hash.
+
+### Request
+
+`POST /apps/{appId}/objects/{objectId}/hashes`
+
+#### Headers
+
+* `'Content-Type: application/json'`
+* `'Authorization: Bearer eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9...'`
+
+### Request
+
+```json
+{
+	"hash": "e17b691a22460b7540a75f524e4f093faa0f2df08a47b3fb3d0c220606db6e7d"
+}
+```
+
+### Response
+
+```json
+{
+    "id": "bed9d7cd-9ea7-4d81-a735-18e5239e8010",
+    "unixTimestamp": 1550610197,
+    "objectId": "566f8a83-bdf9-4397-8ca4-698c29ca656d",
+    "proofId": null,
+    "hash": "e17b691a22460b7540a75f524e4f093faa0f2df08a47b3fb3d0c220606db6e7d"
+}
+```
+
+Notice how the `proofId` is null. It will become populated during the next time that this app's `interval` ticks over, and a blockchain transaction is created.
+
+## Get all hashes
+
+This endpoint will return all hashes which have been associated with an object
+
+### Request
+
+`GET /apps/{appId}/objects/{objectId}/hashes`
+
+#### Headers
+
+* `'Content-Type: application/json'`
+* `'Authorization: Bearer eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9...'`
+
+### Response
+
+```json
+[
+    {
+        "id": "bed9d7cd-9ea7-4d81-a735-18e5239e8010",
+        "unixTimestamp": 1550610197,
+        "objectId": "566f8a83-bdf9-4397-8ca4-698c29ca656d",
+        "proofId": "be199086-670b-48e8-a6a0-7fd506f97ff0",
+        "hash": "e17b691a22460b7540a75f524e4f093faa0f2df08a47b3fb3d0c220606db6e7d"
+    },
+    {
+        "id": "1ea94df9-4069-404c-82e6-718850798354",
+        "unixTimestamp": 1550610332,
+        "objectId": "566f8a83-bdf9-4397-8ca4-698c29ca656d",
+        "proofId": null,
+        "hash": "b7b85ea166f915f514e1950e3195ea87cfedb87934eee8b6c4a80891e190f819"
+    }
+]
+```
+
+## Get a single hash
+
+This endpoint will return details about a single hash, given the `hashId` passed in as the request parameter
+
+### Request
+
+`GET /apps/{appId}/objects/{objectId}/hashes/{hashId}`
+
+#### Headers
+
+* `'Content-Type: application/json'`
+* `'Authorization: Bearer eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9...'`
+
+### Response
+
+```json
+{
+    "id": "bed9d7cd-9ea7-4d81-a735-18e5239e8010",
+    "unixTimestamp": 1550610197,
+    "objectId": "566f8a83-bdf9-4397-8ca4-698c29ca656d",
+    "proofId": "be199086-670b-48e8-a6a0-7fd506f97ff0",
+    "hash": "e17b691a22460b7540a75f524e4f093faa0f2df08a47b3fb3d0c220606db6e7d"
+}
+```
+
+See how the `proofId` is now populated. This means that a proof has been created and stamped into the blockchain. Congratulations, your data is now provable for all of eternity!
+
+# Proofs
+
+Proofs are automatically created within the context of an app, so all requests in this section are prefixed with `/apps/{appId}`.
+
+## Get all proofs
+
+This endpoint will return all proofs associated with an app
+
+### Request
+
+`GET /apps/{appId}/proofs`
+
+#### Headers
+
+* `'Content-Type: application/json'`
+* `'Authorization: Bearer eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9...'`
+
+### Response
+
+```json
+[
+    {
+        "id": "be199086-670b-48e8-a6a0-7fd506f97ff0",
+        "merkleRoot": "QmRXPkj6np5mJe9o6a7NJRzaY9esaJ7yvbtnk4XpJd5dgX",
+        "ethTransaction": "0xcc9b0aae939acd8aa727b71864e8a803888bd6f2e91b5aa5b4a351dbce9f5eeb",
+        "unixTimestamp": 1550610221,
+        "appId": "d122b8de-c48f-4586-a2b6-42cb337341b6"
+    },
+    {
+        "id": "01041352-6faa-425e-ac2c-babcc464f2ff",
+        "merkleRoot": "QmaFtr1XH8XfpmBqJkoUXqG3jbd452YtWdwcEWK9Py6QAx",
+        "ethTransaction": "0xa3939cbf1ae04451cd59ddfd3d49477506d7e320a05762d231d7fecbff2d8fa0",
+        "unixTimestamp": 1550610551,
+        "appId": "d122b8de-c48f-4586-a2b6-42cb337341b6"
+    }
+]
+```
+
+A proof has a `merkleRoot`, and an `ethTransaction`. These two pieces of data allow you to confirm that your data is secured in the blockchain.
+
+We combine all hashes sent to Topaz for a given app during an `interval` timeframe, create a Merkel Tree out of those hashes, compute the root hash (`merkleRoot`), craft an Ethereum transaction using that `merkleRoot` as input data, and broadcast that transaction to be mined into a block, solidifying it's existence into an untamperable data structure.
+
+## Get a single proof
+
+This endpoint will return details about a single proof, given the `proofId` passed in as the request parameter
+
+### Request
+
+`GET /apps/{appId}/proofs/{proofId}`
+
+#### Headers
+
+* `'Content-Type: application/json'`
+* `'Authorization: Bearer eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9...'`
+
+### Response
+
+```json
+{
+    "id": "be199086-670b-48e8-a6a0-7fd506f97ff0",
+    "merkleRoot": "QmRXPkj6np5mJe9o6a7NJRzaY9esaJ7yvbtnk4XpJd5dgX",
+    "ethTransaction": "0xcc9b0aae939acd8aa727b71864e8a803888bd6f2e91b5aa5b4a351dbce9f5eeb",
+    "unixTimestamp": 1550610221,
+    "appId": "d122b8de-c48f-4586-a2b6-42cb337341b6"
+}
+```
