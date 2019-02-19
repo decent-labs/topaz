@@ -8,9 +8,9 @@ import (
 )
 
 var environments = map[string]string{
-	"production":    "api/settings/prod.json",
-	"preproduction": "api/settings/pre.json",
 	"tests":         "api/settings/tests.json",
+	"preproduction": "api/settings/pre.json",
+	"production":    "api/settings/prod.json",
 }
 
 // Settings ...
