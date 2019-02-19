@@ -10,6 +10,7 @@ import (
 var environments = map[string]string{
 	"tests":         "api/settings/tests.json",
 	"preproduction": "api/settings/pre.json",
+	"sandbox":       "api/settings/sandbox.json",
 	"production":    "api/settings/prod.json",
 }
 
