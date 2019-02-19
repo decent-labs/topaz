@@ -16,6 +16,14 @@ var environments = map[string]string{
 	"production":    "api/settings/prod.json",
 }
 
+type rootContent struct {
+	Version     string `json:"ver"`
+	Environment string `json:"env"`
+}
+
+// Rc ...
+var Rc rootContent
+
 // Settings ...
 type Settings struct {
 	PrivateKeyPath     string
@@ -34,6 +42,11 @@ func Init() {
 		env = "preproduction"
 	}
 	LoadSettingsByEnv(env)
+
+	Rc = rootContent{
+		Environment: env,
+		Version:     version,
+	}
 }
 
 // LoadSettingsByEnv ...
