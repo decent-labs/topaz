@@ -2,7 +2,10 @@ package services
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"os"
+	"strconv"
 
 	"github.com/decentorganization/topaz/api/authorization"
 	"github.com/decentorganization/topaz/shared/database"
@@ -16,8 +19,14 @@ func CreateApp(u *models.User, ra *models.App) (int, []byte) {
 		return http.StatusUnauthorized, []byte("")
 	}
 
-	if len(ra.Name) == 0 || ra.Interval < 30 {
-		return http.StatusBadRequest, []byte("bad name or interval")
+	minI, err := strconv.Atoi(os.Getenv("MIN_APP_INTERVAL"))
+	if err != nil {
+		return http.StatusInternalServerError, []byte("contact Topaz tech support")
+	}
+
+	if len(ra.Name) == 0 || ra.Interval < minI {
+		e := fmt.Sprintf("name must not be 0 characters, and interval must be >= %d seconds", minI)
+		return http.StatusBadRequest, []byte(e)
 	}
 
 	a.Name = ra.Name
