@@ -7,22 +7,12 @@ import (
 	"os"
 )
 
-var version = "0.1.0"
-
 var environments = map[string]string{
 	"tests":         "api/settings/tests.json",
 	"preproduction": "api/settings/pre.json",
 	"sandbox":       "api/settings/sandbox.json",
 	"production":    "api/settings/prod.json",
 }
-
-type rootContent struct {
-	Version     string `json:"ver"`
-	Environment string `json:"env"`
-}
-
-// Rc ...
-var Rc rootContent
 
 // Settings ...
 type Settings struct {
@@ -41,13 +31,8 @@ func Init() {
 		fmt.Println("Warning: Setting preproduction environment due to lack of GO_ENV value")
 		env = "preproduction"
 	}
-	LoadSettingsByEnv(env)
-
-	Rc = rootContent{
-		Environment: env,
-		Version:     version,
-	}
 	loadSettingsByEnv(env)
+	generateRootContent()
 }
 
 // loadSettingsByEnv ...
