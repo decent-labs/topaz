@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/decentorganization/topaz/shared/ethereum"
-	dotenv "github.com/joho/godotenv"
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	migrate "github.com/rubenv/sql-migrate"
 )
@@ -40,9 +40,9 @@ func main() {
 }
 
 func init() {
-	err := dotenv.Load(".env")
+	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatal("couldn't load .env file")
+		log.Println("couldn't load dotenv:", err.Error())
 	}
 
 	dbConn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
