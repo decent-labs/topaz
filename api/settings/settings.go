@@ -47,10 +47,11 @@ func Init() {
 		Environment: env,
 		Version:     version,
 	}
+	loadSettingsByEnv(env)
 }
 
-// LoadSettingsByEnv ...
-func LoadSettingsByEnv(env string) {
+// loadSettingsByEnv ...
+func loadSettingsByEnv(env string) {
 	content, err := ioutil.ReadFile(environments[env])
 	if err != nil {
 		fmt.Println("Error while reading config file", err)
