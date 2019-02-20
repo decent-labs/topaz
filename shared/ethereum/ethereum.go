@@ -59,7 +59,7 @@ func Deploy() (string, error) {
 func init() {
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatalf("couldn't load dotenv: %s", err.Error())
+		log.Println("couldn't load dotenv:", err.Error())
 	}
 
 	conn := fmt.Sprintf("%s:%s", os.Getenv("GETH_HOST"), os.Getenv("GETH_PORT"))
