@@ -7,6 +7,7 @@ BINNAME=topaz-api
 # GOTEST=$(GOCMD) test
 GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
+GOGET=$(GOCMD) get
 
 # all: test build
 

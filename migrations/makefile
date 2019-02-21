@@ -1,12 +1,13 @@
 # Go parameters
 GOCMD=go
 BUILDDIR=build
-CURDIR=migrate
+CURDIR=migrations
 BINNAME=topaz-migrate
 
 # GOTEST=$(GOCMD) test
 GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
+GOGET=$(GOCMD) get
 
 # all: test build
 
