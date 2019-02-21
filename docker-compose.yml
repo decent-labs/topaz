@@ -1,6 +1,7 @@
 version: "3"
 
 services:
+
   ## the database service provides the topaz database
   database:
     build:
@@ -8,12 +9,16 @@ services:
       dockerfile: Dockerfile-database
     ports:
       - "${DB_PORT}:5432"
+
   ## the ethereum service for pushing txs to the networks
   ethereum:
-    image: trufflesuite/ganache-cli
-    command: -m ${GANACHE_MNEMONIC}
+    image: trufflesuite/ganache-cli:v6.3.0
+    command: -m ${GANACHE_MNEMONIC} -i 5777 --db /ganache_data
     ports:
       - "${GETH_PORT}:8545"
+    volumes:
+      - ./chainstate:/ganache_data
+
   ## the redis store provides to track blacklisted or expired JWTs
   redis:
     image: 'redis:5.0-alpine'
