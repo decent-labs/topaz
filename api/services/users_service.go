@@ -11,8 +11,8 @@ import (
 
 // CreateUser ...
 func CreateUser(ru *models.User) (int, []byte) {
-	if len(ru.Email) == 0 || len(ru.Password) == 0 || len(ru.Name) == 0 {
-		return http.StatusBadRequest, []byte("bad email, password, or name")
+	if len(ru.Email) == 0 || len(ru.Password) == 0 {
+		return http.StatusBadRequest, []byte("email and password must be set")
 	}
 
 	hp, err := authentication.HashPassword(ru.Password)

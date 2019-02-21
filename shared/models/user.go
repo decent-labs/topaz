@@ -13,9 +13,9 @@ type User struct {
 	UpdatedAt time.Time  `json:"-"`
 	DeletedAt *time.Time `sql:"index" json:"-"`
 
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Name     *string `json:"name,omitempty"`
+	Email    string  `json:"email"`
+	Password string  `json:"password"`
 }
 
 // CreateUser ...
