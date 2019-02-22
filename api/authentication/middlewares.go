@@ -62,14 +62,14 @@ func DoubleAuth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc
 	}
 	req.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
 
-	ru := new(models.User)
-	if err := json.Unmarshal(bodyBytes, ru); err != nil {
+	ru := make(map[string]interface{})
+	if err := json.Unmarshal(bodyBytes, &ru); err != nil {
 		rw.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	u := req.Context().Value(models.AuthUser).(*models.User)
-	if ok := CheckPasswordHash(ru.Password, u.Password); !ok {
+	if ok := CheckPasswordHash(ru["password"].(string), u.Password); !ok {
 		rw.WriteHeader(http.StatusUnauthorized)
 		return
 	}
