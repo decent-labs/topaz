@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -41,5 +42,8 @@ func (u *User) UpdateUser(db *gorm.DB) error {
 
 // GetUserWithEmail ...
 func (u *User) GetUserWithEmail(db *gorm.DB) error {
+	if u.Email == "" {
+		return errors.New("no email")
+	}
 	return db.Where(&User{Email: u.Email}).First(&u).Error
 }
