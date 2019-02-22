@@ -17,6 +17,11 @@ func SetUsersRoutes(r *mux.Router) *mux.Router {
 
 	s.Handle("/me", negroni.New(
 		negroni.HandlerFunc(authentication.Auth),
+		negroni.HandlerFunc(controllers.GetUser),
+	)).Methods("GET")
+
+	s.Handle("/me", negroni.New(
+		negroni.HandlerFunc(authentication.Auth),
 		negroni.HandlerFunc(authentication.DoubleAuth),
 		negroni.HandlerFunc(controllers.EditUser),
 	)).Methods("PUT", "PATCH")
