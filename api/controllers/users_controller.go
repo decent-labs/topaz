@@ -9,7 +9,7 @@ import (
 )
 
 // CreateUser ...
-func CreateUser(w http.ResponseWriter, r *http.Request) {
+func CreateUser(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	ru := new(models.User)
 	d := json.NewDecoder(r.Body)
 	d.Decode(&ru)
@@ -18,6 +18,17 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(rs)
+	w.Write(u)
+}
+
+// GetUser ...
+func GetUser(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	h, u := services.GetUser(
+		r.Context().Value(models.AuthUser).(*models.User),
+	)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(h)
 	w.Write(u)
 }
 
