@@ -1,7 +1,10 @@
 package authentication
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/decentorganization/topaz/shared/database"
@@ -48,4 +51,29 @@ func Auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 
 	ctx := context.WithValue(req.Context(), models.AuthUser, &u)
 	next(rw, req.WithContext(ctx))
+}
+
+// DoubleAuth ...
+func DoubleAuth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	tokenUser := req.Context().Value(models.AuthUser).(*models.User)
+
+	bodyBytes, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		rw.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	req.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+
+	ru := new(models.User)
+	if err := json.Unmarshal(bodyBytes, ru); err != nil {
+		rw.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if ok := CheckPasswordHash(ru.Password, tokenUser.Password); !ok {
+		rw.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	next(rw, req)
 }
