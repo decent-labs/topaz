@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -24,6 +25,12 @@ type UpdatePassword struct {
 	NewPassword string `json:"newPassword"`
 }
 
+// ResetPassword ...
+type ResetPassword struct {
+	Token       string `json:"token"`
+	NewPassword string `json:"newPassword"`
+}
+
 // CreateUser ...
 func (u *User) CreateUser(db *gorm.DB) error {
 	return db.Create(&u).Error
@@ -41,5 +48,8 @@ func (u *User) UpdateUser(db *gorm.DB) error {
 
 // GetUserWithEmail ...
 func (u *User) GetUserWithEmail(db *gorm.DB) error {
+	if u.Email == "" {
+		return errors.New("no email")
+	}
 	return db.Where(&User{Email: u.Email}).First(&u).Error
 }

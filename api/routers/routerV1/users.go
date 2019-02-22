@@ -32,5 +32,13 @@ func SetUsersRoutes(r *mux.Router) *mux.Router {
 		negroni.HandlerFunc(controllers.UpdatePassword),
 	)).Methods("PUT", "PATCH")
 
+	s.Handle("/reset-password/generate-token", negroni.New(
+		negroni.HandlerFunc(controllers.ResetPasswordGenerateToken),
+	)).Methods("POST")
+
+	s.Handle("/reset-password/verify-token", negroni.New(
+		negroni.HandlerFunc(controllers.ResetPasswordVerifyToken),
+	)).Methods("POST")
+
 	return r
 }
