@@ -11,7 +11,9 @@ import (
 func SetUsersRoutes(r *mux.Router) *mux.Router {
 	s := r.PathPrefix("/users").Subrouter()
 
-	s.HandleFunc("", controllers.CreateUser).Methods("POST")
+	s.Handle("", negroni.New(
+		negroni.HandlerFunc(controllers.CreateUser),
+	)).Methods("POST")
 
 	s.Handle("/me", negroni.New(
 		negroni.HandlerFunc(authentication.Auth),

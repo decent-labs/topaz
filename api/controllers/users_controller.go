@@ -9,7 +9,7 @@ import (
 )
 
 // CreateUser ...
-func CreateUser(w http.ResponseWriter, r *http.Request) {
+func CreateUser(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	ru := new(models.User)
 	d := json.NewDecoder(r.Body)
 	d.Decode(&ru)
