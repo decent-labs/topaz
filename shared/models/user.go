@@ -25,6 +25,12 @@ type UpdatePassword struct {
 	NewPassword string `json:"newPassword"`
 }
 
+// ResetPassword ...
+type ResetPassword struct {
+	Token       string `json:"token"`
+	NewPassword string `json:"newPassword"`
+}
+
 // CreateUser ...
 func (u *User) CreateUser(db *gorm.DB) error {
 	return db.Create(&u).Error
