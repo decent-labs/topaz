@@ -30,6 +30,8 @@ func CreateUser(ru *models.User) (int, []byte) {
 		return http.StatusInternalServerError, []byte("")
 	}
 
+	SendWelcomeEmail(u.Email)
+
 	response, _ := json.Marshal(&u)
 	return http.StatusOK, response
 }
