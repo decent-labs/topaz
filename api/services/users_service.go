@@ -38,5 +38,22 @@ func CreateUser(ru *models.User) (int, []byte) {
 
 // EditUser ...
 func EditUser(r *models.User, ru *models.User) (int, []byte) {
-	return http.StatusNotImplemented, []byte("")
+	if ru.Name != nil {
+		r.Name = ru.Name
+	}
+
+	if ru.Email != "" {
+		r.Email = ru.Email
+	}
+
+	if err := r.UpdateUser(database.Manager); err != nil {
+		return http.StatusInternalServerError, []byte("")
+	}
+
+	res, err := json.Marshal(&r)
+	if err != nil {
+		return http.StatusInternalServerError, []byte("")
+	}
+
+	return http.StatusOK, res
 }

@@ -28,6 +28,11 @@ func (u *User) GetUser(db *gorm.DB) error {
 	return db.First(&u).Error
 }
 
+// UpdateUser ...
+func (u *User) UpdateUser(db *gorm.DB) error {
+	return db.Save(&u).Error
+}
+
 // GetUserWithEmail ...
 func (u *User) GetUserWithEmail(db *gorm.DB) error {
 	return db.Where(&User{Email: u.Email}).First(&u).Error
