@@ -26,5 +26,11 @@ func SetUsersRoutes(r *mux.Router) *mux.Router {
 		negroni.HandlerFunc(controllers.EditUser),
 	)).Methods("PUT", "PATCH")
 
+	s.Handle("/me/update-password", negroni.New(
+		negroni.HandlerFunc(authentication.Auth),
+		negroni.HandlerFunc(authentication.DoubleAuth),
+		negroni.HandlerFunc(controllers.UpdatePassword),
+	)).Methods("PUT", "PATCH")
+
 	return r
 }
