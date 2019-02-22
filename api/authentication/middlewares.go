@@ -55,8 +55,6 @@ func Auth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 
 // DoubleAuth ...
 func DoubleAuth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	tokenUser := req.Context().Value(models.AuthUser).(*models.User)
-
 	bodyBytes, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		rw.WriteHeader(http.StatusBadRequest)
@@ -70,7 +68,8 @@ func DoubleAuth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc
 		return
 	}
 
-	if ok := CheckPasswordHash(ru.Password, tokenUser.Password); !ok {
+	u := req.Context().Value(models.AuthUser).(*models.User)
+	if ok := CheckPasswordHash(ru.Password, u.Password); !ok {
 		rw.WriteHeader(http.StatusUnauthorized)
 		return
 	}
