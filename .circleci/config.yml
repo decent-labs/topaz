@@ -10,7 +10,7 @@ jobs: # basic units of work in a run
           POSTGRES_USER: postgres
           POSTGRES_DB: postgres
     # directory where steps are run. Path must conform to the Go Workspace requirements
-    working_directory: /go/src/github.com/decentorganization/topaz
+    # working_directory: /go/src/github.com/decentorganization/topaz
 
     environment: # environment variables for the build itself
       TEST_RESULTS: /tmp/test-results # path to where test results will be saved
@@ -29,7 +29,6 @@ jobs: # basic units of work in a run
       # - run: go get github.com/lib/pq
       # - run: go get github.com/mattes/migrate
       # - run: go get github.com/jstemmer/go-junit-report
-      - run: go get -d ./...
 
       #  CircleCi's Go Docker image includes netcat
       #  This allows polling the DB port to confirm it is open before proceeding
