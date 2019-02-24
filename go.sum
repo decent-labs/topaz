@@ -52,6 +52,8 @@ github.com/rjeczalik/notify v0.9.2 h1:MiTWrPj55mNDHEiIX5YUSKefw/+lCQVoAFmD6oQm5w
 github.com/rjeczalik/notify v0.9.2/go.mod h1:aErll2f0sUX9PXZnVNyeiObbmTlk5jnMoCa4QEjJeqM=
 github.com/rs/cors v1.6.0 h1:G9tHG9lebljV9mfp9SNPDL36nCDxmo3zTlAf1YgvzmI=
 github.com/rs/cors v1.6.0/go.mod h1:gFx+x8UowdsKA9AchylcLynDq+nNFfI8FkUZdN/jGCU=
+github.com/rubenv/sql-migrate v0.0.0-20190212093014-1007f53448d7 h1:ID2fzWzRFJcF/xf/8eLN9GW5CXb6NQnKfC+ksTwMNpY=
+github.com/rubenv/sql-migrate v0.0.0-20190212093014-1007f53448d7/go.mod h1:WS0rl9eEliYI8DPnr3TOwz4439pay+qNgzJoVya/DmY=
 github.com/sendgrid/rest v2.4.1+incompatible h1:HDib/5xzQREPq34lN3YMhQtMkdXxS/qLp5G3k9a5++4=
 github.com/sendgrid/rest v2.4.1+incompatible/go.mod h1:kXX7q3jZtJXK5c5qK83bSGMdV6tsOE70KbHoqJls4lE=
 github.com/sendgrid/sendgrid-go v3.4.1+incompatible h1:jkXet0CDmdaMZctaF5qELIAFM7eeUx1nh3kMvLejAXk=
@@ -76,5 +78,7 @@ golang.org/x/sys v0.0.0-20190219092855-153ac476189d/go.mod h1:STP8DvDyc/dI5b8T5h
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/fsnotify.v1 v1.4.7/go.mod h1:Tz8NjZHkW78fSQdbUxIjBTcgA1z1m8ZHf0WmKUhAMys=
+gopkg.in/gorp.v1 v1.7.2 h1:j3DWlAyGVv8whO7AcIWznQ2Yj7yJkn34B8s63GViAAw=
+gopkg.in/gorp.v1 v1.7.2/go.mod h1:Wo3h+DBQZIxATwftsglhdD/62zRFPhGhTiu5jUJmCaw=
 gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7/go.mod h1:dt/ZhP58zS4L8KSrWDmTeBkI65Dw0HsyUHuEVlX15mw=
 gopkg.in/yaml.v2 v2.2.1/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
