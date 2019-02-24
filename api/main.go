@@ -28,5 +28,5 @@ func init() {
 		log.Println("couldn't load dotenv:", err.Error())
 	}
 
-	settings.Init()
+	settings.GenerateRootContent()
 }
