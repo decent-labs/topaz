@@ -38,10 +38,6 @@ func CreateUser(ru *models.User) (int, []byte) {
 
 // GetUser ...
 func GetUser(u *models.User) (int, []byte) {
-	if err := u.GetUser(database.Manager); err != nil {
-		return http.StatusInternalServerError, []byte("")
-	}
-
 	res, err := json.Marshal(&u)
 	if err != nil {
 		return http.StatusInternalServerError, []byte("")
