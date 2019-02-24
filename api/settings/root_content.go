@@ -18,10 +18,11 @@ type ethereumContent struct {
 	EthereumContract string `json:"contract"`
 }
 
-func generateRootContent() {
+// GenerateRootContent ...
+func GenerateRootContent() {
 	Rc = rootContent{
 		Version:     version,
-		Environment: GetEnvironment(),
+		Environment: os.Getenv("GO_ENV"),
 		EthereumContent: ethereumContent{
 			EthereumNode:     os.Getenv("GETH_HOST"),
 			EthereumContract: os.Getenv("ETH_CONTRACT_ADDRESS"),

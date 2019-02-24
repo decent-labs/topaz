@@ -1,7 +1,6 @@
 package authentication
 
 import (
-	"bufio"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
@@ -11,7 +10,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/decentorganization/topaz/api/settings"
 	"github.com/decentorganization/topaz/shared/models"
 	"github.com/decentorganization/topaz/shared/redis"
 	jwt "github.com/dgrijalva/jwt-go"
@@ -21,12 +19,14 @@ import (
 // JWTAuthenticationBackend ...
 type JWTAuthenticationBackend struct {
 	privateKey *rsa.PrivateKey
-	PublicKey  *rsa.PublicKey
+	publicKey  *rsa.PublicKey
 }
 
 var (
-	tokenDuration, _ = strconv.Atoi(os.Getenv("TOKEN_DURATION_HOURS"))
-	expireOffset, _  = strconv.Atoi(os.Getenv("TOKEN_EXPIRE_OFFSET"))
+	expireOffset, _  = strconv.Atoi(os.Getenv("JWT_EXPIRE_OFFSET"))
+	tokenDuration, _ = strconv.Atoi(os.Getenv("JWT_TOKEN_DURATION"))
+	pkString         = os.Getenv("JWT_PRIVATE_KEY")
+	pubString        = os.Getenv("JWT_PUBLIC_KEY")
 )
 
 var authBackendInstance *JWTAuthenticationBackend
@@ -36,7 +36,7 @@ func InitJWTAuthenticationBackend() *JWTAuthenticationBackend {
 	if authBackendInstance == nil {
 		authBackendInstance = &JWTAuthenticationBackend{
 			privateKey: getPrivateKey(),
-			PublicKey:  getPublicKey(),
+			publicKey:  getPublicKey(),
 		}
 	}
 
@@ -48,7 +48,7 @@ func (backend *JWTAuthenticationBackend) GenerateToken(userID string) (string, e
 	claims := models.AuthClaims{
 		UserID: userID,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour * time.Duration(settings.Get().JWTExpirationDelta)).Unix(),
+			ExpiresAt: time.Now().Add(time.Hour * time.Duration(tokenDuration)).Unix(),
 			IssuedAt:  time.Now().Unix(),
 			Subject:   userID,
 		},
@@ -76,7 +76,7 @@ func (backend *JWTAuthenticationBackend) GetToken(req *http.Request) (*jwt.Token
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
-		return backend.PublicKey, nil
+		return backend.publicKey, nil
 	})
 
 	return token, err
@@ -112,22 +112,7 @@ func (backend *JWTAuthenticationBackend) IsInBlacklist(token string) bool {
 }
 
 func getPrivateKey() *rsa.PrivateKey {
-	privateKeyFile, err := os.Open(settings.Get().PrivateKeyPath)
-	if err != nil {
-		panic(err)
-	}
-
-	pemfileinfo, _ := privateKeyFile.Stat()
-	size := pemfileinfo.Size()
-	pembytes := make([]byte, size)
-
-	buffer := bufio.NewReader(privateKeyFile)
-	_, err = buffer.Read(pembytes)
-
-	data, _ := pem.Decode([]byte(pembytes))
-
-	privateKeyFile.Close()
-
+	data, _ := pem.Decode([]byte(pkString))
 	privateKeyImported, err := x509.ParsePKCS1PrivateKey(data.Bytes)
 
 	if err != nil {
@@ -138,22 +123,7 @@ func getPrivateKey() *rsa.PrivateKey {
 }
 
 func getPublicKey() *rsa.PublicKey {
-	publicKeyFile, err := os.Open(settings.Get().PublicKeyPath)
-	if err != nil {
-		panic(err)
-	}
-
-	pemfileinfo, _ := publicKeyFile.Stat()
-	size := pemfileinfo.Size()
-	pembytes := make([]byte, size)
-
-	buffer := bufio.NewReader(publicKeyFile)
-	_, err = buffer.Read(pembytes)
-
-	data, _ := pem.Decode([]byte(pembytes))
-
-	publicKeyFile.Close()
-
+	data, _ := pem.Decode([]byte(pubString))
 	publicKeyImported, err := x509.ParsePKIXPublicKey(data.Bytes)
 
 	if err != nil {
