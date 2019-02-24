@@ -21,9 +21,11 @@ require (
 	github.com/rubenv/sql-migrate v0.0.0-20190212093014-1007f53448d7
 	github.com/sendgrid/rest v2.4.1+incompatible // indirect
 	github.com/sendgrid/sendgrid-go v3.4.2-0.20190124235127-1e8aa9067d63+incompatible
+	github.com/stretchr/testify v1.3.0
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 	github.com/urfave/negroni v1.0.0
 	golang.org/x/crypto v0.0.0-20190222235706-ffb98f73852f
 	golang.org/x/net v0.0.0-20190213061140-3a22650c66bd // indirect
+	gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405
 	gopkg.in/gorp.v1 v1.7.2 // indirect
 )
