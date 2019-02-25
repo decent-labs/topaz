@@ -24,14 +24,14 @@ $ docker-compose up -d
 
 The ganache-cli node will save all local blockchain and account state into the `/chainstate` folder of this repo, the contents of which are gitignored. This lets it stay persisted between `docker-compose` runs. If you need to wipe your local blockchain, delete all the files in `/chainstate` (except for `.keep`)
 
-### Run DB migrations if you have to
+### Run migrations
 
 ```sh
 $ cd migrate
 $ make run
 ```
 
-If `ETH_CONTRACT_ADDRESS` in `.env` was blank, the migrations will deploy a new instance of the Capture contract, and spit the address to `stdout`. Copy that into `.env`.
+If `ETH_CONTRACT_ADDRESS` in `.env` was blank, the migrations will deploy a new instance of the Capture contract and automatically add that new address to `.env` for you :)
 
 ### Start the API
 
