@@ -3,6 +3,8 @@ FROM golang:1.11
 RUN mkdir /topaz 
 ADD . /topaz/
 
+RUN go get -u github.com/gobuffalo/packr/packr
+
 WORKDIR /topaz/api
 RUN go build -o ../topaz-api .
 
@@ -10,6 +12,6 @@ WORKDIR /topaz/batch
 RUN go build -o ../topaz-batch .
 
 WORKDIR /topaz/migrations
-RUN go build -o ../topaz-migrate .
+RUN packr build -o ../topaz-migrate .
 
 WORKDIR /topaz
