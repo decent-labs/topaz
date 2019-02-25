@@ -22,9 +22,9 @@ func main() {
 			log.Println("Couldn't deploy Ethereum contract")
 			log.Fatal(err)
 		}
-		fmt.Println("Deployed Ethereum contract at", addr)
-	} else {
-		fmt.Println("Ethereum contract already set at", ethAddy)
+		env, err := godotenv.Read(".env")
+		env["ETH_CONTRACT_ADDRESS"] = addr
+		err = godotenv.Write(env, ".env")
 	}
 
 	migrations := &migrate.PackrMigrationSource{
