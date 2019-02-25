@@ -93,6 +93,20 @@ func CreateNewMarketingEmail(to *models.SendgridEmails) bool {
 	return true
 }
 
+// CreateNewAPIUserEmail ...
+func CreateNewAPIUserEmail(to *models.SendgridEmails) bool {
+	sgr, ok := addEmailToContacts(to)
+	if !ok {
+		return false
+	}
+
+	if ok = addContactToList(sgr.PersistedRecipients[0], os.Getenv("SENDGRID_API_USERS_LIST")); !ok {
+		return false
+	}
+
+	return true
+}
+
 func addEmailToContacts(to *models.SendgridEmails) (*models.SendgridNewContactRespone, bool) {
 	t, _ := json.Marshal(&to)
 
