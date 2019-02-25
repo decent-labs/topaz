@@ -15,7 +15,7 @@ func CreateMarketingEmail(me *models.SendgridEmail) int {
 	var mes models.SendgridEmails
 	mes = append(mes, *me)
 
-	if ok := CreateNewMarketingEmail(mes); !ok {
+	if ok := CreateNewMarketingEmail(&mes); !ok {
 		return http.StatusInternalServerError
 	}
 
