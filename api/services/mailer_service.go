@@ -80,7 +80,7 @@ func SendPasswordResetEmail(to, token string) {
 }
 
 // CreateNewMarketingEmail ...
-func CreateNewMarketingEmail(to models.MarketingSiteEmails) bool {
+func CreateNewMarketingEmail(to models.SendgridEmails) bool {
 	t, _ := json.Marshal(&to)
 
 	create := sendgrid.GetRequest(os.Getenv("SENDGRID_API_KEY"), "/v3/contactdb/recipients", "https://api.sendgrid.com")
