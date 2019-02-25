@@ -30,6 +30,11 @@ func CreateUser(ru *models.User) (int, []byte) {
 		return http.StatusInternalServerError, []byte("")
 	}
 
+	sg := models.SendgridEmail{Email: u.Email}
+	var mes models.SendgridEmails
+	mes = append(mes, sg)
+
+	CreateNewAPIUserEmail(&mes)
 	SendWelcomeEmail(u.Email)
 
 	response, _ := json.Marshal(&u)
