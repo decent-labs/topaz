@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/decentorganization/topaz/shared/ethereum"
+	"github.com/gobuffalo/packr"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	migrate "github.com/rubenv/sql-migrate"
@@ -26,8 +27,8 @@ func main() {
 		fmt.Println("Ethereum contract already set at", ethAddy)
 	}
 
-	migrations := &migrate.FileMigrationSource{
-		Dir: "migrations",
+	migrations := &migrate.PackrMigrationSource{
+		Box: packr.NewBox("sql"),
 	}
 
 	n, err := migrate.Exec(db, "postgres", migrations, migrate.Up)

@@ -1,8 +1,9 @@
 GOCMD=go
+PACKRCMD=packr
 BUILDDIR=build
 BINNAME=topaz-migrate
 
-GOBUILD=$(GOCMD) build
+GOBUILD=$(PACKRCMD) build
 GOCLEAN=$(GOCMD) clean
 
 build:
