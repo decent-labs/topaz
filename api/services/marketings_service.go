@@ -7,15 +7,15 @@ import (
 )
 
 // CreateMarketingEmail ...
-func CreateMarketingEmail(me *models.MarketingSiteEmail) int {
+func CreateMarketingEmail(me *models.SendgridEmail) int {
 	if len(me.Email) == 0 {
 		return http.StatusBadRequest
 	}
 
-	var mes models.MarketingSiteEmails
+	var mes models.SendgridEmails
 	mes = append(mes, *me)
 
-	if ok := CreateNewMarketingEmail(mes); !ok {
+	if ok := CreateNewMarketingEmail(&mes); !ok {
 		return http.StatusInternalServerError
 	}
 

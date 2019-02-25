@@ -1,12 +1,12 @@
 package models
 
-// MarketingSiteEmail ...
-type MarketingSiteEmail struct {
+// SendgridEmail ...
+type SendgridEmail struct {
 	Email string `json:"email"`
 }
 
-// MarketingSiteEmails ...
-type MarketingSiteEmails []MarketingSiteEmail
+// SendgridEmail ...
+type SendgridEmails []SendgridEmail
 
 // SendgridNewContactRespone ...
 type SendgridNewContactRespone struct {

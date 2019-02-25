@@ -80,48 +80,80 @@ func SendPasswordResetEmail(to, token string) {
 }
 
 // CreateNewMarketingEmail ...
-func CreateNewMarketingEmail(to models.MarketingSiteEmails) bool {
+func CreateNewMarketingEmail(to *models.SendgridEmails) bool {
+	sgr, ok := addEmailToContacts(to)
+	if !ok {
+		return false
+	}
+
+	if ok = addContactToList(sgr.PersistedRecipients[0], os.Getenv("SENDGRID_MARKETING_UPDATES_LIST")); !ok {
+		return false
+	}
+
+	return true
+}
+
+// CreateNewAPIUserEmail ...
+func CreateNewAPIUserEmail(to *models.SendgridEmails) bool {
+	sgr, ok := addEmailToContacts(to)
+	if !ok {
+		return false
+	}
+
+	if ok = addContactToList(sgr.PersistedRecipients[0], os.Getenv("SENDGRID_API_USERS_LIST")); !ok {
+		return false
+	}
+
+	return true
+}
+
+func addEmailToContacts(to *models.SendgridEmails) (*models.SendgridNewContactRespone, bool) {
 	t, _ := json.Marshal(&to)
 
-	create := sendgrid.GetRequest(os.Getenv("SENDGRID_API_KEY"), "/v3/contactdb/recipients", "https://api.sendgrid.com")
+	create := sendgrid.GetRequest(os.Getenv("SENDGRID_API_KEY"), "/v3/contactdb/recipients", os.Getenv("SENDGRID_API_ROOT"))
 	create.Method = "POST"
 	create.Body = t
 
 	createRes, err := sendgrid.API(create)
-	if err != nil {
-		fmt.Println(err)
-		return false
-	}
 
 	fmt.Println(createRes.StatusCode)
 	fmt.Println(createRes.Body)
 	fmt.Println(createRes.Headers)
 
+	if err != nil {
+		fmt.Println(err)
+		return nil, false
+	}
+
 	sgr := new(models.SendgridNewContactRespone)
 	if err = json.Unmarshal([]byte(createRes.Body), &sgr); err != nil {
 		fmt.Println(err)
-		return false
+		return nil, false
 	}
 
 	if len(sgr.PersistedRecipients) == 0 {
 		fmt.Println("didn't create the new contact")
-		return false
+		return nil, false
 	}
 
-	listReq := fmt.Sprintf("/v3/contactdb/lists/%s/recipients/%s", os.Getenv("SENDGRID_MARKETING_UPDATES_LIST"), sgr.PersistedRecipients[0])
-	list := sendgrid.GetRequest(os.Getenv("SENDGRID_API_KEY"), listReq, "https://api.sendgrid.com")
+	return sgr, true
+}
+
+func addContactToList(contactID, listID string) bool {
+	listReq := fmt.Sprintf("/v3/contactdb/lists/%s/recipients/%s", listID, contactID)
+	list := sendgrid.GetRequest(os.Getenv("SENDGRID_API_KEY"), listReq, os.Getenv("SENDGRID_API_ROOT"))
 	list.Method = "POST"
-	list.Body = t
 
 	listRes, err := sendgrid.API(list)
-	if err != nil {
-		fmt.Println(err)
-		return false
-	}
 
 	fmt.Println(listRes.StatusCode)
 	fmt.Println(listRes.Body)
 	fmt.Println(listRes.Headers)
+
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
 
 	return true
 }
