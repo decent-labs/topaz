@@ -31,7 +31,7 @@ require (
 	github.com/multiformats/go-multihash v1.0.10
 	github.com/pborman/uuid v1.2.0 // indirect
 	github.com/rjeczalik/notify v0.9.2 // indirect
-	github.com/rs/cors v1.6.0 // indirect
+	github.com/rs/cors v1.6.0
 	github.com/rubenv/sql-migrate v0.0.0-20190212093014-1007f53448d7
 	github.com/sendgrid/rest v2.4.1+incompatible // indirect
 	github.com/sendgrid/sendgrid-go v3.4.2-0.20190124235127-1e8aa9067d63+incompatible
