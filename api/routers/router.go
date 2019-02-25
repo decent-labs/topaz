@@ -17,6 +17,7 @@ func InitRoutes() *mux.Router {
 	sv1 = v1.SetObjectsRoutes(sv1)
 	sv1 = v1.SetHashesRoutes(sv1)
 	sv1 = v1.SetProofsRoutes(sv1)
+	sv1 = v1.SetMarketingRoutes(sv1)
 
 	return r
 }
