@@ -8,12 +8,16 @@ import (
 	"github.com/decentorganization/topaz/api/routers"
 	"github.com/decentorganization/topaz/api/settings"
 	"github.com/joho/godotenv"
+	"github.com/rs/cors"
 	"github.com/urfave/negroni"
 )
 
 func main() {
 	r := routers.InitRoutes()
 	n := negroni.Classic()
+	c := cors.Default()
+
+	n.Use(c)
 	n.UseHandler(r)
 
 	p := os.Getenv("API_PORT")
