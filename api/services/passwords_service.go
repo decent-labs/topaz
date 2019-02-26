@@ -53,7 +53,7 @@ func ResetPasswordGenerateToken(u *models.User) (int, []byte) {
 
 	token := authentication.NewResetToken(u.ID, time.Duration(timeout)*time.Hour, pwhash, secret)
 
-	SendPasswordResetEmail(u.Email, token)
+	go SendPasswordResetEmail(u.Email, token)
 
 	return http.StatusOK, []byte("")
 }

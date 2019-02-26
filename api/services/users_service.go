@@ -3,6 +3,7 @@ package services
 import (
 	"encoding/json"
 	"net/http"
+	"os"
 
 	"github.com/decentorganization/topaz/api/authentication"
 	"github.com/decentorganization/topaz/shared/database"
@@ -34,8 +35,8 @@ func CreateUser(ru *models.User) (int, []byte) {
 	var mes models.SendgridEmails
 	mes = append(mes, sg)
 
-	CreateNewAPIUserEmail(&mes)
-	SendWelcomeEmail(u.Email)
+	go CreateNewEmailOnList(&mes, os.Getenv("SENDGRID_API_USERS_LIST"))
+	go SendWelcomeEmail(u.Email)
 
 	response, _ := json.Marshal(&u)
 	return http.StatusOK, response

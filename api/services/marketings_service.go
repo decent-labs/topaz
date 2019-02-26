@@ -2,6 +2,7 @@ package services
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/decentorganization/topaz/shared/models"
 )
@@ -15,9 +16,7 @@ func CreateMarketingEmail(me *models.SendgridEmail) int {
 	var mes models.SendgridEmails
 	mes = append(mes, *me)
 
-	if ok := CreateNewMarketingEmail(&mes); !ok {
-		return http.StatusInternalServerError
-	}
+	go CreateNewEmailOnList(&mes, os.Getenv("SENDGRID_MARKETING_UPDATES_LIST"))
 
 	return http.StatusOK
 }
