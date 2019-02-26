@@ -1,0 +1,9 @@
+FROM golang:1.11
+
+RUN mkdir /topaz 
+ADD . /topaz/
+
+WORKDIR /topaz/api
+RUN go build -o ../topaz-api .
+
+WORKDIR /topaz
