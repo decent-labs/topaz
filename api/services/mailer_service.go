@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/decentorganization/topaz/shared/models"
 
@@ -79,32 +80,13 @@ func SendPasswordResetEmail(to, token string) {
 	}
 }
 
-// CreateNewMarketingEmail ...
-func CreateNewMarketingEmail(to *models.SendgridEmails) bool {
+// CreateNewEmailOnList sleeps, so be sure to call it with a goroutine
+func CreateNewEmailOnList(to *models.SendgridEmails, list string) {
 	sgr, ok := addEmailToContacts(to)
-	if !ok {
-		return false
+	if ok {
+		time.Sleep(5 * time.Second)
+		addContactToList(sgr.PersistedRecipients[0], list)
 	}
-
-	if ok = addContactToList(sgr.PersistedRecipients[0], os.Getenv("SENDGRID_MARKETING_UPDATES_LIST")); !ok {
-		return false
-	}
-
-	return true
-}
-
-// CreateNewAPIUserEmail ...
-func CreateNewAPIUserEmail(to *models.SendgridEmails) bool {
-	sgr, ok := addEmailToContacts(to)
-	if !ok {
-		return false
-	}
-
-	if ok = addContactToList(sgr.PersistedRecipients[0], os.Getenv("SENDGRID_API_USERS_LIST")); !ok {
-		return false
-	}
-
-	return true
 }
 
 func addEmailToContacts(to *models.SendgridEmails) (*models.SendgridNewContactRespone, bool) {
