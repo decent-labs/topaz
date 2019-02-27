@@ -13,12 +13,14 @@ import (
 // CreateUser ...
 func CreateUser(ru *models.User) (int, []byte) {
 	if len(ru.Email) == 0 || len(ru.Password) == 0 {
-		return http.StatusBadRequest, []byte("email and password must be set")
+		errS, _ := json.Marshal(models.Exception{Message: "email and password must be set"})
+		return http.StatusBadRequest, errS
 	}
 
 	hp, err := authentication.HashPassword(ru.Password)
 	if err != nil {
-		return http.StatusInternalServerError, []byte("")
+		errS, _ := json.Marshal(models.Exception{Message: "contact Topaz support"})
+		return http.StatusInternalServerError, errS
 	}
 
 	u := models.User{
@@ -28,6 +30,10 @@ func CreateUser(ru *models.User) (int, []byte) {
 	}
 
 	if err := u.CreateUser(database.Manager); err != nil {
+		if err = u.GetUserWithEmail(database.Manager); err == nil {
+			errS, _ := json.Marshal(models.Exception{Message: "the email already exists"})
+			return http.StatusConflict, errS
+		}
 		return http.StatusInternalServerError, []byte("")
 	}
 
