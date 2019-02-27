@@ -7,6 +7,8 @@ import (
 	"encoding/base64"
 	"encoding/binary"
 	"errors"
+	"os"
+	"strconv"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -14,7 +16,12 @@ import (
 
 // HashPassword takes a string and returns a hash and possible error
 func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	cost, err := strconv.Atoi(os.Getenv("BCRYPT_COST"))
+	if err != nil {
+		return "", err
+	}
+
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), cost)
 	return string(bytes), err
 }
 
