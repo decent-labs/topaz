@@ -13,19 +13,19 @@ func SetObjectsRoutes(r *mux.Router) *mux.Router {
 
 	// Create new object
 	s.Handle("", negroni.New(
-		negroni.HandlerFunc(authentication.Auth),
+		negroni.HandlerFunc(authentication.UserAuth),
 		negroni.HandlerFunc(controllers.CreateObject),
 	)).Methods("POST")
 
 	// Get all objects
 	s.Handle("", negroni.New(
-		negroni.HandlerFunc(authentication.Auth),
+		negroni.HandlerFunc(authentication.UserAuth),
 		negroni.HandlerFunc(controllers.GetObjects),
 	)).Methods("GET")
 
 	// Get an object
 	s.Handle("/{id}", negroni.New(
-		negroni.HandlerFunc(authentication.Auth),
+		negroni.HandlerFunc(authentication.UserAuth),
 		negroni.HandlerFunc(controllers.GetObject),
 	)).Methods("GET")
 

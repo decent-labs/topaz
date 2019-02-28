@@ -13,19 +13,19 @@ func SetHashesRoutes(r *mux.Router) *mux.Router {
 
 	// Create new hash
 	s.Handle("", negroni.New(
-		negroni.HandlerFunc(authentication.Auth),
+		negroni.HandlerFunc(authentication.UserAuth),
 		negroni.HandlerFunc(controllers.CreateHash),
 	)).Methods("POST")
 
 	// Get all hashes
 	s.Handle("", negroni.New(
-		negroni.HandlerFunc(authentication.Auth),
+		negroni.HandlerFunc(authentication.UserAuth),
 		negroni.HandlerFunc(controllers.GetHashes),
 	)).Methods("GET")
 
 	// Get an hash
 	s.Handle("/{id}", negroni.New(
-		negroni.HandlerFunc(authentication.Auth),
+		negroni.HandlerFunc(authentication.UserAuth),
 		negroni.HandlerFunc(controllers.GetHash),
 	)).Methods("GET")
 
