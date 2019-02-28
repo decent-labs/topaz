@@ -1,4 +1,4 @@
-package routerV1
+package routerv1
 
 import (
 	"github.com/decentorganization/topaz/api/authentication"
@@ -14,12 +14,12 @@ func SetAuthRoutes(r *mux.Router) *mux.Router {
 	s.HandleFunc("/login", controllers.Login).Methods("POST")
 
 	s.Handle("/refresh-token", negroni.New(
-		negroni.HandlerFunc(authentication.Auth),
+		negroni.HandlerFunc(authentication.UserAuth),
 		negroni.HandlerFunc(controllers.RefreshToken),
 	)).Methods("GET")
 
 	s.Handle("/logout", negroni.New(
-		negroni.HandlerFunc(authentication.Auth),
+		negroni.HandlerFunc(authentication.UserAuth),
 		negroni.HandlerFunc(controllers.Logout),
 	)).Methods("GET")
 

@@ -1,4 +1,4 @@
-package routerV1
+package routerv1
 
 import (
 	"github.com/decentorganization/topaz/api/authentication"
@@ -13,19 +13,19 @@ func SetObjectsRoutes(r *mux.Router) *mux.Router {
 
 	// Create new object
 	s.Handle("", negroni.New(
-		negroni.HandlerFunc(authentication.Auth),
+		negroni.HandlerFunc(authentication.APIAuth),
 		negroni.HandlerFunc(controllers.CreateObject),
 	)).Methods("POST")
 
 	// Get all objects
 	s.Handle("", negroni.New(
-		negroni.HandlerFunc(authentication.Auth),
+		negroni.HandlerFunc(authentication.APIAuth),
 		negroni.HandlerFunc(controllers.GetObjects),
 	)).Methods("GET")
 
 	// Get an object
 	s.Handle("/{id}", negroni.New(
-		negroni.HandlerFunc(authentication.Auth),
+		negroni.HandlerFunc(authentication.APIAuth),
 		negroni.HandlerFunc(controllers.GetObject),
 	)).Methods("GET")
 

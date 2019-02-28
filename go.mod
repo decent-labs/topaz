@@ -34,6 +34,7 @@ require (
 	github.com/mattn/go-colorable v0.1.1 // indirect
 	github.com/mattn/go-isatty v0.0.6 // indirect
 	github.com/mattn/go-sqlite3 v1.10.0 // indirect
+	github.com/mr-tron/base58 v1.1.0
 	github.com/multiformats/go-multihash v0.0.1
 	github.com/pborman/uuid v1.2.0 // indirect
 	github.com/rjeczalik/notify v0.9.2 // indirect
