@@ -25,7 +25,7 @@ func CreateAPIToken(u *models.User) (int, []byte) {
 		return http.StatusInternalServerError, []byte("")
 	}
 
-	return http.StatusOK, r
+	return http.StatusCreated, r
 }
 
 // GetAPITokens ...

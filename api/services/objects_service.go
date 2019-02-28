@@ -25,7 +25,7 @@ func CreateObject(u *models.User, aid string) (int, []byte) {
 		return http.StatusInternalServerError, []byte("")
 	}
 
-	return http.StatusOK, r
+	return http.StatusCreated, r
 }
 
 // GetObjects ...

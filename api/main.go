@@ -15,7 +15,7 @@ import (
 func main() {
 	r := routers.InitRoutes()
 	n := negroni.Classic()
-	c := cors.Default()
+	c := cors.AllowAll()
 
 	n.Use(c)
 	n.UseHandler(r)

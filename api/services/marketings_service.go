@@ -18,5 +18,5 @@ func CreateMarketingEmail(me *models.SendgridEmail) int {
 
 	go CreateNewEmailOnList(&mes, os.Getenv("SENDGRID_MARKETING_UPDATES_LIST"))
 
-	return http.StatusOK
+	return http.StatusAccepted
 }

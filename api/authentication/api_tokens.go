@@ -17,9 +17,6 @@ func APIAuth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	// strip "BEARER " off of it
 	if len(tok) > 6 && strings.ToUpper(tok[0:7]) == "BEARER " {
 		tok = tok[7:]
-	} else {
-		rw.WriteHeader(http.StatusUnauthorized)
-		return
 	}
 
 	a := models.APIToken{Token: tok}

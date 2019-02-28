@@ -20,4 +20,4 @@ deploy-linux-batch:
 
 deploy-linux-migrate:
 	rsync -azvv -e ssh build/topaz-migrate-linux ubuntu@sandbox.topaz.io:~
-	ssh ubuntu@sandbox.topaz.io sudo systemctl restart topaz-migrate
+	ssh ubuntu@sandbox.topaz.io ./topaz-migrate-linux
