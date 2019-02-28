@@ -1,9 +1,9 @@
 package models
 
 import (
+	"crypto/rand"
 	"crypto/sha256"
 	"errors"
-	"math/rand"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -54,7 +54,10 @@ func (a *APIToken) GetAPITokenFromToken(db *gorm.DB) error {
 
 func (a *APIToken) makeNewToken() error {
 	rb := make([]byte, 256)
-	rand.Read(rb)
+	_, err := rand.Read(rb)
+	if err != nil {
+		return err
+	}
 	hash := sha256.Sum256(rb)
 	token := b58.Encode(hash[:])
 	a.Token = token
