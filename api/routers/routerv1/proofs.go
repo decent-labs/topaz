@@ -13,13 +13,13 @@ func SetProofsRoutes(r *mux.Router) *mux.Router {
 
 	// Get all proofs
 	s.Handle("", negroni.New(
-		negroni.HandlerFunc(authentication.UserAuth),
+		negroni.HandlerFunc(authentication.APIAuth),
 		negroni.HandlerFunc(controllers.GetProofs),
 	)).Methods("GET")
 
 	// Get a proof
 	s.Handle("/{id}", negroni.New(
-		negroni.HandlerFunc(authentication.UserAuth),
+		negroni.HandlerFunc(authentication.APIAuth),
 		negroni.HandlerFunc(controllers.GetProof),
 	)).Methods("GET")
 
