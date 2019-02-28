@@ -39,7 +39,7 @@ func CreateHash(u *models.User, aid string, oid string, rh *models.Hash) (int, [
 		return http.StatusInternalServerError, []byte("")
 	}
 
-	return http.StatusOK, r
+	return http.StatusCreated, r
 }
 
 // GetHashes ...

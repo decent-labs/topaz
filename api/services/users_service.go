@@ -45,7 +45,7 @@ func CreateUser(ru *models.User) (int, []byte) {
 	go SendWelcomeEmail(u.Email)
 
 	response, _ := json.Marshal(&u)
-	return http.StatusOK, response
+	return http.StatusCreated, response
 }
 
 // GetUser ...
