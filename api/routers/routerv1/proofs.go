@@ -1,4 +1,4 @@
-package routerV1
+package routerv1
 
 import (
 	"github.com/decentorganization/topaz/api/authentication"

@@ -1,7 +1,7 @@
 package routers
 
 import (
-	v1 "github.com/decentorganization/topaz/api/routers/routerV1"
+	v1 "github.com/decentorganization/topaz/api/routers/routerv1"
 	"github.com/gorilla/mux"
 )
 
