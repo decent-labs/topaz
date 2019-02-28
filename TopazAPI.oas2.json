@@ -1,0 +1,787 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Topaz API",
+        "version": "0.1.8",
+        "contact": {
+            "name": "Topaz",
+            "url": "https://topaz.io",
+            "email": "hello@topaz.io"
+        },
+        "description": "## Topaz API Spec\n\nTo get up and running with Topaz API as quickly as possible, read through these docs.\n\n### Prerequisites\n\nCreate an account at [https://topaz.io](https://topaz.io), log in, and generate an API Token.\n\nYou'll need an API Token to create a new app, create objects, create hashes, and view proofs.\n\nAll API requests should be prefixed with `/v1`, indicating that you're targeting version 1 of our API.\n\n### Guarantee\n\nTopaz API follows Semantic Versioning (https://semver.org), so expect that any breaking changes will be versioned under a new route prefix."
+    },
+    "paths": {
+        "/apps": {
+            "get": {
+                "summary": "List Apps",
+                "operationId": "findApps",
+                "responses": {
+                    "200": {
+                        "description": "An array of all `app` objects belonging to the user.",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/app-output"
+                            }
+                        },
+                        "examples": {
+                            "application/json": [
+                                {
+                                    "id": "93e8d456-c195-de31-0ad0-41d704c2ccd7",
+                                    "userId": "32eb8a3d-ba12-6cca-07be-a3fb92073355",
+                                    "name": "dolo",
+                                    "interval": 90949208
+                                },
+                                {
+                                    "id": "9ac5380d-0b49-51a0-1995-aabb5f9d8579",
+                                    "userId": "17004a87-86e3-5d55-69f9-689657f96e75",
+                                    "name": "anim eu sint incididunt",
+                                    "interval": 68254023
+                                },
+                                {
+                                    "id": "6170397f-2951-63b6-5881-3f70ef651312",
+                                    "userId": "4ef1bd48-9901-1bb9-08a2-9fdd0d5c5fbd",
+                                    "name": "sunt ",
+                                    "interval": 2159934
+                                },
+                                {
+                                    "id": "90bf35ac-7862-bee5-4910-0f41bcbf2725",
+                                    "userId": "c7bed21-6edf-1dc9-d0e5-54d948981c72",
+                                    "name": "vel",
+                                    "interval": 44006348
+                                },
+                                {
+                                    "id": "6d92edb3-da70-9a40-b30e-821df74f9d1e",
+                                    "userId": "74b42123-7e8a-a933-f3f4-e2841a9b9354",
+                                    "name": "non",
+                                    "interval": 26495669
+                                }
+                            ]
+                        }
+                    }
+                },
+                "description": "List all `apps` belonging to a user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "apps"
+                ]
+            },
+            "post": {
+                "summary": "Create App",
+                "operationId": "createApp",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "schema": {
+                            "$ref": "#/definitions/app-input"
+                        },
+                        "x-examples": {
+                            "application/json": {
+                                "name": "ex eu enim ipsum",
+                                "interval": 9328408
+                            }
+                        },
+                        "description": "Send in `name` and `interval` to generate an `app` with a blockchain transaction resolution no less than the defined `interval` in seconds."
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "schema": {
+                            "$ref": "#/definitions/app-output-detailed"
+                        },
+                        "description": "Returns the full `app` object, including `UUID` generated `id`, and the `userId` associated with this `app`.",
+                        "examples": {
+                            "application/json": {
+                                "id": "6ba55b0c-aaa1-91ae-9c9e-fea0b9c220ff",
+                                "userId": "9a27cf48-c09d-01af-eb7c-34f9444c69d3",
+                                "name": "Excepteu",
+                                "interval": 9328408
+                            }
+                        }
+                    }
+                },
+                "description": "To create a new `app`, post to the `/apps` endpoint. You'll need to name the `app`, and pass in an `interval`, in seconds. This interval represents the amount of time between blockchain transactions that will occur as you're adding `hashes` to `objects` in this `app`.\n\nIn effect, it's the \"resolution\" at which you're comfortable proving that your data exists.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "apps"
+                ]
+            }
+        },
+        "/apps/{appId}": {
+            "parameters": [
+                {
+                    "name": "appId",
+                    "in": "path",
+                    "type": "string",
+                    "required": true
+                }
+            ],
+            "get": {
+                "summary": "Get App",
+                "operationId": "getApp",
+                "responses": {
+                    "200": {
+                        "description": "Returns details about a single `app`.",
+                        "schema": {
+                            "$ref": "#/definitions/app-output-detailed"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "id": "09192c37-0b5a-0081-2ef9-1acafb8d6735",
+                                "userId": "85e67f55-41ef-8bf9-e73d-2eecc84bdcaf",
+                                "name": "ad et consectetur quis mollit",
+                                "interval": 47376422
+                            }
+                        }
+                    }
+                },
+                "description": "This endpoint will return details about a single `app`, given the `appId` passed in as the request parameter.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "apps"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "appId",
+                        "type": "string",
+                        "required": true
+                    }
+                ]
+            }
+        },
+        "/apps/{appId}/objects": {
+            "get": {
+                "summary": "List Objects",
+                "operationId": "findObjects",
+                "responses": {
+                    "200": {
+                        "description": "Returns an array of `objects`.",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/object-output"
+                            }
+                        },
+                        "examples": {
+                            "application/json": [
+                                {
+                                    "appId": "19b730e0-0d8e-6f90-f588-c75cee1a87ef",
+                                    "id": "cff2da16-0bd4-aa3b-4a87-dcfdf32dd233"
+                                },
+                                {
+                                    "appId": "19b730e0-0d8e-6f90-f588-c75cee1a87ef",
+                                    "id": "07b1ce3f-cfaf-692c-02e3-6d955efb26c3"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "description": "This endpoint will return all `objects` registered for an `app`.",
+                "parameters": [],
+                "tags": [
+                    "objects"
+                ],
+                "produces": [
+                    "application/json"
+                ]
+            },
+            "post": {
+                "summary": "Create Object",
+                "operationId": "createObject",
+                "responses": {
+                    "201": {
+                        "description": "The response includes a new `id` for the `object`, along with the `appId` that it belongs to.",
+                        "schema": {
+                            "$ref": "#/definitions/object-output-detailed"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "appId": "46038ab0-c0d5-8030-4fcd-60e205f4c95f",
+                                "id": "9bf2bc66-6e48-98f8-3051-b26855c45ca2"
+                            }
+                        }
+                    }
+                },
+                "description": "Creating a new `object` doesn't take any body data in its request.",
+                "tags": [
+                    "objects"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [],
+                "consumes": [
+                    "application/json"
+                ]
+            },
+            "parameters": [
+                {
+                    "name": "appId",
+                    "in": "path",
+                    "type": "string",
+                    "required": true
+                }
+            ]
+        },
+        "/apps/{appId}/objects/{objectId}": {
+            "parameters": [
+                {
+                    "name": "appId",
+                    "in": "path",
+                    "type": "string",
+                    "required": true
+                },
+                {
+                    "name": "objectId",
+                    "in": "path",
+                    "type": "string",
+                    "required": true
+                }
+            ],
+            "get": {
+                "summary": "Get Object",
+                "operationId": "getObject",
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/object-output-detailed"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "appId": "1cab655b-a515-36d9-1cae-d123001c0f4b",
+                                "id": "5ac153a3-4e44-2952-e7a8-6ab7434283af"
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "objects"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "description": "This endpoint will return details about a single object, given the `objectId` passed in as the request parameter"
+            }
+        },
+        "/apps/{appId}/objects/{objectId}/hashes": {
+            "parameters": [
+                {
+                    "name": "appId",
+                    "in": "path",
+                    "type": "string",
+                    "required": true
+                },
+                {
+                    "name": "objectId",
+                    "in": "path",
+                    "type": "string",
+                    "required": true
+                }
+            ],
+            "get": {
+                "summary": "List Hashes",
+                "operationId": "findHashes",
+                "responses": {
+                    "200": {
+                        "description": "Returns an array of `hash` objects",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/hash-output"
+                            }
+                        },
+                        "examples": {
+                            "application/json": [
+                                {
+                                    "hash": "C41ecD8B3354Ef82BF1308cA1bCDaB0CEd285aeDB17418fad45c1b2AAb4DCd72",
+                                    "id": "4909eea8-ec1c-396c-5d21-3e17c6e686c8",
+                                    "objectId": "e00b10dd-c6ad-7eb3-e44a-16c589d5d401",
+                                    "unixTimestamp": 1551386546,
+                                    "proofId": "5fb9126c-f473-c095-2c4d-3aa05130dde9"
+                                },
+                                {
+                                    "hash": "5bb6AF99cdcbe8dAf60FffCEaD5381d1038EbbF9AAfeA60BD8b8bf442B547Ea9",
+                                    "id": "538c8c95-41ce-d490-6bee-eb1924c39442",
+                                    "objectId": "e00b10dd-c6ad-7eb3-e44a-16c589d5d401",
+                                    "unixTimestamp": 15513853897,
+                                    "proofId": "d43bcea2-afed-bf0f-6bb2-2ada12738ffd"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "tags": [
+                    "hashes"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "description": "This endpoint will return all `hashes` which have been associated with an `object`"
+            },
+            "post": {
+                "summary": "Create Hash",
+                "operationId": "createHash",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "schema": {
+                            "$ref": "#/definitions/hash-input"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Notice how the `proofId` is null. It will become populated during the next time that this app's `interval` ticks over, and a blockchain transaction is created.",
+                        "schema": {
+                            "$ref": "#/definitions/hash-output-detailed"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "hash": "cb602e6DE88C0D2bBefB8EDFe10F9338F316e671c006fB4AAf6dffebD682C4f6",
+                                "id": "809177f0-9db6-667a-3cd4-4512fb42bcf8",
+                                "objectId": "e20cc109-322c-86c5-cc89-0e203c01f42e",
+                                "unixTimestamp": 15513987153,
+                                "proofId": null
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "hashes"
+                ],
+                "description": "This endpoint inputs a json object in it's body which defines a `hash` property. This `hash` should be a hex-encoded SHA256 hash.\n",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ]
+            }
+        },
+        "/apps/{appId}/objects/{objectId}/hashes/{hashId}": {
+            "parameters": [
+                {
+                    "name": "appId",
+                    "in": "path",
+                    "type": "string",
+                    "required": true
+                },
+                {
+                    "name": "objectId",
+                    "in": "path",
+                    "type": "string",
+                    "required": true
+                },
+                {
+                    "name": "hashId",
+                    "in": "path",
+                    "type": "string",
+                    "required": true
+                }
+            ],
+            "get": {
+                "summary": "Get Hash",
+                "operationId": "getHash",
+                "responses": {
+                    "200": {
+                        "description": "See how the `proofId` is now populated. This means that a proof has been created and stamped into the blockchain. Congratulations, your data is now provable for all of eternity!",
+                        "schema": {
+                            "$ref": "#/definitions/hash-output-detailed"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "hash": "bDED3C0be8CE5a0FC8CFbFE4b3538dBcd8F5BC323A26CBedeaD4Dc8B4fAF2385",
+                                "id": "11d7c71c-10ba-d867-ba9f-da257cf2d5b8",
+                                "objectId": "48f2774d-4ce5-976c-c88f-b444999b7368",
+                                "unixTimestamp": 1550610197,
+                                "proofId": "a02350b3-46c5-25ad-7640-8d1540a9f6bd"
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "hashes"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "description": "This endpoint will return details about a single hash, given the `hashId` passed in as the request parameter"
+            }
+        },
+        "/apps/{appId}/proofs": {
+            "parameters": [
+                {
+                    "name": "appId",
+                    "in": "path",
+                    "type": "string",
+                    "required": true
+                }
+            ],
+            "get": {
+                "summary": "List Proofs",
+                "operationId": "findProofs",
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/proof-output"
+                            }
+                        }
+                    }
+                },
+                "description": "This endpoint will return all `proofs` associated with an `app`.",
+                "tags": [
+                    "proofs"
+                ],
+                "produces": [
+                    "application/json"
+                ]
+            }
+        },
+        "/apps/{appId}/proofs/{proofsId}": {
+            "parameters": [
+                {
+                    "name": "appId",
+                    "in": "path",
+                    "type": "string",
+                    "required": true
+                },
+                {
+                    "name": "proofsId",
+                    "in": "path",
+                    "type": "string",
+                    "required": true
+                }
+            ],
+            "get": {
+                "summary": "Get Proof",
+                "operationId": "getProofs",
+                "responses": {
+                    "200": {
+                        "description": "A proof has a `merkleRoot`, and an `ethTransaction`. These two pieces of data allow you to confirm that your data is secured in the blockchain.\n\nWe combine all hashes sent to Topaz for a given app during an `interval` timeframe, create a Merkel Tree out of those hashes, compute the root hash (`merkleRoot`), craft an Ethereum transaction using that `merkleRoot` as input data, and broadcast that transaction to be mined into a block, solidifying it's existence into an untamperable data structure.",
+                        "schema": {
+                            "$ref": "#/definitions/proof-output-detailed"
+                        }
+                    }
+                },
+                "tags": [
+                    "proofs"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "description": "This endpoint will return details about a single proof, given the `proofId` passed in as the request parameter."
+            }
+        }
+    },
+    "schemes": [
+        "https"
+    ],
+    "basePath": "/v1",
+    "securityDefinitions": {
+        "API Key": {
+            "type": "apiKey",
+            "in": "header",
+            "name": "Authorization",
+            "description": "Topaz API uses a standard Bearer Token Authorization header for authorization. The header's `key` must be the word `Authorization`, and the `value` may start with `Bearer ` (case insentivie, mind the space, followed by the actual token), but that `Bearer` prefix is not required."
+        }
+    },
+    "definitions": {
+        "app-common": {
+            "title": "App Common",
+            "description": "The properties that are shared amongst all versions of the App model.",
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "interval": {
+                    "type": "integer",
+                    "minimum": 30
+                }
+            },
+            "required": [
+                "name",
+                "interval"
+            ]
+        },
+        "app-input": {
+            "title": "App Input",
+            "description": "The properties that are allowed when creating or updating an App.",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/app-common"
+                },
+                {
+                    "type": "object"
+                }
+            ]
+        },
+        "app-output": {
+            "title": "App Output",
+            "description": "The properties that are included when fetching a list of Apps.",
+            "allOf": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "userId": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "userId"
+                    ]
+                },
+                {
+                    "$ref": "#/definitions/app-common"
+                }
+            ]
+        },
+        "app-output-detailed": {
+            "title": "App Output Detailed",
+            "description": "The properties that are included when fetching a single Object.",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/app-output"
+                }
+            ]
+        },
+        "object-common": {
+            "title": "Object Common",
+            "description": "The properties that are shared amongst all versions of the Object model.",
+            "type": "object",
+            "properties": {}
+        },
+        "object-input": {
+            "title": "Object Input",
+            "description": "The properties that are allowed when creating or updating a Object.",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/object-common"
+                },
+                {
+                    "type": "object",
+                    "properties": {}
+                }
+            ]
+        },
+        "object-output": {
+            "title": "Object Output",
+            "description": "The properties that are included when fetching a list of Objects.",
+            "allOf": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "appId": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "id": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    "required": [
+                        "appId",
+                        "id"
+                    ]
+                },
+                {
+                    "$ref": "#/definitions/object-common"
+                }
+            ]
+        },
+        "object-output-detailed": {
+            "title": "Object Output Detailed",
+            "description": "The properties that are included when fetching a single Object.",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/object-output"
+                },
+                {
+                    "type": "object"
+                }
+            ]
+        },
+        "hash-common": {
+            "title": "Hash Common",
+            "description": "The properties that are shared amongst all versions of the Hash model.",
+            "type": "object",
+            "properties": {
+                "hash": {
+                    "type": "string",
+                    "pattern": "[A-Fa-f0-9]{64}"
+                }
+            },
+            "required": [
+                "hash"
+            ]
+        },
+        "hash-input": {
+            "title": "Hash Input",
+            "description": "The properties that are allowed when creating or updating a Hash.",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/hash-common"
+                },
+                {
+                    "type": "object",
+                    "properties": {}
+                }
+            ]
+        },
+        "hash-output": {
+            "title": "Hash Output",
+            "description": "The properties that are included when fetching a list of Hashes.",
+            "type": "object",
+            "required": [
+                "id",
+                "unixTimestamp",
+                "objectId"
+            ],
+            "$ref": "#/definitions/hash-common",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "format": "uuid"
+                },
+                "unixTimestamp": {
+                    "type": "integer",
+                    "minimum": 1551386546,
+                    "exclusiveMinimum": false
+                },
+                "objectId": {
+                    "type": "string",
+                    "format": "uuid"
+                },
+                "proofId": {
+                    "type": "string",
+                    "format": "uuid"
+                }
+            }
+        },
+        "hash-output-detailed": {
+            "title": "Hash Output Detailed",
+            "description": "The properties that are included when fetching a single Hash.",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/hash-output"
+                },
+                {
+                    "type": "object",
+                    "properties": {}
+                }
+            ]
+        },
+        "proof-common": {
+            "title": "Proof Common",
+            "description": "The properties that are shared amongst all versions of the Proof model.",
+            "type": "object",
+            "properties": {}
+        },
+        "proof-input": {
+            "title": "Proof Input",
+            "description": "The properties that are allowed when creating or updating a Proof.",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/proof-common"
+                },
+                {
+                    "type": "object",
+                    "properties": {}
+                }
+            ]
+        },
+        "proof-output": {
+            "title": "Proof Output",
+            "description": "The properties that are included when fetching a list of Proof.",
+            "allOf": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "merkleRoot": {
+                            "type": "string"
+                        },
+                        "ethTransaction": {
+                            "type": "string"
+                        },
+                        "unixTimestamp": {
+                            "type": "integer"
+                        },
+                        "appId": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "merkleRoot",
+                        "ethTransaction",
+                        "unixTimestamp",
+                        "appId"
+                    ]
+                },
+                {
+                    "$ref": "#/definitions/proof-common"
+                }
+            ]
+        },
+        "proof-output-detailed": {
+            "title": "Proof Output Detailed",
+            "description": "The properties that are included when fetching a single Proof.",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/proof-output"
+                },
+                {
+                    "type": "object"
+                }
+            ]
+        }
+    },
+    "tags": [
+        {
+            "name": "apps"
+        },
+        {
+            "name": "objects"
+        },
+        {
+            "name": "hashes"
+        },
+        {
+            "name": "proofs"
+        }
+    ],
+    "host": "sandbox.topaz.io",
+    "security": [
+        {
+            "API Key": []
+        }
+    ]
+}
