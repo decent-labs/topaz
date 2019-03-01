@@ -14,11 +14,13 @@ func Login(u *models.User) (int, []byte) {
 	suppliedPassword := u.Password
 
 	if err := u.GetUserWithEmail(database.Manager); err != nil {
-		return http.StatusUnauthorized, []byte("")
+		errS, _ := json.Marshal(models.Exception{Message: "bad email or password"})
+		return http.StatusUnauthorized, errS
 	}
 
 	if ok := authentication.InitJWTAuthenticationBackend().Authenticate(suppliedPassword, u.Password); !ok {
-		return http.StatusUnauthorized, []byte("")
+		errS, _ := json.Marshal(models.Exception{Message: "bad email or password"})
+		return http.StatusUnauthorized, errS
 	}
 
 	return RefreshToken(u)
