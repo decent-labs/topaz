@@ -15,18 +15,21 @@ import (
 // UpdatePassword ...
 func UpdatePassword(u *models.User, rp *models.UpdatePassword) (int, []byte) {
 	if len(rp.NewPassword) == 0 {
-		return http.StatusBadRequest, []byte("set the new password")
+		errS, _ := json.Marshal(models.Exception{Message: "set a new password"})
+		return http.StatusBadRequest, errS
 	}
 
 	hp, err := authentication.HashPassword(rp.NewPassword)
 	if err != nil {
-		return http.StatusInternalServerError, []byte("")
+		errS, _ := json.Marshal(models.Exception{Message: "contact Topaz support"})
+		return http.StatusInternalServerError, errS
 	}
 
 	u.Password = hp
 
 	if err := u.UpdateUser(database.Manager); err != nil {
-		return http.StatusInternalServerError, []byte("")
+		errS, _ := json.Marshal(models.Exception{Message: "contact Topaz support"})
+		return http.StatusInternalServerError, errS
 	}
 
 	response, _ := json.Marshal(&u)
@@ -48,7 +51,8 @@ func ResetPasswordGenerateToken(u *models.User) (int, []byte) {
 
 	timeout, err := strconv.Atoi(os.Getenv("PASSWORD_RESET_TIMEOUT"))
 	if err != nil {
-		return http.StatusInternalServerError, []byte("contact topaz tech support")
+		errS, _ := json.Marshal(models.Exception{Message: "contact Topaz support"})
+		return http.StatusInternalServerError, errS
 	}
 
 	token := authentication.NewResetToken(u.ID, time.Duration(timeout)*time.Hour, pwhash, secret)
@@ -64,27 +68,32 @@ func ResetPasswordValidatePassword(rp *models.ResetPassword) (int, []byte) {
 
 	userID, err := authentication.VerifyResetToken(rp.Token, getPasswordHash, secret)
 	if err != nil {
-		return http.StatusBadRequest, []byte("")
+		errS, _ := json.Marshal(models.Exception{Message: "invalid password reset token"})
+		return http.StatusBadRequest, errS
 	}
 
 	if len(rp.NewPassword) == 0 {
-		return http.StatusBadRequest, []byte("set the new password")
+		errS, _ := json.Marshal(models.Exception{Message: "set a new password"})
+		return http.StatusBadRequest, errS
 	}
 
 	hp, err := authentication.HashPassword(rp.NewPassword)
 	if err != nil {
-		return http.StatusInternalServerError, []byte("")
+		errS, _ := json.Marshal(models.Exception{Message: "contact Topaz support"})
+		return http.StatusInternalServerError, errS
 	}
 
 	u := models.User{ID: userID}
 	if err := u.GetUser(database.Manager); err != nil {
-		return http.StatusInternalServerError, []byte("")
+		errS, _ := json.Marshal(models.Exception{Message: "contact Topaz support"})
+		return http.StatusInternalServerError, errS
 	}
 
 	u.Password = hp
 
 	if err := u.UpdateUser(database.Manager); err != nil {
-		return http.StatusInternalServerError, []byte("")
+		errS, _ := json.Marshal(models.Exception{Message: "contact Topaz support"})
+		return http.StatusInternalServerError, errS
 	}
 
 	response, _ := json.Marshal(&u)
