@@ -3,6 +3,7 @@ package services
 import (
 	"encoding/json"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 	"time"
@@ -57,7 +58,16 @@ func ResetPasswordGenerateToken(u *models.User) (int, []byte) {
 
 	token := authentication.NewResetToken(u.ID, time.Duration(timeout)*time.Hour, pwhash, secret)
 
-	go SendPasswordResetEmail(u.Email, token)
+	url, err := url.Parse(os.Getenv("FRONTEND_RESET_PASSWORD_ROUTE"))
+	if err != nil {
+		errS, _ := json.Marshal(models.Exception{Message: "contact Topaz support"})
+		return http.StatusInternalServerError, errS
+	}
+	q := url.Query()
+	q.Set("token", token)
+	url.RawQuery = q.Encode()
+
+	go SendPasswordResetEmail(u.Email, url.String())
 
 	return http.StatusOK, []byte("")
 }
