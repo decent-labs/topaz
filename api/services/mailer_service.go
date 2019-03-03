@@ -47,7 +47,7 @@ func SendWelcomeEmail(to string) {
 }
 
 // SendPasswordResetEmail ...
-func SendPasswordResetEmail(to, token string) {
+func SendPasswordResetEmail(to, tokenURL string) {
 	f := mail.NewEmail(os.Getenv("SENDGRID_FROM_NAME"), os.Getenv("SENDGRID_FROM_EMAIL"))
 	t := mail.NewEmail("", to)
 
@@ -66,7 +66,7 @@ func SendPasswordResetEmail(to, token string) {
 	p.SetDynamicTemplateData("Sender_City", os.Getenv("SENDGRID_SENDER_CITY"))
 	p.SetDynamicTemplateData("Sender_State", os.Getenv("SENDGRID_SENDER_STATE"))
 	p.SetDynamicTemplateData("Sender_Zip", os.Getenv("SENDGRID_SENDER_ZIP"))
-	p.SetDynamicTemplateData("password_reset_token", token)
+	p.SetDynamicTemplateData("password_reset_token", tokenURL)
 
 	client := sendgrid.NewSendClient(os.Getenv("SENDGRID_API_KEY"))
 	response, err := client.Send(email)
