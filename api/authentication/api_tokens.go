@@ -12,7 +12,10 @@ import (
 // APIAuth ...
 func APIAuth(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	// get first "Authorization" header
-	tok := req.Header["Authorization"][0]
+	var tok string
+	if ah := req.Header["Authorization"]; ah != nil {
+		tok = ah[0]
+	}
 
 	// strip "BEARER " off of it
 	if len(tok) > 6 && strings.ToUpper(tok[0:7]) == "BEARER " {
