@@ -6,6 +6,6 @@ ADD . /topaz/
 RUN go get -u github.com/gobuffalo/packr/packr
 
 WORKDIR /topaz/migrations
-RUN packr build -o ../topaz-migrate .
+RUN packr build -mod=vendor -o ../topaz-migrate .
 
 WORKDIR /topaz
