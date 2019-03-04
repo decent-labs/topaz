@@ -4,6 +4,6 @@ RUN mkdir /topaz
 ADD . /topaz/
 
 WORKDIR /topaz/api
-RUN go build -o ../topaz-api .
+RUN go build -mod=vendor -o ../topaz-api .
 
 WORKDIR /topaz
