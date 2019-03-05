@@ -8,6 +8,16 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// HashStub ...
+type HashStub struct {
+	ID      string `json:"id"`
+	HashHex string `json:"hash"`
+	Hash    []byte `json:"-"`
+}
+
+// HashStubs ...
+type HashStubs []HashStub
+
 // Hash ...
 type Hash struct {
 	ID        string     `gorm:"primary_key" json:"id"`
@@ -37,6 +47,18 @@ func (h *Hash) MarshalJSON() ([]byte, error) {
 	}{
 		Alias:   (*Alias)(h),
 		HashHex: crypto.TransformHashToHex(h.Hash),
+	})
+}
+
+// MarshalJSON ...
+func (hs *HashStub) MarshalJSON() ([]byte, error) {
+	type Alias HashStub
+	return json.Marshal(&struct {
+		*Alias
+		HashHex string `json:"hash"`
+	}{
+		Alias:   (*Alias)(hs),
+		HashHex: crypto.TransformHashToHex(hs.Hash),
 	})
 }
 
@@ -73,6 +95,15 @@ func (hs *Hashes) GetHashesByApp(db *gorm.DB, app *App) error {
 		Joins("join apps on apps.id = objects.app_id").
 		Where("apps.id = (?)", app.ID).
 		Where("hashes.proof_id IS NULL").
+		Find(&hs).
+		Error
+}
+
+// GetHashesByProof ...
+func (hs *HashStubs) GetHashesByProof(db *gorm.DB, p *Proof) error {
+	return db.
+		Table("hashes").
+		Where(&Hash{ProofID: &p.ID}).
 		Find(&hs).
 		Error
 }

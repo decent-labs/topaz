@@ -20,7 +20,7 @@ type Proof struct {
 	AppID string `json:"appId"`
 	App   *App   `json:"-"`
 
-	Hashes Hashes `json:"-"`
+	HashStubs HashStubs `json:"hashes,omitempty"`
 }
 
 // Proofs ...
@@ -38,5 +38,15 @@ func (ps *Proofs) GetProofs(p *Proof, db *gorm.DB) error {
 
 // GetProof ...
 func (p *Proof) GetProof(db *gorm.DB) error {
-	return db.Model(&p.App).Related(&p).Error
+	if err := db.Model(&p.App).Related(&p).Error; err != nil {
+		return err
+	}
+
+	hs := HashStubs{}
+	if err := hs.GetHashesByProof(db, p); err != nil {
+		return err
+	}
+
+	p.HashStubs = hs
+	return nil
 }

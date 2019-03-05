@@ -305,18 +305,25 @@
                         "examples": {
                             "application/json": [
                                 {
-                                    "hash": "C41ecD8B3354Ef82BF1308cA1bCDaB0CEd285aeDB17418fad45c1b2AAb4DCd72",
-                                    "id": "4909eea8-ec1c-396c-5d21-3e17c6e686c8",
-                                    "objectId": "e00b10dd-c6ad-7eb3-e44a-16c589d5d401",
-                                    "unixTimestamp": 1551386546,
-                                    "proofId": "5fb9126c-f473-c095-2c4d-3aa05130dde9"
+                                    "hash": "D385cd4aBF18cB633AD6FAa12304D9bA6C4C57ec42DaeDB63e67C0CedfCbFc7D",
+                                    "id": "164ba85d-024e-47d0-33a8-176c3ad5f6b3",
+                                    "objectId": "3b219075-8365-bc98-33d0-d1f128cc6e75",
+                                    "unixTimestamp": 91575573,
+                                    "proofId": "47cfc8de-77cd-deaf-8db7-1ecabc6863c6"
                                 },
                                 {
-                                    "hash": "5bb6AF99cdcbe8dAf60FffCEaD5381d1038EbbF9AAfeA60BD8b8bf442B547Ea9",
-                                    "id": "538c8c95-41ce-d490-6bee-eb1924c39442",
-                                    "objectId": "e00b10dd-c6ad-7eb3-e44a-16c589d5d401",
-                                    "unixTimestamp": 15513853897,
-                                    "proofId": "d43bcea2-afed-bf0f-6bb2-2ada12738ffd"
+                                    "hash": "eB14fADB75c70aD4cBa78E9Bb2faC22CeCD8b6BB8a5Ce8e389a3a737498EECAc",
+                                    "id": "cbbe39e8-f009-5fa2-4845-210dc846f415",
+                                    "objectId": "3b219075-8365-bc98-33d0-d1f128cc6e75",
+                                    "unixTimestamp": 76947557,
+                                    "proofId": "5fb7d70b-934f-0197-a80d-f78795278320"
+                                },
+                                {
+                                    "hash": "aD6DeFe3dBDfcbfbFC93DB215ba49b2fe8bf40fac8CEB6e7a88754821D4d1C8B",
+                                    "id": "1bd39f9d-c1f1-e65f-0103-6be9a74b6c2a",
+                                    "objectId": "3b219075-8365-bc98-33d0-d1f128cc6e75",
+                                    "unixTimestamp": 81325725,
+                                    "proofId": "3be55d00-0c6a-7fa8-3f31-aecf631b3f00"
                                 }
                             ]
                         }
@@ -339,7 +346,13 @@
                         "name": "body",
                         "schema": {
                             "$ref": "#/definitions/hash-input"
-                        }
+                        },
+                        "x-examples": {
+                            "application/json": {
+                                "hash": "17935945caC3Eaf15A5FD81A10FabdF8292CD42778ceaAdefE78B71deaE7bBeD"
+                            }
+                        },
+                        "description": "Pass in a single `hash` string to create a hash"
                     }
                 ],
                 "responses": {
@@ -350,10 +363,10 @@
                         },
                         "examples": {
                             "application/json": {
-                                "hash": "cb602e6DE88C0D2bBefB8EDFe10F9338F316e671c006fB4AAf6dffebD682C4f6",
-                                "id": "809177f0-9db6-667a-3cd4-4512fb42bcf8",
-                                "objectId": "e20cc109-322c-86c5-cc89-0e203c01f42e",
-                                "unixTimestamp": 15513987153,
+                                "hash": "122BDe97cF962b48a2ca0d3eAB1C5ad2D45be61268975E057BB0CfAA2289E7D0",
+                                "id": "bb994339-e393-d33d-aab9-af3c427d15ee",
+                                "objectId": "urn:uuid:f291dba1-6705-66de-77d7-f9b7dd48b7fa",
+                                "unixTimestamp": 30158611,
                                 "proofId": null
                             }
                         }
@@ -441,6 +454,45 @@
                             "items": {
                                 "$ref": "#/definitions/proof-output"
                             }
+                        },
+                        "examples": {
+                            "application/json": [
+                                {
+                                    "id": "02a0719f-e09b-f87f-0c28-22d86449e5c6",
+                                    "merkleRoot": "QmTjapHMBQbRSzunKKT4iJZwHBxkuQG8bQcShJ8xypuscB",
+                                    "ethTransaction": "0x504d5563a12ad9a49ef657d26e97b44ef955cb827843697fbb3001ec28821038",
+                                    "unixTimestamp": 99848909,
+                                    "appId": "a38c6577-4639-faa7-d62d-ec64281ace3e"
+                                },
+                                {
+                                    "id": "a40461b7-e89a-65f0-df72-0a913646fff7",
+                                    "merkleRoot": "QmTuC11Uj8xULk2ieszHyrGhhdwHLyKWM6SxTZLseRwUZm",
+                                    "ethTransaction": "0x68f33a9d8a14bb13c321b6eeb9e1e70710bde5b96e1ce2cd287c776d876b87e2",
+                                    "unixTimestamp": 35635572,
+                                    "appId": "a38c6577-4639-faa7-d62d-ec64281ace3e"
+                                },
+                                {
+                                    "id": "ff9e4af0-d138-13a9-5c9a-6637d3b2ed62",
+                                    "merkleRoot": "Qmd4ApDZVM7r4tbFwx5ZtbzsCbLQoV3wh3eqpXGkJSaRW4",
+                                    "ethTransaction": "0x08b2af84a471d5b0600ffa9998fa49399722a536566ba5d429c31e88a6b4bee8",
+                                    "unixTimestamp": 41471206,
+                                    "appId": "a38c6577-4639-faa7-d62d-ec64281ace3e"
+                                },
+                                {
+                                    "id": "344cca83-a1de-f19a-758f-c3691aaf8068",
+                                    "merkleRoot": "QmQKSk1rzhqQ23SiAy15ueg3G3u9YqGok3cnTwygyA5AVs",
+                                    "ethTransaction": "0xb3c4fd0d48155d99cc5d2bf4eb80ce3d2a35a9c4b6949109a87aa1c4905143f9",
+                                    "unixTimestamp": 27598480,
+                                    "appId": "a38c6577-4639-faa7-d62d-ec64281ace3e"
+                                },
+                                {
+                                    "id": "64769610-161f-7a4c-a5a4-af09a564f86f",
+                                    "merkleRoot": "QmTjapHMBQbRSzunKKT4iJZwHBxkuQG8bQcShJ8xypuscB",
+                                    "ethTransaction": "0xe3cad0f60e731ce504e2a8efa8f09a2945bff60e1293e4d9b13302d3ce8c9355",
+                                    "unixTimestamp": 93372085,
+                                    "appId": "a38c6577-4639-faa7-d62d-ec64281ace3e"
+                                }
+                            ]
                         }
                     }
                 },
@@ -476,6 +528,19 @@
                         "description": "A proof has a `merkleRoot`, and an `ethTransaction`. These two pieces of data allow you to confirm that your data is secured in the blockchain.\n\nWe combine all hashes sent to Topaz for a given app during an `interval` timeframe, create a Merkel Tree out of those hashes, compute the root hash (`merkleRoot`), craft an Ethereum transaction using that `merkleRoot` as input data, and broadcast that transaction to be mined into a block, solidifying it's existence into an untamperable data structure.",
                         "schema": {
                             "$ref": "#/definitions/proof-output-detailed"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "id": "fc13687b-2603-fe2b-3ca8-93aa4881cb7c",
+                                "merkleRoot": "QmfPubEf1HMqfYV7NhPBrz61BSpE6oY7Jwc8ivb2XCTEAw",
+                                "ethTransaction": "0xe3cad0f60e731ce504e2a8efa8f09a2945bff60e1293e4d9b13302d3ce8c9355",
+                                "unixTimestamp": 1551724423,
+                                "appId": "fa7e09db-4c9c-4902-ccd9-4bc906c4bdef",
+                                "hashes": {
+                                    "id": "2136a5a8-db34-1efb-5b02-be65fb1fbb84",
+                                    "hash": "4Eff6Bc64feDa8C36B0C1Aa828cafeB6a0CcEF7c34780b15F6EbDd9db5cb5856"
+                                }
+                            }
                         }
                     }
                 },
@@ -646,40 +711,43 @@
                     "$ref": "#/definitions/hash-common"
                 },
                 {
-                    "type": "object",
-                    "properties": {}
+                    "type": "object"
                 }
             ]
         },
         "hash-output": {
             "title": "Hash Output",
             "description": "The properties that are included when fetching a list of Hashes.",
-            "type": "object",
-            "required": [
-                "id",
-                "unixTimestamp",
-                "objectId"
-            ],
-            "$ref": "#/definitions/hash-common",
-            "properties": {
-                "id": {
-                    "type": "string",
-                    "format": "uuid"
+            "allOf": [
+                {
+                    "$ref": "#/definitions/hash-common"
                 },
-                "unixTimestamp": {
-                    "type": "integer",
-                    "minimum": 1551386546,
-                    "exclusiveMinimum": false
-                },
-                "objectId": {
-                    "type": "string",
-                    "format": "uuid"
-                },
-                "proofId": {
-                    "type": "string",
-                    "format": "uuid"
+                {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "unixTimestamp": {
+                            "type": "integer"
+                        },
+                        "objectId": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "proofId": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "unixTimestamp",
+                        "objectId"
+                    ]
                 }
-            }
+            ]
         },
         "hash-output-detailed": {
             "title": "Hash Output Detailed",
@@ -689,8 +757,7 @@
                     "$ref": "#/definitions/hash-output"
                 },
                 {
-                    "type": "object",
-                    "properties": {}
+                    "type": "object"
                 }
             ]
         },
@@ -759,7 +826,26 @@
                     "$ref": "#/definitions/proof-output"
                 },
                 {
-                    "type": "object"
+                    "type": "object",
+                    "properties": {
+                        "hashes": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                },
+                                "hash": {
+                                    "type": "string",
+                                    "pattern": "[A-Fa-f0-9]{64}"
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "hash"
+                            ]
+                        }
+                    }
                 }
             ]
         }
