@@ -6,7 +6,7 @@ GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
 
 build:
-	$(GOBUILD) -mod=vendor -o ../$(BUILDDIR)/$(BINNAME) -v
+	$(GOBUILD) -o ../$(BUILDDIR)/$(BINNAME) -v
 
 clean:
 	$(GOCLEAN)

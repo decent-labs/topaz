@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/decentorganization/topaz/shared/models"
@@ -20,12 +19,6 @@ func SendWelcomeEmail(to string) {
 
 	email := mail.NewV3MailInit(f, "", t)
 	email.SetTemplateID(os.Getenv("SENDGRID_WELCOME_EMAIL_ID"))
-
-	asm := mail.NewASM()
-	asmID, _ := strconv.Atoi(os.Getenv("SENDGRID_ACCOUNT_ASM"))
-	asm.SetGroupID(asmID)
-	asm.AddGroupsToDisplay(asmID)
-	email.SetASM(asm)
 
 	p := email.Personalizations[0]
 	p.SetDynamicTemplateData("Sender_Name", os.Getenv("SENDGRID_SENDER_NAME"))
@@ -53,12 +46,6 @@ func SendPasswordResetEmail(to, tokenURL string) {
 
 	email := mail.NewV3MailInit(f, "", t)
 	email.SetTemplateID(os.Getenv("SENDGRID_PASSWORD_RESET_ID"))
-
-	asm := mail.NewASM()
-	asmID, _ := strconv.Atoi(os.Getenv("SENDGRID_ACCOUNT_ASM"))
-	asm.SetGroupID(asmID)
-	asm.AddGroupsToDisplay(asmID)
-	email.SetASM(asm)
 
 	p := email.Personalizations[0]
 	p.SetDynamicTemplateData("Sender_Name", os.Getenv("SENDGRID_SENDER_NAME"))

@@ -4,6 +4,6 @@ RUN mkdir /topaz
 ADD . /topaz/
 
 WORKDIR /topaz/batch
-RUN go build -mod=vendor -o ../topaz-batch .
+RUN go build -o ../topaz-batch .
 
 WORKDIR /topaz
