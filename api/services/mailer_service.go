@@ -54,6 +54,7 @@ func SendPasswordResetEmail(to, tokenURL string) {
 	p.SetDynamicTemplateData("Sender_State", os.Getenv("SENDGRID_SENDER_STATE"))
 	p.SetDynamicTemplateData("Sender_Zip", os.Getenv("SENDGRID_SENDER_ZIP"))
 	p.SetDynamicTemplateData("password_reset_token", tokenURL)
+	p.SetDynamicTemplateData("user_email", to)
 
 	client := sendgrid.NewSendClient(os.Getenv("SENDGRID_API_KEY"))
 	response, err := client.Send(email)
