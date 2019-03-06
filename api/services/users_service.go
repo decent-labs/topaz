@@ -41,8 +41,9 @@ func CreateUser(ru *models.User) (int, []byte) {
 	var mes models.SendgridEmails
 	mes = append(mes, sg)
 
-	go CreateNewEmailOnList(&mes, os.Getenv("SENDGRID_API_USERS_LIST"))
 	go SendWelcomeEmail(u.Email)
+	go CreateNewEmailOnList(&mes, os.Getenv("SENDGRID_API_USERS_LIST"))
+	go CreateNewEmailOnList(&mes, os.Getenv("SENDGRID_MARKETING_UPDATES_LIST"))
 
 	response, _ := json.Marshal(&u)
 	return http.StatusCreated, response
