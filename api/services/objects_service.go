@@ -56,7 +56,7 @@ func GetObject(u *models.User, aid string, oid string) (int, []byte) {
 	}
 
 	o.ID = oid
-	if err := o.GetObject(database.Manager); err != nil {
+	if err := o.GetObjectWithHashStubs(database.Manager); err != nil {
 		return http.StatusUnauthorized, []byte("")
 	}
 

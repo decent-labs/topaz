@@ -36,7 +36,7 @@ func (a *APIToken) CreateAPIToken(db *gorm.DB) error {
 
 // GetAPITokens ...
 func (as *APITokens) GetAPITokens(a *APIToken, db *gorm.DB) error {
-	return db.Model(&a.User).Related(&as).Error
+	return db.Model(&a.User).Order("created_at").Related(&as).Error
 }
 
 // GetAPIToken ...

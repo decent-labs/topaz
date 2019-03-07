@@ -10,7 +10,11 @@ import (
 
 // HashStub ...
 type HashStub struct {
-	ID      string `json:"id"`
+	ID        string     `gorm:"primary_key" json:"id"`
+	CreatedAt time.Time  `json:"-"`
+	UpdatedAt time.Time  `json:"-"`
+	DeletedAt *time.Time `sql:"index" json:"-"`
+
 	HashHex string `json:"hash"`
 	Hash    []byte `json:"-"`
 }
@@ -69,7 +73,7 @@ func (h *Hash) CreateHash(db *gorm.DB) error {
 
 // GetHashes ...
 func (hs *Hashes) GetHashes(h *Hash, db *gorm.DB) error {
-	return db.Model(&h.Object).Related(&hs).Error
+	return db.Model(&h.Object).Order("created_at").Related(&hs).Error
 }
 
 // GetHash ...
@@ -95,6 +99,7 @@ func (hs *Hashes) GetHashesByApp(db *gorm.DB, app *App) error {
 		Joins("join apps on apps.id = objects.app_id").
 		Where("apps.id = (?)", app.ID).
 		Where("hashes.proof_id IS NULL").
+		Order("hashes.created_at").
 		Find(&hs).
 		Error
 }
@@ -104,6 +109,7 @@ func (hs *HashStubs) GetHashesByProof(db *gorm.DB, p *Proof) error {
 	return db.
 		Table("hashes").
 		Where(&Hash{ProofID: &p.ID}).
+		Order("created_at").
 		Find(&hs).
 		Error
 }
@@ -113,6 +119,7 @@ func (hs *HashStubs) GetHashesByObject(db *gorm.DB, o *Object) error {
 	return db.
 		Table("hashes").
 		Where(&Hash{ObjectID: &o.ID}).
+		Order("created_at").
 		Find(&hs).
 		Error
 }
