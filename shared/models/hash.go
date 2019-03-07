@@ -108,6 +108,15 @@ func (hs *HashStubs) GetHashesByProof(db *gorm.DB, p *Proof) error {
 		Error
 }
 
+// GetHashesByObject ...
+func (hs *HashStubs) GetHashesByObject(db *gorm.DB, o *Object) error {
+	return db.
+		Table("hashes").
+		Where(&Hash{ObjectID: &o.ID}).
+		Find(&hs).
+		Error
+}
+
 // UpdateWithProof ...
 func (hs Hashes) UpdateWithProof(db *gorm.DB, proofID *string) error {
 	ids := make([]string, len(hs))

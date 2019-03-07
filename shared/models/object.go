@@ -16,7 +16,7 @@ type Object struct {
 	AppID string `json:"appId"`
 	App   *App   `json:"-"`
 
-	Hashes Hashes `json:"-"`
+	HashStubs HashStubs `json:"hashes,omitempty"`
 }
 
 // Objects ...
@@ -34,5 +34,15 @@ func (os *Objects) GetObjects(o *Object, db *gorm.DB) error {
 
 // GetObject ...
 func (o *Object) GetObject(db *gorm.DB) error {
-	return db.Model(&o.App).Related(&o).Error
+	if err := db.Model(&o.App).Related(&o).Error; err != nil {
+		return err
+	}
+
+	hs := HashStubs{}
+	if err := hs.GetHashesByObject(db, o); err != nil {
+		return err
+	}
+
+	o.HashStubs = hs
+	return nil
 }
