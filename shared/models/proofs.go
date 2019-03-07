@@ -36,8 +36,8 @@ func (ps *Proofs) GetProofs(p *Proof, db *gorm.DB) error {
 	return db.Model(&p.App).Related(&ps).Error
 }
 
-// GetProof ...
-func (p *Proof) GetProof(db *gorm.DB) error {
+// GetProofWithHashStubs ...
+func (p *Proof) GetProofWithHashStubs(db *gorm.DB) error {
 	if err := db.Model(&p.App).Related(&p).Error; err != nil {
 		return err
 	}
