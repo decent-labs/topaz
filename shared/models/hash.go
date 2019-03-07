@@ -10,7 +10,11 @@ import (
 
 // HashStub ...
 type HashStub struct {
-	ID      string `json:"id"`
+	ID        string     `gorm:"primary_key" json:"id"`
+	CreatedAt time.Time  `json:"-"`
+	UpdatedAt time.Time  `json:"-"`
+	DeletedAt *time.Time `sql:"index" json:"-"`
+
 	HashHex string `json:"hash"`
 	Hash    []byte `json:"-"`
 }
