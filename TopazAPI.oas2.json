@@ -261,7 +261,17 @@
                         "examples": {
                             "application/json": {
                                 "appId": "1cab655b-a515-36d9-1cae-d123001c0f4b",
-                                "id": "5ac153a3-4e44-2952-e7a8-6ab7434283af"
+                                "id": "5ac153a3-4e44-2952-e7a8-6ab7434283af",
+                                "hashes": [
+                                    {
+                                        "id": "350e995-f7a6-384d-293b-53fad81c3d28",
+                                        "hash": "4fbB5Dc98cd75Ee35Bc85CA6FfAA337AeFCb4d37Ab9f1249eAfe0b49eACc4685"
+                                    },
+                                    {
+                                        "id": "147e6e96-c8ea-22f5-1db5-666140129830",
+                                        "hash": "5c8CB9ffDdC0AD09ED1B3a7c7bDB80BC2BEC26aa2aBb23b08c3F70FC3A1dD153"
+                                    }
+                                ]
                             }
                         }
                     }
@@ -685,7 +695,7 @@
                     "$ref": "#/definitions/object-output"
                 },
                 {
-                    "type": "object"
+                    "$ref": "#/definitions/hash-stub-output"
                 }
             ]
         },
@@ -826,28 +836,36 @@
                     "$ref": "#/definitions/proof-output"
                 },
                 {
-                    "type": "object",
-                    "properties": {
-                        "hashes": {
-                            "type": "object",
-                            "properties": {
-                                "id": {
-                                    "type": "string",
-                                    "format": "uuid"
-                                },
-                                "hash": {
-                                    "type": "string",
-                                    "pattern": "[A-Fa-f0-9]{64}"
-                                }
-                            },
-                            "required": [
-                                "id",
-                                "hash"
-                            ]
-                        }
-                    }
+                    "$ref": "#/definitions/hash-stub-output"
                 }
             ]
+        },
+        "hash-stub-output": {
+            "type": "object",
+            "title": "Hash Stub Output",
+            "description": "Hash stub consisting of ID and Hash value",
+            "properties": {
+                "hashes": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            "hash": {
+                                "type": "string",
+                                "pattern": "[A-Fa-f0-9]{64}"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "hash"
+                        ]
+                    }
+                }
+            }
         }
     },
     "tags": [
