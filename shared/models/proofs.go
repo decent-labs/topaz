@@ -33,7 +33,7 @@ func (p *Proof) CreateProof(db *gorm.DB) error {
 
 // GetProofs ...
 func (ps *Proofs) GetProofs(p *Proof, db *gorm.DB) error {
-	return db.Model(&p.App).Related(&ps).Error
+	return db.Model(&p.App).Order("created_at").Related(&ps).Error
 }
 
 // GetProofWithHashStubs ...

@@ -33,7 +33,7 @@ func (a *App) CreateApp(db *gorm.DB) error {
 
 // GetApps ...
 func (as *Apps) GetApps(a *App, db *gorm.DB) error {
-	return db.Model(&a.User).Related(&as).Error
+	return db.Model(&a.User).Order("created_at").Related(&as).Error
 }
 
 // GetApp ...

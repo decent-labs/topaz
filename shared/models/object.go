@@ -29,7 +29,7 @@ func (o *Object) CreateObject(db *gorm.DB) error {
 
 // GetObjects ...
 func (os *Objects) GetObjects(o *Object, db *gorm.DB) error {
-	return db.Model(&o.App).Related(&os).Error
+	return db.Model(&o.App).Order("created_at").Related(&os).Error
 }
 
 // GetObject ...
