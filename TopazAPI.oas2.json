@@ -515,7 +515,7 @@
                 ]
             }
         },
-        "/apps/{appId}/proofs/{proofsId}": {
+        "/apps/{appId}/proofs/{proofId}": {
             "parameters": [
                 {
                     "name": "appId",
@@ -524,7 +524,7 @@
                     "required": true
                 },
                 {
-                    "name": "proofsId",
+                    "name": "proofId",
                     "in": "path",
                     "type": "string",
                     "required": true
