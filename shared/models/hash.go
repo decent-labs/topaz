@@ -6,6 +6,7 @@ import (
 
 	"github.com/decentorganization/topaz/api/crypto"
 	"github.com/jinzhu/gorm"
+	multihash "github.com/multiformats/go-multihash"
 )
 
 // HashStub ...
@@ -15,8 +16,8 @@ type HashStub struct {
 	UpdatedAt time.Time  `json:"-"`
 	DeletedAt *time.Time `sql:"index" json:"-"`
 
-	HashHex string `json:"hash"`
-	Hash    []byte `json:"-"`
+	HashString string `json:"hash" gorm:"-"`
+	MultiHash  []byte `json:"-" gorm:"column:hash"`
 }
 
 // HashStubs ...
@@ -29,8 +30,8 @@ type Hash struct {
 	UpdatedAt time.Time  `json:"-"`
 	DeletedAt *time.Time `sql:"index" json:"-"`
 
-	HashHex       string `json:"hash" gorm:"-"`
-	Hash          []byte `json:"-"`
+	HashString    string `json:"hash" gorm:"-"`
+	MultiHash     []byte `json:"-" gorm:"column:hash"`
 	UnixTimestamp int64  `json:"unixTimestamp"`
 
 	ObjectID *string `json:"objectId"`
@@ -47,10 +48,10 @@ func (h *Hash) MarshalJSON() ([]byte, error) {
 	type Alias Hash
 	return json.Marshal(&struct {
 		*Alias
-		HashHex string `json:"hash"`
+		HashString string `json:"hash"`
 	}{
-		Alias:   (*Alias)(h),
-		HashHex: crypto.TransformHashToHex(h.Hash),
+		Alias:      (*Alias)(h),
+		HashString: HashBytesToString(h.MultiHash),
 	})
 }
 
@@ -59,11 +60,17 @@ func (hs *HashStub) MarshalJSON() ([]byte, error) {
 	type Alias HashStub
 	return json.Marshal(&struct {
 		*Alias
-		HashHex string `json:"hash"`
+		HashString string `json:"hash"`
 	}{
-		Alias:   (*Alias)(hs),
-		HashHex: crypto.TransformHashToHex(hs.Hash),
+		Alias:      (*Alias)(hs),
+		HashString: HashBytesToString(hs.MultiHash),
 	})
+}
+
+// HashBytesToString ...
+func HashBytesToString(hash []byte) string {
+	var mh multihash.Multihash = hash
+	return mh.B58String()
 }
 
 // CreateHash ...
@@ -85,7 +92,7 @@ func (h *Hash) GetHash(db *gorm.DB) error {
 func (hs *Hashes) MakeMerkleLeafs() crypto.MerkleLeafs {
 	var ms crypto.MerkleLeafs
 	for _, h := range *hs {
-		m := crypto.MerkleLeaf{Hash: h.Hash}
+		m := crypto.MerkleLeaf{Hash: h.MultiHash}
 		ms = append(ms, m)
 	}
 	return ms

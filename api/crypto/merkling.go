@@ -4,6 +4,7 @@ import (
 	"bytes"
 
 	"github.com/cbergoon/merkletree"
+	multihash "github.com/multiformats/go-multihash"
 )
 
 // MerkleLeaf ...
@@ -37,5 +38,17 @@ func (ms *MerkleLeafs) GetMerkleRoot() (string, error) {
 	}
 
 	b := t.MerkleRoot()
-	return GetReadableHash(b)
+
+	// merkle tree library returns SHA256 hashes
+	mhBuf, err := multihash.Encode(b, multihash.SHA2_256)
+	if err != nil {
+		return "", err
+	}
+
+	mh, err := multihash.Cast(mhBuf)
+	if err != nil {
+		return "", err
+	}
+
+	return mh.B58String(), nil
 }

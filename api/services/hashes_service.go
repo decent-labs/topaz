@@ -1,7 +1,6 @@
 package services
 
 import (
-	"encoding/hex"
 	"encoding/json"
 	"net/http"
 	"time"
@@ -9,6 +8,7 @@ import (
 	"github.com/decentorganization/topaz/api/authorization"
 	"github.com/decentorganization/topaz/shared/database"
 	"github.com/decentorganization/topaz/shared/models"
+	multihash "github.com/multiformats/go-multihash"
 )
 
 // CreateHash ...
@@ -18,16 +18,13 @@ func CreateHash(u *models.User, aid string, oid string, rh *models.Hash) (int, [
 		return http.StatusUnauthorized, []byte("")
 	}
 
-	hb, err := hex.DecodeString(rh.HashHex)
+	mh, err := multihash.FromB58String(rh.HashString)
 	if err != nil {
-		return http.StatusBadRequest, []byte("cannot decode hex hash")
+		errS, _ := json.Marshal(models.Exception{Message: "cannot decode the expected b58 encoded multihash"})
+		return http.StatusBadRequest, errS
 	}
 
-	if len(hb) != 32 {
-		return http.StatusBadRequest, []byte("invalid hash length")
-	}
-
-	h.Hash = hb
+	h.MultiHash = mh
 	h.UnixTimestamp = time.Now().Unix()
 
 	if err := h.CreateHash(database.Manager); err != nil {
