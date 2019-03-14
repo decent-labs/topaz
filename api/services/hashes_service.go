@@ -23,10 +23,6 @@ func CreateHash(u *models.User, aid string, oid string, rh *models.Hash) (int, [
 		return http.StatusBadRequest, []byte("cannot decode hex hash")
 	}
 
-	if len(hb) != 32 {
-		return http.StatusBadRequest, []byte("invalid hash length")
-	}
-
 	h.Hash = hb
 	h.UnixTimestamp = time.Now().Unix()
 
