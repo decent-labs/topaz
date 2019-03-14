@@ -265,11 +265,11 @@
                                 "hashes": [
                                     {
                                         "id": "350e995-f7a6-384d-293b-53fad81c3d28",
-                                        "hash": "4fbB5Dc98cd75Ee35Bc85CA6FfAA337AeFCb4d37Ab9f1249eAfe0b49eACc4685"
+                                        "hash": "QmaGMCsGjAEyLmqAbRkP2vhvv9tASdLgww9scrWo82ZJhe"
                                     },
                                     {
                                         "id": "147e6e96-c8ea-22f5-1db5-666140129830",
-                                        "hash": "5c8CB9ffDdC0AD09ED1B3a7c7bDB80BC2BEC26aa2aBb23b08c3F70FC3A1dD153"
+                                        "hash": "8tUmWPcU5LA1ruUiu7KbWTNdbxV8VCyxPtpvcdixTNbkw4EW7d89aMJE2kGq3H1JBf4LTtjZhrNxS7LXE7wCzRfhZo"
                                     }
                                 ]
                             }
@@ -315,25 +315,25 @@
                         "examples": {
                             "application/json": [
                                 {
-                                    "hash": "D385cd4aBF18cB633AD6FAa12304D9bA6C4C57ec42DaeDB63e67C0CedfCbFc7D",
                                     "id": "164ba85d-024e-47d0-33a8-176c3ad5f6b3",
                                     "objectId": "3b219075-8365-bc98-33d0-d1f128cc6e75",
                                     "unixTimestamp": 91575573,
-                                    "proofId": "47cfc8de-77cd-deaf-8db7-1ecabc6863c6"
+                                    "proofId": "47cfc8de-77cd-deaf-8db7-1ecabc6863c6",
+                                    "hash": "8tYpC8u53XBNMJ8544s5KZixH7BAsu5ZxBdgQ6thWw5bc2ADpfjBFn7g92Q9enUMQ4zVhHvjeLqeTp81vTmo2M4ZGp"
                                 },
                                 {
-                                    "hash": "eB14fADB75c70aD4cBa78E9Bb2faC22CeCD8b6BB8a5Ce8e389a3a737498EECAc",
                                     "id": "cbbe39e8-f009-5fa2-4845-210dc846f415",
                                     "objectId": "3b219075-8365-bc98-33d0-d1f128cc6e75",
                                     "unixTimestamp": 76947557,
-                                    "proofId": "5fb7d70b-934f-0197-a80d-f78795278320"
+                                    "proofId": "5fb7d70b-934f-0197-a80d-f78795278320",
+                                    "hash": "QmddB8YCzmSGMTocvj9v32xfqEtBdzRrRrWwLuHCBjT4od"
                                 },
                                 {
-                                    "hash": "aD6DeFe3dBDfcbfbFC93DB215ba49b2fe8bf40fac8CEB6e7a88754821D4d1C8B",
                                     "id": "1bd39f9d-c1f1-e65f-0103-6be9a74b6c2a",
                                     "objectId": "3b219075-8365-bc98-33d0-d1f128cc6e75",
                                     "unixTimestamp": 81325725,
-                                    "proofId": "3be55d00-0c6a-7fa8-3f31-aecf631b3f00"
+                                    "proofId": "3be55d00-0c6a-7fa8-3f31-aecf631b3f00",
+                                    "hash": "Qmav1RrpUjkSpmd16SKfjCPKyWHnhvYMs3YBokFFAfS7qm"
                                 }
                             ]
                         }
@@ -345,7 +345,7 @@
                 "produces": [
                     "application/json"
                 ],
-                "description": "This endpoint will return all `hashes` which have been associated with an `object`"
+                "description": "This endpoint will return all `hashes`, in Multihash format, which have been associated with an `object`"
             },
             "post": {
                 "summary": "Create Hash",
@@ -359,10 +359,10 @@
                         },
                         "x-examples": {
                             "application/json": {
-                                "hash": "17935945caC3Eaf15A5FD81A10FabdF8292CD42778ceaAdefE78B71deaE7bBeD"
+                                "hash": "QmNYBynD1MRbsvsjYWeCzUsY4CKAFuZUH5BqDHbV7s7QdP"
                             }
                         },
-                        "description": "Pass in a single `hash` string to create a hash"
+                        "description": "Pass in a single `hash` string, in Base58 encoded Multihash format, to create a hash"
                     }
                 ],
                 "responses": {
@@ -373,11 +373,11 @@
                         },
                         "examples": {
                             "application/json": {
-                                "hash": "122BDe97cF962b48a2ca0d3eAB1C5ad2D45be61268975E057BB0CfAA2289E7D0",
                                 "id": "bb994339-e393-d33d-aab9-af3c427d15ee",
-                                "objectId": "urn:uuid:f291dba1-6705-66de-77d7-f9b7dd48b7fa",
+                                "objectId": "f291dba1-6705-66de-77d7-f9b7dd48b7fa",
                                 "unixTimestamp": 30158611,
-                                "proofId": null
+                                "proofId": null,
+                                "hash": "QmaozNR7DZHQK1ZcU9p7QdrshMvXqWK6gpu5rmrkPdT3L4"
                             }
                         }
                     }
@@ -385,7 +385,7 @@
                 "tags": [
                     "hashes"
                 ],
-                "description": "This endpoint inputs a json object in it's body which defines a `hash` property. This `hash` should be a hex-encoded SHA256 hash.\n",
+                "description": "This endpoint inputs a json object in it's body which defines a `hash` property. This `hash` should be a Base58 encoded hash in Multihash format.\n\nPlease see https://github.com/multiformats/multihash for more information regarding the Multihash format. To generate Multihashes, first make sure Golang is installed and configured on your machine (https://golang.org/doc/install), then:\n\n```\n$ go get github.com/multiformats/go-multihash/multihash\n$ echo -n \"hello world\" | multihash -a sha2-256\nQmaozNR7DZHQK1ZcU9p7QdrshMvXqWK6gpu5rmrkPdT3L4\n```",
                 "consumes": [
                     "application/json"
                 ],
@@ -426,11 +426,11 @@
                         },
                         "examples": {
                             "application/json": {
-                                "hash": "bDED3C0be8CE5a0FC8CFbFE4b3538dBcd8F5BC323A26CBedeaD4Dc8B4fAF2385",
                                 "id": "11d7c71c-10ba-d867-ba9f-da257cf2d5b8",
                                 "objectId": "48f2774d-4ce5-976c-c88f-b444999b7368",
                                 "unixTimestamp": 1550610197,
-                                "proofId": "a02350b3-46c5-25ad-7640-8d1540a9f6bd"
+                                "proofId": "a02350b3-46c5-25ad-7640-8d1540a9f6bd",
+                                "hash": "QmfK3n3jknJhRRXJNJdK2sJ2fpXarHXsXt1tuNYe12oDvW"
                             }
                         }
                     }
@@ -548,7 +548,7 @@
                                 "appId": "fa7e09db-4c9c-4902-ccd9-4bc906c4bdef",
                                 "hashes": {
                                     "id": "2136a5a8-db34-1efb-5b02-be65fb1fbb84",
-                                    "hash": "4Eff6Bc64feDa8C36B0C1Aa828cafeB6a0CcEF7c34780b15F6EbDd9db5cb5856"
+                                    "hash": "QmSahRgkxLfRs25i1Arjv2Zx1LWME99GedsFbdUVF5FJ3A"
                                 }
                             }
                         }
@@ -705,8 +705,7 @@
             "type": "object",
             "properties": {
                 "hash": {
-                    "type": "string",
-                    "pattern": "[A-Fa-f0-9]{64}"
+                    "type": "string"
                 }
             },
             "required": [
@@ -855,8 +854,7 @@
                                 "format": "uuid"
                             },
                             "hash": {
-                                "type": "string",
-                                "pattern": "[A-Fa-f0-9]{64}"
+                                "type": "string"
                             }
                         },
                         "required": [
