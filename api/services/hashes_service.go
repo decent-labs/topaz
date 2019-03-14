@@ -18,13 +18,13 @@ func CreateHash(u *models.User, aid string, oid string, rh *models.Hash) (int, [
 		return http.StatusUnauthorized, []byte("")
 	}
 
-	mh, err := multihash.FromB58String(rh.HashHex)
+	mh, err := multihash.FromB58String(rh.HashString)
 	if err != nil {
 		errS, _ := json.Marshal(models.Exception{Message: "cannot decode the expected b58 encoded multihash"})
 		return http.StatusBadRequest, errS
 	}
 
-	h.Hash = mh
+	h.MultiHash = mh
 	h.UnixTimestamp = time.Now().Unix()
 
 	if err := h.CreateHash(database.Manager); err != nil {

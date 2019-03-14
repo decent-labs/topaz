@@ -16,8 +16,8 @@ type HashStub struct {
 	UpdatedAt time.Time  `json:"-"`
 	DeletedAt *time.Time `sql:"index" json:"-"`
 
-	HashHex string `json:"hash"`
-	Hash    []byte `json:"-"`
+	HashString string `json:"hash" gorm:"-"`
+	MultiHash  []byte `json:"-" gorm:"column:hash"`
 }
 
 // HashStubs ...
@@ -30,8 +30,8 @@ type Hash struct {
 	UpdatedAt time.Time  `json:"-"`
 	DeletedAt *time.Time `sql:"index" json:"-"`
 
-	HashHex       string `json:"hash" gorm:"-"`
-	Hash          []byte `json:"-"`
+	HashString    string `json:"hash" gorm:"-"`
+	MultiHash     []byte `json:"-" gorm:"column:hash"`
 	UnixTimestamp int64  `json:"unixTimestamp"`
 
 	ObjectID *string `json:"objectId"`
@@ -48,10 +48,10 @@ func (h *Hash) MarshalJSON() ([]byte, error) {
 	type Alias Hash
 	return json.Marshal(&struct {
 		*Alias
-		HashHex string `json:"hash"`
+		HashString string `json:"hash"`
 	}{
-		Alias:   (*Alias)(h),
-		HashHex: HashBytesToString(h.Hash),
+		Alias:      (*Alias)(h),
+		HashString: HashBytesToString(h.MultiHash),
 	})
 }
 
@@ -60,10 +60,10 @@ func (hs *HashStub) MarshalJSON() ([]byte, error) {
 	type Alias HashStub
 	return json.Marshal(&struct {
 		*Alias
-		HashHex string `json:"hash"`
+		HashString string `json:"hash"`
 	}{
-		Alias:   (*Alias)(hs),
-		HashHex: HashBytesToString(hs.Hash),
+		Alias:      (*Alias)(hs),
+		HashString: HashBytesToString(hs.MultiHash),
 	})
 }
 
@@ -92,7 +92,7 @@ func (h *Hash) GetHash(db *gorm.DB) error {
 func (hs *Hashes) MakeMerkleLeafs() crypto.MerkleLeafs {
 	var ms crypto.MerkleLeafs
 	for _, h := range *hs {
-		m := crypto.MerkleLeaf{Hash: h.Hash}
+		m := crypto.MerkleLeaf{Hash: h.MultiHash}
 		ms = append(ms, m)
 	}
 	return ms
