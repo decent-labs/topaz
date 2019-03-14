@@ -6,6 +6,7 @@ import (
 
 	"github.com/decentorganization/topaz/api/crypto"
 	"github.com/jinzhu/gorm"
+	multihash "github.com/multiformats/go-multihash"
 )
 
 // HashStub ...
@@ -50,7 +51,7 @@ func (h *Hash) MarshalJSON() ([]byte, error) {
 		HashHex string `json:"hash"`
 	}{
 		Alias:   (*Alias)(h),
-		HashHex: crypto.TransformHashToHex(h.Hash),
+		HashHex: HashBytesToString(h.Hash),
 	})
 }
 
@@ -62,8 +63,14 @@ func (hs *HashStub) MarshalJSON() ([]byte, error) {
 		HashHex string `json:"hash"`
 	}{
 		Alias:   (*Alias)(hs),
-		HashHex: crypto.TransformHashToHex(hs.Hash),
+		HashHex: HashBytesToString(hs.Hash),
 	})
+}
+
+// HashBytesToString ...
+func HashBytesToString(hash []byte) string {
+	var mh multihash.Multihash = hash
+	return mh.B58String()
 }
 
 // CreateHash ...
