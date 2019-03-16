@@ -26,7 +26,7 @@ func (m MerkleLeaf) Equals(other merkletree.Content) (bool, error) {
 }
 
 // GetMerkleRoot ...
-func (ms *MerkleLeafs) GetMerkleRoot() (string, error) {
+func (ms *MerkleLeafs) GetMerkleRoot() ([]byte, error) {
 	var list []merkletree.Content
 	for _, obj := range *ms {
 		list = append(list, obj)
@@ -34,21 +34,16 @@ func (ms *MerkleLeafs) GetMerkleRoot() (string, error) {
 
 	t, err := merkletree.NewTree(list)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	b := t.MerkleRoot()
 
 	// merkle tree library returns SHA256 hashes
-	mhBuf, err := multihash.Encode(b, multihash.SHA2_256)
+	mh, err := multihash.Encode(b, multihash.SHA2_256)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	mh, err := multihash.Cast(mhBuf)
-	if err != nil {
-		return "", err
-	}
-
-	return mh.B58String(), nil
+	return mh, nil
 }
