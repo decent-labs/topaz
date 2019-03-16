@@ -14,8 +14,7 @@ type rootContent struct {
 }
 
 type ethereumContent struct {
-	EthereumNode     string `json:"node"`
-	EthereumContract string `json:"contract"`
+	EthereumNode string `json:"node"`
 }
 
 // GenerateRootContent ...
@@ -24,8 +23,7 @@ func GenerateRootContent() {
 		Version:     version,
 		Environment: os.Getenv("GO_ENV"),
 		EthereumContent: ethereumContent{
-			EthereumNode:     os.Getenv("GETH_HOST"),
-			EthereumContract: os.Getenv("ETH_CONTRACT_ADDRESS"),
+			EthereumNode: os.Getenv("GETH_HOST"),
 		},
 	}
 }
