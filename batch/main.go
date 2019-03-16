@@ -9,6 +9,7 @@ import (
 	"github.com/decentorganization/topaz/shared/database"
 	"github.com/decentorganization/topaz/shared/ethereum"
 	"github.com/decentorganization/topaz/shared/models"
+	multihash "github.com/multiformats/go-multihash"
 )
 
 func mainLoop() {
@@ -36,13 +37,7 @@ func mainLoop() {
 			continue
 		}
 
-		addr := os.Getenv("ETH_CONTRACT_ADDRESS")
-		if addr == "" {
-			fmt.Println("Ethereum contract address not set")
-			continue
-		}
-
-		tx, err := ethereum.Store(addr, root)
+		tx, err := ethereum.Store(root)
 		if err != nil {
 			fmt.Println("Had trouble storing hash in Ethereum transation:", err.Error())
 			continue
@@ -51,9 +46,12 @@ func mainLoop() {
 		ut := time.Now().Unix()
 		a.LastProofed = &ut
 
+		var rootMultihash multihash.Multihash = root
+		rootString := rootMultihash.B58String()
+
 		p := models.Proof{
 			App:            &a,
-			MerkleRoot:     root,
+			MerkleRoot:     rootString,
 			EthTransaction: tx,
 			UnixTimestamp:  ut,
 		}
