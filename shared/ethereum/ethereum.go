@@ -1,59 +1,78 @@
 package ethereum
 
 import (
+	"context"
+	"crypto/ecdsa"
 	"fmt"
 	"log"
+	"math/big"
 	"os"
+	"strconv"
 
-	"github.com/decentorganization/topaz/shared/ethereum/contracts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/joho/godotenv"
-	multihash "github.com/multiformats/go-multihash"
 )
 
-var auth *bind.TransactOpts
-var blockchain *ethclient.Client
+var from common.Address
+var client *ethclient.Client
+var privateKey *ecdsa.PrivateKey
 
-// Store takes a Capture Contract address and a hash to store on it
-func Store(address, hash string) (string, error) {
-	m, err := multihash.FromB58String(hash)
+// Store takes a hash and puts it in a transaction
+func Store(hash []byte) (string, error) {
+	nonce, err := client.PendingNonceAt(context.Background(), from)
 	if err != nil {
-		return "", err
+		log.Fatal(err)
 	}
 
-	dm, err := multihash.Decode(m)
+	to := from
+	value := big.NewInt(0)
+
+	baseFee, err := strconv.Atoi(os.Getenv("GETH_BASE_GAS"))
 	if err != nil {
-		return "", err
+		log.Fatal("set the geth base gas fee:", err)
 	}
 
-	var digest [32]byte
-	copy(digest[:], dm.Digest)
-	var code = uint8(dm.Code)
-	var length = uint8(dm.Length)
-
-	contract, err := contracts.NewClientCapture(common.HexToAddress(address), blockchain)
+	byteFee, err := strconv.Atoi(os.Getenv("GETH_BYTE_COST"))
 	if err != nil {
-		return "", err
+		log.Fatal("set the geth byte cost fee:", err)
 	}
 
-	transaction, err := contract.Store(&bind.TransactOpts{
-		From:   auth.From,
-		Signer: auth.Signer,
-	}, digest, code, length)
+	gasLimit := uint64(baseFee + (byteFee * len(hash)))
+	gasPrice, err := client.SuggestGasPrice(context.Background())
 	if err != nil {
-		return "", err
+		log.Fatal(err)
 	}
 
-	return transaction.Hash().Hex(), nil
-}
+	newTx := types.NewTransaction(nonce, to, value, gasLimit, gasPrice, hash)
 
-// Deploy creates a new Capture Contract
-func Deploy() (string, error) {
-	address, _, _, err := contracts.DeployClientCapture(auth, blockchain)
-	return address.Hex(), err
+	chainID, err := client.NetworkID(context.Background())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	signedTx, err := types.SignTx(newTx, types.NewEIP155Signer(chainID), privateKey)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ts := types.Transactions{signedTx}
+	rawTx := ts.GetRlp(0)
+
+	var tx *types.Transaction
+
+	rlp.DecodeBytes(rawTx, &tx)
+
+	err = client.SendTransaction(context.Background(), tx)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return tx.Hash().Hex(), nil
 }
 
 func init() {
@@ -68,13 +87,13 @@ func init() {
 		log.Fatalf(err.Error())
 	}
 
-	pkecdsa, err := crypto.HexToECDSA(os.Getenv("GETH_PRIVATE_KEY"))
+	privateKey, err := crypto.HexToECDSA(os.Getenv("GETH_PRIVATE_KEY"))
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
 
-	a := bind.NewKeyedTransactor(pkecdsa)
+	a := bind.NewKeyedTransactor(privateKey)
 
-	blockchain = bc
-	auth = a
+	from = a.From
+	client = bc
 }

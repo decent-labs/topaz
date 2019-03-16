@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/decentorganization/topaz/shared/ethereum"
 	"github.com/gobuffalo/packr"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
@@ -16,17 +15,6 @@ import (
 var db *sql.DB
 
 func main() {
-	if ethAddy := os.Getenv("ETH_CONTRACT_ADDRESS"); ethAddy == "" {
-		addr, err := ethereum.Deploy()
-		if err != nil {
-			log.Println("Couldn't deploy Ethereum contract")
-			log.Fatal(err)
-		}
-		fmt.Println("Deployed Ethereum contract at", addr)
-	} else {
-		fmt.Println("Ethereum contract already set at", ethAddy)
-	}
-
 	migrations := &migrate.PackrMigrationSource{
 		Box: packr.NewBox("sql"),
 	}

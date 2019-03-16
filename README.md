@@ -14,7 +14,7 @@ This project uses golang modules, so simply building or running the project(s) w
 $ cp .env.example .env
 ```
 
-Update appropriately. Leave `ETH_CONTRACT_ADDRESS` blank if you're setting up your development environment for the first time.
+Update appropriately.
 
 ### Spin up external services
 
@@ -30,8 +30,6 @@ The ganache-cli node will save all local blockchain and account state into the `
 $ cd migrate
 $ make run
 ```
-
-If `ETH_CONTRACT_ADDRESS` in `.env` was blank, the migrations will deploy a new instance of the Capture contract, and spit the address to `stdout`. Copy that into `.env`.
 
 ### Start the API
 
