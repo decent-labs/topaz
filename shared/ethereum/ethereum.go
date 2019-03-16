@@ -50,12 +50,6 @@ func Store(address, hash string) (string, error) {
 	return transaction.Hash().Hex(), nil
 }
 
-// Deploy creates a new Capture Contract
-func Deploy() (string, error) {
-	address, _, _, err := contracts.DeployClientCapture(auth, blockchain)
-	return address.Hex(), err
-}
-
 func init() {
 	err := godotenv.Load(".env")
 	if err != nil {
