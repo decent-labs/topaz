@@ -16,6 +16,7 @@ import (
 
 var auth *bind.TransactOpts
 var blockchain *ethclient.Client
+var privateKey *ecdsa.PrivateKey
 
 // Store takes a Capture Contract address and a hash to store on it
 func Store(address, hash string) (string, error) {
@@ -62,12 +63,12 @@ func init() {
 		log.Fatalf(err.Error())
 	}
 
-	pkecdsa, err := crypto.HexToECDSA(os.Getenv("GETH_PRIVATE_KEY"))
+	privateKey, err := crypto.HexToECDSA(os.Getenv("GETH_PRIVATE_KEY"))
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
 
-	a := bind.NewKeyedTransactor(pkecdsa)
+	a := bind.NewKeyedTransactor(privateKey)
 
 	blockchain = bc
 	auth = a
