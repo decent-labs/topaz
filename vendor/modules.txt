@@ -14,49 +14,30 @@ github.com/deckarep/golang-set
 # github.com/dgrijalva/jwt-go v3.2.0+incompatible
 github.com/dgrijalva/jwt-go
 github.com/dgrijalva/jwt-go/request
-# github.com/edsrzf/mmap-go v1.0.0
-github.com/edsrzf/mmap-go
 # github.com/ethereum/go-ethereum v1.8.23
 github.com/ethereum/go-ethereum/accounts/abi/bind
 github.com/ethereum/go-ethereum/common
+github.com/ethereum/go-ethereum/core/types
 github.com/ethereum/go-ethereum/crypto
 github.com/ethereum/go-ethereum/ethclient
+github.com/ethereum/go-ethereum/rlp
 github.com/ethereum/go-ethereum
 github.com/ethereum/go-ethereum/accounts/abi
-github.com/ethereum/go-ethereum/core/types
-github.com/ethereum/go-ethereum/event
 github.com/ethereum/go-ethereum/accounts/keystore
+github.com/ethereum/go-ethereum/event
 github.com/ethereum/go-ethereum/log
 github.com/ethereum/go-ethereum/common/hexutil
-github.com/ethereum/go-ethereum/common/math
-github.com/ethereum/go-ethereum/crypto/secp256k1
-github.com/ethereum/go-ethereum/rlp
-github.com/ethereum/go-ethereum/rpc
 github.com/ethereum/go-ethereum/params
 github.com/ethereum/go-ethereum/trie
-github.com/ethereum/go-ethereum/common/mclock
-github.com/ethereum/go-ethereum/accounts/abi/bind/backends
-github.com/ethereum/go-ethereum/core
+github.com/ethereum/go-ethereum/common/math
+github.com/ethereum/go-ethereum/crypto/secp256k1
+github.com/ethereum/go-ethereum/rpc
 github.com/ethereum/go-ethereum/accounts
-github.com/ethereum/go-ethereum/p2p/netutil
+github.com/ethereum/go-ethereum/common/mclock
 github.com/ethereum/go-ethereum/common/prque
 github.com/ethereum/go-ethereum/ethdb
 github.com/ethereum/go-ethereum/metrics
-github.com/ethereum/go-ethereum/consensus/ethash
-github.com/ethereum/go-ethereum/core/bloombits
-github.com/ethereum/go-ethereum/core/rawdb
-github.com/ethereum/go-ethereum/core/state
-github.com/ethereum/go-ethereum/core/vm
-github.com/ethereum/go-ethereum/eth/filters
-github.com/ethereum/go-ethereum/consensus
-github.com/ethereum/go-ethereum/consensus/misc
-github.com/ethereum/go-ethereum/common/bitutil
-github.com/ethereum/go-ethereum/crypto/bn256
-github.com/ethereum/go-ethereum/crypto/bn256/cloudflare
-github.com/ethereum/go-ethereum/crypto/bn256/google
-# github.com/garyburd/redigo v1.6.0
-github.com/garyburd/redigo/redis
-github.com/garyburd/redigo/internal
+github.com/ethereum/go-ethereum/p2p/netutil
 # github.com/go-stack/stack v1.8.0
 github.com/go-stack/stack
 # github.com/gobuffalo/envy v1.6.15
@@ -69,6 +50,9 @@ github.com/gobuffalo/packr
 github.com/gobuffalo/syncx
 # github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db
 github.com/golang/snappy
+# github.com/gomodule/redigo v2.0.0+incompatible
+github.com/gomodule/redigo/redis
+github.com/gomodule/redigo/internal
 # github.com/google/uuid v1.0.0
 github.com/google/uuid
 # github.com/gorilla/mux v1.7.0
@@ -77,9 +61,6 @@ github.com/gorilla/mux
 github.com/gxed/hashland/keccakpg
 # github.com/gxed/hashland/murmur3 v0.0.1
 github.com/gxed/hashland/murmur3
-# github.com/hashicorp/golang-lru v0.5.0
-github.com/hashicorp/golang-lru
-github.com/hashicorp/golang-lru/simplelru
 # github.com/jinzhu/gorm v1.9.2
 github.com/jinzhu/gorm
 github.com/jinzhu/gorm/dialects/postgres
@@ -149,13 +130,11 @@ golang.org/x/crypto/blake2s
 golang.org/x/crypto/sha3
 golang.org/x/crypto/pbkdf2
 golang.org/x/crypto/scrypt
-golang.org/x/crypto/ripemd160
 # golang.org/x/net v0.0.0-20190213061140-3a22650c66bd
 golang.org/x/net/websocket
 # golang.org/x/sys v0.0.0-20190222171317-cd391775e71e
 golang.org/x/sys/cpu
 golang.org/x/sys/unix
-golang.org/x/sys/windows
 # gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127
 gopkg.in/check.v1
 # gopkg.in/gorp.v1 v1.7.2

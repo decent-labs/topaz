@@ -14,13 +14,13 @@ require (
 	github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5 // indirect
 	github.com/ethereum/go-ethereum v1.8.23
 	github.com/fjl/memsize v0.0.0-20180929194037-2a09253e352a // indirect
-	github.com/garyburd/redigo v1.6.0
 	github.com/go-sql-driver/mysql v1.4.1 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/gobuffalo/envy v1.6.15 // indirect
 	github.com/gobuffalo/packd v0.0.0-20190224160250-d04dd98aca5b // indirect
 	github.com/gobuffalo/packr v1.22.0
 	github.com/gobuffalo/syncx v0.0.0-20190224160051-33c29581e754 // indirect
+	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/gorilla/mux v1.7.0
 	github.com/hashicorp/golang-lru v0.5.0 // indirect
 	github.com/huin/goupnp v1.0.0 // indirect
