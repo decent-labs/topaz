@@ -24,11 +24,6 @@ func Connect() (conn *Cli) {
 		if err != nil {
 			panic(err)
 		}
-
-		if _, err := cliInstance.conn.Do("AUTH", os.Getenv("REDIS_PASSWORD")); err != nil {
-			cliInstance.conn.Close()
-			panic(err)
-		}
 	}
 
 	return cliInstance
