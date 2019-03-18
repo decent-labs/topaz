@@ -22,7 +22,7 @@ services:
   ## the redis store provides to track blacklisted or expired JWTs
   redis:
     image: 'redis:5.0-alpine'
-    command: redis-server --requirepass ${REDIS_PASSWORD}
+    command: redis-server
     ports:
       - "${REDIS_PORT}:6379"
     volumes:

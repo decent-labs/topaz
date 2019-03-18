@@ -95,14 +95,12 @@ func (backend *JWTAuthenticationBackend) getTokenRemainingValidity(timestamp int
 
 // Logout ...
 func (backend *JWTAuthenticationBackend) Logout(tokenString string, token *jwt.Token) error {
-	redisConn := redis.Connect()
-	return redisConn.SetValue(tokenString, tokenString, backend.getTokenRemainingValidity(token.Claims.(jwt.MapClaims)["exp"]))
+	return redis.SetValue(tokenString, tokenString, backend.getTokenRemainingValidity(token.Claims.(jwt.MapClaims)["exp"]))
 }
 
 // IsInBlacklist ...
 func (backend *JWTAuthenticationBackend) IsInBlacklist(token string) bool {
-	redisConn := redis.Connect()
-	redisToken, _ := redisConn.GetValue(token)
+	redisToken, _ := redis.GetValue(token)
 
 	if redisToken == nil {
 		return false

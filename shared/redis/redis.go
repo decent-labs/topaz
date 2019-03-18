@@ -3,49 +3,44 @@ package redis
 import (
 	"fmt"
 	"os"
+	"time"
 
-	"github.com/garyburd/redigo/redis"
+	"github.com/gomodule/redigo/redis"
 )
 
-// Cli is used to communicate with Redis throughout our application
-type Cli struct {
-	conn redis.Conn
-}
+var (
+	pool        *redis.Pool
+	redisServer = fmt.Sprintf("%s:%s", os.Getenv("REDIS_HOST"), os.Getenv("REDIS_PORT"))
+)
 
-var cliInstance *Cli
-
-// Connect created a new connection to redis and returns an instance of type Cli
-func Connect() (conn *Cli) {
-	if cliInstance == nil {
-		cliInstance = new(Cli)
-		var err error
-
-		cliInstance.conn, err = redis.Dial("tcp", fmt.Sprintf("%s:%s", os.Getenv("REDIS_HOST"), os.Getenv("REDIS_PORT")))
-		if err != nil {
-			panic(err)
-		}
-
-		if _, err := cliInstance.conn.Do("AUTH", os.Getenv("REDIS_PASSWORD")); err != nil {
-			cliInstance.conn.Close()
-			panic(err)
-		}
+func init() {
+	pool = &redis.Pool{
+		MaxIdle:     3,
+		IdleTimeout: 240 * time.Second,
+		Dial: func() (redis.Conn, error) {
+			return redis.Dial("tcp", redisServer)
+		},
 	}
-
-	return cliInstance
 }
 
 // SetValue takes data and configuration to store a value in redis
-func (cli *Cli) SetValue(key string, value string, expiration ...interface{}) error {
-	_, err := cli.conn.Do("SET", key, value)
+func SetValue(key string, value string, expiration ...interface{}) error {
+	conn := pool.Get()
+	defer conn.Close()
+
+	_, err := conn.Do("SET", key, value)
 
 	if err == nil && expiration != nil {
-		cli.conn.Do("EXPIRE", key, expiration[0])
+		conn.Do("EXPIRE", key, expiration[0])
 	}
 
 	return err
 }
 
 // GetValue returns the value stored at a specific key
-func (cli *Cli) GetValue(key string) (interface{}, error) {
-	return cli.conn.Do("GET", key)
+func GetValue(key string) (interface{}, error) {
+	conn := pool.Get()
+	defer conn.Close()
+
+	return conn.Do("GET", key)
 }
