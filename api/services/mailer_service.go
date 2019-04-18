@@ -14,6 +14,11 @@ import (
 
 // SendWelcomeEmail ...
 func SendWelcomeEmail(to string) {
+	apiKey := os.Getenv("SENDGRID_API_KEY")
+	if apiKey == "" {
+		return
+	}
+
 	f := mail.NewEmail(os.Getenv("SENDGRID_FROM_NAME"), os.Getenv("SENDGRID_FROM_EMAIL"))
 	t := mail.NewEmail("", to)
 
@@ -27,7 +32,7 @@ func SendWelcomeEmail(to string) {
 	p.SetDynamicTemplateData("Sender_State", os.Getenv("SENDGRID_SENDER_STATE"))
 	p.SetDynamicTemplateData("Sender_Zip", os.Getenv("SENDGRID_SENDER_ZIP"))
 
-	client := sendgrid.NewSendClient(os.Getenv("SENDGRID_API_KEY"))
+	client := sendgrid.NewSendClient(apiKey)
 	response, err := client.Send(email)
 
 	if err != nil {
@@ -41,6 +46,11 @@ func SendWelcomeEmail(to string) {
 
 // SendPasswordResetEmail ...
 func SendPasswordResetEmail(to, tokenURL string) {
+	apiKey := os.Getenv("SENDGRID_API_KEY")
+	if apiKey == "" {
+		return
+	}
+
 	f := mail.NewEmail(os.Getenv("SENDGRID_FROM_NAME"), os.Getenv("SENDGRID_FROM_EMAIL"))
 	t := mail.NewEmail("", to)
 
@@ -56,7 +66,7 @@ func SendPasswordResetEmail(to, tokenURL string) {
 	p.SetDynamicTemplateData("password_reset_token", tokenURL)
 	p.SetDynamicTemplateData("user_email", to)
 
-	client := sendgrid.NewSendClient(os.Getenv("SENDGRID_API_KEY"))
+	client := sendgrid.NewSendClient(apiKey)
 	response, err := client.Send(email)
 
 	if err != nil {
@@ -78,9 +88,14 @@ func CreateNewEmailOnList(to *models.SendgridEmails, list string) {
 }
 
 func addEmailToContacts(to *models.SendgridEmails) (*models.SendgridNewContactRespone, bool) {
+	apiKey := os.Getenv("SENDGRID_API_KEY")
+	if apiKey == "" {
+		return nil, false
+	}
+
 	t, _ := json.Marshal(&to)
 
-	create := sendgrid.GetRequest(os.Getenv("SENDGRID_API_KEY"), "/v3/contactdb/recipients", os.Getenv("SENDGRID_API_ROOT"))
+	create := sendgrid.GetRequest(apiKey, "/v3/contactdb/recipients", os.Getenv("SENDGRID_API_ROOT"))
 	create.Method = "POST"
 	create.Body = t
 
@@ -109,9 +124,14 @@ func addEmailToContacts(to *models.SendgridEmails) (*models.SendgridNewContactRe
 	return sgr, true
 }
 
-func addContactToList(contactID, listID string) bool {
+func addContactToList(contactID, listID string) {
+	apiKey := os.Getenv("SENDGRID_API_KEY")
+	if apiKey == "" {
+		return
+	}
+
 	listReq := fmt.Sprintf("/v3/contactdb/lists/%s/recipients/%s", listID, contactID)
-	list := sendgrid.GetRequest(os.Getenv("SENDGRID_API_KEY"), listReq, os.Getenv("SENDGRID_API_ROOT"))
+	list := sendgrid.GetRequest(apiKey, listReq, os.Getenv("SENDGRID_API_ROOT"))
 	list.Method = "POST"
 
 	listRes, err := sendgrid.API(list)
@@ -122,8 +142,5 @@ func addContactToList(contactID, listID string) bool {
 
 	if err != nil {
 		fmt.Println(err)
-		return false
 	}
-
-	return true
 }
