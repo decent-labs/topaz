@@ -87,7 +87,7 @@ func init() {
 		log.Fatalf(err.Error())
 	}
 
-	privateKey, err := crypto.HexToECDSA(os.Getenv("GETH_PRIVATE_KEY"))
+	privateKey, err = crypto.HexToECDSA(os.Getenv("GETH_PRIVATE_KEY"))
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
