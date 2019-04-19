@@ -16,7 +16,7 @@ type Object struct {
 	AppID string `json:"appId"`
 	App   *App   `json:"-"`
 
-	HashStubs HashStubs `json:"hashes,omitempty"`
+	HashStubs HashStubs `json:"hashes"`
 }
 
 // Objects ...
