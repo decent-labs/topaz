@@ -24,7 +24,12 @@ type Objects []Object
 
 // CreateObject ...
 func (o *Object) CreateObject(db *gorm.DB) error {
-	return db.Create(&o).Error
+	if err := db.Create(&o).Error; err != nil {
+		return err
+	}
+
+	o.HashStubs = HashStubs{}
+	return nil
 }
 
 // GetObjects ...
