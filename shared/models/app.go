@@ -40,11 +40,3 @@ func (as *Apps) GetApps(a *App, db *gorm.DB) error {
 func (a *App) GetApp(db *gorm.DB) error {
 	return db.Model(&a.User).Related(&a).Error
 }
-
-// For proofing
-
-// GetAppsToProof ...
-func (as *Apps) GetAppsToProof(db *gorm.DB) error {
-	clause := "last_proofed is null or (extract(epoch from now()) - last_proofed >= interval)"
-	return db.Where(clause).Find(&as).Error
-}
