@@ -12,25 +12,61 @@ import (
 	multihash "github.com/multiformats/go-multihash"
 )
 
+// AppHashesBundle ...
+type AppHashesBundle struct {
+	App    models.App
+	Hashes models.Hashes
+}
+
+// FullCollection ...
+type FullCollection map[string]*AppHashesBundle
+
 func mainLoop() {
-	apps := new(models.Apps)
-	if err := apps.GetAppsToProof(database.Manager); err != nil {
-		fmt.Println("Had trouble getting apps eligible for new proof:", err.Error())
+	hwa := new(models.HashesWithApp)
+	if err := hwa.GetHashesForProofing(database.Manager); err != nil {
+		fmt.Println("Had trouble getting hashes for new proof:", err.Error())
 		return
 	}
 
-	for _, a := range *apps {
-		hs := new(models.Hashes)
-		if err := hs.GetHashesByApp(database.Manager, &a); err != nil {
-			fmt.Println("Had trouble getting available hashes to proof:", err.Error())
-			continue
+	if len(*hwa) == 0 {
+		fmt.Println("No hashes to proof")
+		return
+	}
+
+	fullCollection := make(map[string]*AppHashesBundle)
+
+	for _, ha := range *hwa {
+		hash := models.Hash{
+			ID:            ha.HashID,
+			CreatedAt:     ha.HashCreatedAt,
+			UpdatedAt:     ha.HashUpdatedAt,
+			DeletedAt:     ha.HashDeletedAt,
+			MultiHash:     ha.HashMultiHash,
+			UnixTimestamp: ha.HashUnixTimestamp,
+			ObjectID:      ha.HashObjectID,
+			ProofID:       ha.HashProofID,
 		}
 
-		if len(*hs) == 0 {
-			continue
+		app := models.App{
+			ID:          ha.AppID,
+			CreatedAt:   ha.AppCreatedAt,
+			UpdatedAt:   ha.AppUpdatedAt,
+			DeletedAt:   ha.AppDeletedAt,
+			Interval:    ha.AppInterval,
+			Name:        ha.AppName,
+			LastProofed: ha.AppLastProofed,
+			UserID:      ha.AppUserID,
 		}
 
-		ms := hs.MakeMerkleLeafs()
+		if fullCollection[app.ID] == nil {
+			fullCollection[app.ID] = &AppHashesBundle{App: app}
+		}
+
+		fullCollection[app.ID].Hashes = append(fullCollection[app.ID].Hashes, hash)
+	}
+
+	for _, bundle := range fullCollection {
+		ms := bundle.Hashes.MakeMerkleLeafs()
 		root, err := ms.GetMerkleRoot()
 		if err != nil {
 			fmt.Println("Had trouble creating merkle root:", err.Error())
@@ -44,13 +80,13 @@ func mainLoop() {
 		}
 
 		ut := time.Now().Unix()
-		a.LastProofed = &ut
+		bundle.App.LastProofed = &ut
 
 		var rootMultihash multihash.Multihash = root
 		rootString := rootMultihash.B58String()
 
 		p := models.Proof{
-			App:            &a,
+			App:            &bundle.App,
 			MerkleRoot:     rootString,
 			EthTransaction: tx,
 			UnixTimestamp:  ut,
@@ -61,7 +97,7 @@ func mainLoop() {
 			continue
 		}
 
-		if err := hs.UpdateWithProof(database.Manager, &p.ID); err != nil {
+		if err := bundle.Hashes.UpdateWithProof(database.Manager, &p.ID); err != nil {
 			fmt.Println("Had trouble updating hashes with proof:", err.Error())
 			continue
 		}
@@ -69,6 +105,8 @@ func mainLoop() {
 }
 
 func main() {
+	mainLoop()
+
 	i, _ := strconv.Atoi(os.Getenv("BATCH_TICKER"))
 	tick := time.Tick(time.Duration(i) * time.Second)
 	for {
