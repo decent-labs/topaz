@@ -43,6 +43,29 @@ type Hash struct {
 // Hashes ...
 type Hashes []Hash
 
+// HashWithApp ...
+type HashWithApp struct {
+	HashID            string     `gorm:"column:hash_id"`
+	HashCreatedAt     time.Time  `gorm:"column:hash_created_at"`
+	HashUpdatedAt     time.Time  `gorm:"column:hash_updated_at"`
+	HashDeletedAt     *time.Time `gorm:"column:hash_deleted_at"`
+	HashMultiHash     []byte     `gorm:"column:hash_multihash"`
+	HashUnixTimestamp int64      `gorm:"column:hash_unix_timestamp"`
+	HashObjectID      *string    `gorm:"column:hash_object_id"`
+	HashProofID       *string    `gorm:"column:hash_proof_id"`
+	AppID             string     `gorm:"column:app_id"`
+	AppCreatedAt      time.Time  `gorm:"column:app_created_at"`
+	AppUpdatedAt      time.Time  `gorm:"column:app_updated_at"`
+	AppDeletedAt      *time.Time `gorm:"column:app_deleted_at"`
+	AppInterval       int        `gorm:"column:app_interval"`
+	AppName           string     `gorm:"column:app_name"`
+	AppLastProofed    *int64     `gorm:"column:app_last_proofed"`
+	AppUserID         string     `gorm:"column:app_user_id"`
+}
+
+// HashesWithApp ...
+type HashesWithApp []HashWithApp
+
 // MarshalJSON ...
 func (h *Hash) MarshalJSON() ([]byte, error) {
 	type Alias Hash
@@ -98,17 +121,36 @@ func (hs *Hashes) MakeMerkleLeafs() crypto.MerkleLeafs {
 	return ms
 }
 
-// GetHashesByApp ...
-func (hs *Hashes) GetHashesByApp(db *gorm.DB, app *App) error {
-	return db.
-		Table("hashes").
-		Joins("join objects on objects.id = hashes.object_id").
-		Joins("join apps on apps.id = objects.app_id").
-		Where("apps.id = (?)", app.ID).
-		Where("hashes.proof_id IS NULL").
-		Order("hashes.created_at").
-		Find(&hs).
-		Error
+// GetHashesForProofing ...
+func (hs *HashesWithApp) GetHashesForProofing(db *gorm.DB) error {
+	clause := `
+	SELECT 
+		h.id as hash_id,
+		h.created_at as hash_created_at,
+		h.updated_at as hash_updated_at,
+		h.deleted_at as hash_deleted_at,
+		h.hash as hash_multihash,
+		h.unix_timestamp as hash_unix_timestamp,
+		h.object_id as hash_object_id,
+		h.proof_id as hash_proof_id,
+		a.id as app_id,
+		a.created_at as app_created_at,
+		a.updated_at as app_updated_at,
+		a.deleted_at as app_deleted_at,
+		a.interval as app_interval,
+		a.name as app_name,
+		a.last_proofed as app_last_proofed,
+		a.user_id as app_user_id
+	FROM hashes h
+		join objects o on o.id = h.object_id
+		join apps a on a.id = o.app_id
+	WHERE h.proof_id IS NULL
+		AND (a.last_proofed IS NULL
+			or (extract(epoch from now()) - a.last_proofed >= a.interval))
+	ORDER BY h.created_at
+	`
+
+	return db.Raw(clause).Scan(&hs).Error
 }
 
 // GetHashesByProof ...
