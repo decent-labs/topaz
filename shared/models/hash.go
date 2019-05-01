@@ -125,28 +125,33 @@ func (hs *Hashes) MakeMerkleLeafs() crypto.MerkleLeafs {
 func (hs *HashesWithApp) GetHashesForProofing(db *gorm.DB) error {
 	clause := `
 	SELECT 
-		h.id as hash_id,
-		h.created_at as hash_created_at,
-		h.updated_at as hash_updated_at,
-		h.deleted_at as hash_deleted_at,
-		h.hash as hash_multihash,
-		h.unix_timestamp as hash_unix_timestamp,
-		h.object_id as hash_object_id,
-		h.proof_id as hash_proof_id,
-		a.id as app_id,
-		a.created_at as app_created_at,
-		a.updated_at as app_updated_at,
-		a.deleted_at as app_deleted_at,
-		a.interval as app_interval,
-		a.name as app_name,
-		a.last_proofed as app_last_proofed,
-		a.user_id as app_user_id
-	FROM hashes h
-		join objects o on o.id = h.object_id
-		join apps a on a.id = o.app_id
-	WHERE h.proof_id IS NULL
-		AND (a.last_proofed IS NULL
-			or (extract(epoch from now()) - a.last_proofed >= a.interval))
+		h.id AS hash_id,
+		h.created_at AS hash_created_at,
+		h.updated_at AS hash_updated_at,
+		h.deleted_at AS hash_deleted_at,
+		h.hash AS hash_multihash,
+		h.unix_timestamp AS hash_unix_timestamp,
+		h.object_id AS hash_object_id,
+		h.proof_id AS hash_proof_id,
+		a.id AS app_id,
+		a.created_at AS app_created_at,
+		a.updated_at AS app_updated_at,
+		a.deleted_at AS app_deleted_at,
+		a.interval AS app_interval,
+		a.name AS app_name,
+		a.last_proofed AS app_last_proofed,
+		a.user_id AS app_user_id
+	FROM
+		hashes h
+		JOIN objects o ON o.id = h.object_id
+		JOIN apps a ON a.id = o.app_id
+	WHERE
+		h.proof_id IS NULL
+		AND
+		CASE
+			WHEN a.last_proofed IS NOT NULL THEN (EXTRACT(epoch FROM now()) - a.last_proofed >= a.interval)
+			ELSE (EXTRACT(epoch FROM now()) - EXTRACT(epoch FROM a.created_at) >= a.interval)
+		END
 	ORDER BY h.created_at
 	`
 

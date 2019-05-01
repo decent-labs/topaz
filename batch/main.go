@@ -105,8 +105,6 @@ func mainLoop() {
 }
 
 func main() {
-	mainLoop()
-
 	i, _ := strconv.Atoi(os.Getenv("BATCH_TICKER"))
 	tick := time.Tick(time.Duration(i) * time.Second)
 	for {
