@@ -1,6 +1,7 @@
 package models
 
 import (
+	"strings"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -54,6 +55,19 @@ func (p *Proof) GetFullProof(db *gorm.DB) error {
 			return err
 		}
 		bts[i].BlockchainNetworkName = bn.Name
+
+		bes := BlockchainExplorers{}
+		if err := bes.GetBlockchainExplorersByNetworkID(db, bt.BlockchainNetworkID); err != nil {
+			return err
+		}
+
+		var urls []string
+		for _, be := range bes {
+			s := strings.Replace(be.URLTemplate, "{transaction_hash}", bt.TransactionHash, 1)
+			urls = append(urls, s)
+		}
+
+		bts[i].Explorers = urls
 	}
 
 	p.Transactions = bts
