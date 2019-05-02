@@ -47,6 +47,8 @@ type BlockchainTransaction struct {
 	BlockchainNetworkName string             `json:"blockchainNetwork" gorm:"-"`
 
 	TransactionHash string `json:"transactionHash"`
+
+	Explorers []string `json:"explorers" gorm:"-"`
 }
 
 // BlockchainTransactions ...
