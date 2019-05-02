@@ -25,11 +25,6 @@ type Proof struct {
 // Proofs ...
 type Proofs []Proof
 
-// CreateProof ...
-func (p *Proof) CreateProof(db *gorm.DB) error {
-	return db.Create(&p).Error
-}
-
 // GetProofs ...
 func (ps *Proofs) GetProofs(p *Proof, db *gorm.DB) error {
 	return db.Model(&p.App).Order("created_at").Related(&ps).Error
