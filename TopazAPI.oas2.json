@@ -532,10 +532,10 @@
             ],
             "get": {
                 "summary": "Get Proof",
-                "operationId": "getProofs",
+                "operationId": "getProof",
                 "responses": {
                     "200": {
-                        "description": "A proof has a `merkleRoot`, and an `ethTransaction`. These two pieces of data allow you to confirm that your data is secured in the blockchain.\n\nWe combine all hashes sent to Topaz for a given app during an `interval` timeframe, create a Merkel Tree out of those hashes, compute the root hash (`merkleRoot`), craft an Ethereum transaction using that `merkleRoot` as input data, and broadcast that transaction to be mined into a block, solidifying it's existence into an untamperable data structure.",
+                        "description": "A proof has a Base58 encoded `merkleRoot`, a list of `hashes`, and an array of `blockchainTransactions`. These pieces of data allow you to confirm that your data is secured in the blockchain.\n\nWe combine all hashes sent to Topaz for a given app during an `interval` timeframe, create a Merkel Tree out of those hashes, compute the root hash (`merkleRoot`), craft one or more blockchain transactions using that `merkleRoot` as input data, and broadcast that transaction to be mined into a block, solidifying it's existence into an untamperable data structure.\n\n",
                         "schema": {
                             "$ref": "#/definitions/proof-output-detailed"
                         },
@@ -543,9 +543,18 @@
                             "application/json": {
                                 "id": "fc13687b-2603-fe2b-3ca8-93aa4881cb7c",
                                 "merkleRoot": "QmfPubEf1HMqfYV7NhPBrz61BSpE6oY7Jwc8ivb2XCTEAw",
-                                "ethTransaction": "0xe3cad0f60e731ce504e2a8efa8f09a2945bff60e1293e4d9b13302d3ce8c9355",
                                 "unixTimestamp": 1551724423,
                                 "appId": "fa7e09db-4c9c-4902-ccd9-4bc906c4bdef",
+                                "blockchainTransactions": [
+                                    {
+                                        "blockchainNetwork": "ethereum goerli",
+                                        "transactionHash": "0xe3cad0f60e731ce504e2a8efa8f09a2945bff60e1293e4d9b13302d3ce8c9355",
+                                        "explorers": [
+                                            "https://goerli.etherscan.io/tx/0xe3cad0f60e731ce504e2a8efa8f09a2945bff60e1293e4d9b13302d3ce8c9355",
+                                            "https://blockscout.com/eth/goerli/tx/0xe3cad0f60e731ce504e2a8efa8f09a2945bff60e1293e4d9b13302d3ce8c9355/internal_transactions"
+                                        ]
+                                    }
+                                ],
                                 "hashes": {
                                     "id": "2136a5a8-db34-1efb-5b02-be65fb1fbb84",
                                     "hash": "QmSahRgkxLfRs25i1Arjv2Zx1LWME99GedsFbdUVF5FJ3A"
@@ -803,23 +812,26 @@
                         "merkleRoot": {
                             "type": "string"
                         },
-                        "ethTransaction": {
-                            "type": "string"
-                        },
                         "unixTimestamp": {
                             "type": "integer"
                         },
                         "appId": {
                             "type": "string",
                             "format": "uuid"
+                        },
+                        "blockchainTransactions": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/blockchain-transaction"
+                            }
                         }
                     },
                     "required": [
                         "id",
                         "merkleRoot",
-                        "ethTransaction",
                         "unixTimestamp",
-                        "appId"
+                        "appId",
+                        "blockchainTransactions"
                     ]
                 },
                 {
@@ -864,6 +876,29 @@
                     }
                 }
             }
+        },
+        "blockchain-transaction": {
+            "type": "object",
+            "title": "Blockchain Transaction",
+            "description": "Signifies a single blockchain transaction. Contains network name, transaction hash, and a list of explorers pointing to that transaction",
+            "properties": {
+                "blockchainNetwork": {
+                    "type": "string"
+                },
+                "transactionHash": {
+                    "type": "string"
+                },
+                "explorers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "required": [
+                "blockchainNetwork",
+                "transactionHash"
+            ]
         }
     },
     "tags": [
