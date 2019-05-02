@@ -13,9 +13,8 @@ type Proof struct {
 	UpdatedAt time.Time  `json:"-"`
 	DeletedAt *time.Time `sql:"index" json:"-"`
 
-	MerkleRoot     string `json:"merkleRoot"`
-	EthTransaction string `json:"ethTransaction"`
-	UnixTimestamp  int64  `json:"unixTimestamp"`
+	MerkleRoot    string `json:"merkleRoot"`
+	UnixTimestamp int64  `json:"unixTimestamp"`
 
 	AppID string `json:"appId"`
 	App   *App   `json:"-"`
