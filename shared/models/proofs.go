@@ -30,8 +30,8 @@ func (ps *Proofs) GetProofs(p *Proof, db *gorm.DB) error {
 	return db.Model(&p.App).Order("created_at").Related(&ps).Error
 }
 
-// GetProofWithHashStubs ...
-func (p *Proof) GetProofWithHashStubs(db *gorm.DB) error {
+// GetFullProof ...
+func (p *Proof) GetFullProof(db *gorm.DB) error {
 	if err := db.Model(&p.App).Related(&p).Error; err != nil {
 		return err
 	}
