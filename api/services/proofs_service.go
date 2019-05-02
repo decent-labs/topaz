@@ -37,7 +37,7 @@ func GetProof(u *models.User, aid string, pid string) (int, []byte) {
 	}
 
 	p.ID = pid
-	if err := p.GetProofWithHashStubs(database.Manager); err != nil {
+	if err := p.GetFullProof(database.Manager); err != nil {
 		return http.StatusUnauthorized, []byte("")
 	}
 
