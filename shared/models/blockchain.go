@@ -16,6 +16,22 @@ type BlockchainNetwork struct {
 	Name string `json:"name"`
 }
 
+// BlockchainExplorer ...
+type BlockchainExplorer struct {
+	ID        string     `gorm:"primary_key" json:"-"`
+	CreatedAt time.Time  `json:"-"`
+	UpdatedAt time.Time  `json:"-"`
+	DeletedAt *time.Time `sql:"index" json:"-"`
+
+	BlockchainNetworkID string             `json:"-"`
+	BlockchainNetwork   *BlockchainNetwork `json:"-"`
+
+	URLTemplate string `json:"urlTemplate"`
+}
+
+// BlockchainExplorers ...
+type BlockchainExplorers []BlockchainExplorer
+
 // BlockchainTransaction ...
 type BlockchainTransaction struct {
 	ID        string     `gorm:"primary_key" json:"-"`
