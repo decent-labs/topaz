@@ -19,7 +19,8 @@ type Proof struct {
 	AppID string `json:"appId"`
 	App   *App   `json:"-"`
 
-	HashStubs HashStubs `json:"hashes,omitempty"`
+	HashStubs    HashStubs              `json:"hashes,omitempty"`
+	Transactions BlockchainTransactions `json:"blockchainTransactions,omitempty"`
 }
 
 // Proofs ...
@@ -40,7 +41,22 @@ func (p *Proof) GetFullProof(db *gorm.DB) error {
 	if err := hs.GetHashesByProof(db, p); err != nil {
 		return err
 	}
-
 	p.HashStubs = hs
+
+	bts := BlockchainTransactions{}
+	if err := bts.GetBlockchainTransactionsByProof(db, p); err != nil {
+		return err
+	}
+
+	for i, bt := range bts {
+		bn := BlockchainNetwork{ID: bt.BlockchainNetworkID}
+		if err := bn.GetBlockchainNetwork(db); err != nil {
+			return err
+		}
+		bts[i].BlockchainNetworkName = bn.Name
+	}
+
+	p.Transactions = bts
+
 	return nil
 }
