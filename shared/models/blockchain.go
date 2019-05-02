@@ -78,3 +78,8 @@ func (bts *BlockchainTransactions) GetBlockchainTransactionsByProof(db *gorm.DB,
 		Find(&bts).
 		Error
 }
+
+// GetBlockchainExplorersByNetworkID ...
+func (bes *BlockchainExplorers) GetBlockchainExplorersByNetworkID(db *gorm.DB, bnID string) error {
+	return db.Find(bes, &BlockchainExplorer{BlockchainNetworkID: bnID}).Error
+}
