@@ -86,14 +86,25 @@ func mainLoop() {
 		rootString := rootMultihash.B58String()
 
 		p := models.Proof{
-			App:            &bundle.App,
-			MerkleRoot:     rootString,
-			EthTransaction: tx,
-			UnixTimestamp:  ut,
+			App:           &bundle.App,
+			MerkleRoot:    rootString,
+			UnixTimestamp: ut,
 		}
 
-		if err := p.CreateProof(database.Manager); err != nil {
-			fmt.Println("Had trouble creating proof:", err.Error())
+		bcNetwork := new(models.BlockchainNetwork)
+		if err := bcNetwork.GetBlockchainNetworkFromName(database.Manager, "ethereum goerli"); err != nil {
+			fmt.Println("Had trouble getting blockchain network:", err.Error())
+			continue
+		}
+
+		bt := models.BlockchainTransaction{
+			Proof:               &p,
+			BlockchainNetworkID: bcNetwork.ID,
+			TransactionHash:     tx,
+		}
+
+		if err := bt.CreateBlockchainTransaction(database.Manager); err != nil {
+			fmt.Println("Had trouble creating blockchain transaction record:", err.Error())
 			continue
 		}
 
