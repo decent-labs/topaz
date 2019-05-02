@@ -1,7 +1,7 @@
 FROM golang:1.11
 
 RUN mkdir /topaz 
-ADD . /topaz/
+COPY . /topaz/
 
 WORKDIR /topaz/api
 RUN go build -mod=vendor -o ../topaz-api .

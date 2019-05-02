@@ -1,7 +1,7 @@
 FROM golang:1.11
 
 RUN mkdir /topaz 
-ADD . /topaz/
+COPY . /topaz/
 
 RUN go get -u github.com/gobuffalo/packr/packr
 
