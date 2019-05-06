@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/signal"
 	"strconv"
+	"syscall"
 	"time"
 
 	"github.com/decentorganization/topaz/shared/database"
@@ -170,6 +172,24 @@ func main() {
 	if err != nil {
 		fmt.Println("couldn't load dotenv:", err.Error())
 	}
+
+	var gracefulStop = make(chan os.Signal)
+	signal.Notify(gracefulStop, syscall.SIGTERM)
+	signal.Notify(gracefulStop, syscall.SIGINT)
+	go func() {
+		sig := <-gracefulStop
+		fmt.Printf("caught sig: %+v\n", sig)
+
+		tick := time.Tick(time.Duration((afterBatchSleep / 2)) * time.Millisecond)
+		for {
+			select {
+			case <-tick:
+				if safeBatch() {
+					os.Exit(0)
+				}
+			}
+		}
+	}()
 
 	i, _ := strconv.Atoi(os.Getenv("BATCH_TICKER"))
 	tick := time.Tick(time.Duration(i) * time.Second)
