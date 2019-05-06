@@ -45,10 +45,10 @@ func SetValue(key string, value interface{}, expiration ...interface{}) error {
 	return err
 }
 
-// GetValue returns the value stored at a specific key
-func GetValue(key string) (interface{}, error) {
+// GetString returns the string value stored at a specific key
+func GetString(key string) (string, error) {
 	conn := pool.Get()
 	defer conn.Close()
 
-	return conn.Do("GET", key)
+	return redis.String(conn.Do("GET", key))
 }
