@@ -32,7 +32,7 @@ func init() {
 }
 
 // SetValue takes data and configuration to store a value in redis
-func SetValue(key string, value string, expiration ...interface{}) error {
+func SetValue(key string, value interface{}, expiration ...interface{}) error {
 	conn := pool.Get()
 	defer conn.Close()
 
