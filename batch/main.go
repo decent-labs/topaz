@@ -9,7 +9,7 @@ import (
 	"github.com/decentorganization/topaz/shared/database"
 	"github.com/decentorganization/topaz/shared/ethereum"
 	"github.com/decentorganization/topaz/shared/models"
-	multihash "github.com/multiformats/go-multihash"
+	"github.com/multiformats/go-multihash"
 )
 
 type appHashesBundle struct {
