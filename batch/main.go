@@ -45,14 +45,29 @@ func mainLoop() {
 		return
 	}
 
+	if err := redis.SetValue(currentlyBatching, true); err != nil {
+		fmt.Println("err telling redis that a batch is starting:", err)
+		return
+	}
+
 	hwa := new(models.HashesWithApp)
 	if err := hwa.GetHashesForProofing(database.Manager); err != nil {
 		fmt.Println("Had trouble getting hashes for new proof:", err.Error())
+
+		if err := redis.SetValue(currentlyBatching, false); err != nil {
+			fmt.Println("error telling redis that we're done batching")
+		}
+
 		return
 	}
 
 	if len(*hwa) == 0 {
 		fmt.Println("No hashes to proof")
+
+		if err := redis.SetValue(currentlyBatching, false); err != nil {
+			fmt.Println("error telling redis that we're done batching")
+		}
+
 		return
 	}
 
@@ -141,6 +156,10 @@ func mainLoop() {
 		}
 
 		dbtx.Commit()
+	}
+
+	if err := redis.SetValue(currentlyBatching, false); err != nil {
+		fmt.Println("error telling redis that we're done batching")
 	}
 
 	time.Sleep(time.Duration(afterBatchSleep) * time.Millisecond)
