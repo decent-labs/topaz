@@ -101,15 +101,21 @@ func mainLoop() {
 			TransactionHash:     tx,
 		}
 
-		if err := bt.CreateBlockchainTransaction(database.Manager); err != nil {
+		dbtx := database.Manager.Begin()
+
+		if err := bt.CreateBlockchainTransaction(dbtx); err != nil {
 			fmt.Println("Had trouble creating blockchain transaction record:", err.Error())
+			dbtx.Rollback()
 			continue
 		}
 
-		if err := bundle.Hashes.UpdateWithProof(database.Manager, &p.ID); err != nil {
+		if err := bundle.Hashes.UpdateWithProof(dbtx, &p.ID); err != nil {
 			fmt.Println("Had trouble updating hashes with proof:", err.Error())
+			dbtx.Rollback()
 			continue
 		}
+
+		dbtx.Commit()
 	}
 }
 
