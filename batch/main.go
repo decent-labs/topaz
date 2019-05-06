@@ -12,14 +12,12 @@ import (
 	multihash "github.com/multiformats/go-multihash"
 )
 
-// AppHashesBundle ...
-type AppHashesBundle struct {
+type appHashesBundle struct {
 	App    models.App
 	Hashes models.Hashes
 }
 
-// FullCollection ...
-type FullCollection map[string]*AppHashesBundle
+type fullCollection map[string]*appHashesBundle
 
 func mainLoop() {
 	hwa := new(models.HashesWithApp)
@@ -33,7 +31,7 @@ func mainLoop() {
 		return
 	}
 
-	fullCollection := make(map[string]*AppHashesBundle)
+	fullCollection := make(map[string]*appHashesBundle)
 
 	for _, ha := range *hwa {
 		hash := models.Hash{
@@ -59,7 +57,7 @@ func mainLoop() {
 		}
 
 		if fullCollection[app.ID] == nil {
-			fullCollection[app.ID] = &AppHashesBundle{App: app}
+			fullCollection[app.ID] = &appHashesBundle{App: app}
 		}
 
 		fullCollection[app.ID].Hashes = append(fullCollection[app.ID].Hashes, hash)
