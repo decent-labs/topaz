@@ -3,37 +3,77 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/signal"
 	"strconv"
+	"syscall"
 	"time"
 
 	"github.com/decentorganization/topaz/shared/database"
 	"github.com/decentorganization/topaz/shared/ethereum"
 	"github.com/decentorganization/topaz/shared/models"
-	multihash "github.com/multiformats/go-multihash"
+	"github.com/decentorganization/topaz/shared/redis"
+	"github.com/joho/godotenv"
+	"github.com/multiformats/go-multihash"
 )
 
-// AppHashesBundle ...
-type AppHashesBundle struct {
+type appHashesBundle struct {
 	App    models.App
 	Hashes models.Hashes
 }
 
-// FullCollection ...
-type FullCollection map[string]*AppHashesBundle
+type fullCollection map[string]*appHashesBundle
+
+var currentlyBatching = "currently_batching"
+var afterBatchSleep = 1000
+
+func safeBatch() bool {
+	isBatching, err := redis.GetBool(currentlyBatching)
+
+	if err != nil {
+		fmt.Println("error getting batch status from redis:", err)
+		return false
+	}
+
+	if isBatching == true {
+		fmt.Println("batch process is already executing")
+		return false
+	}
+
+	return true
+}
 
 func mainLoop() {
+	if !safeBatch() {
+		return
+	}
+
+	if err := redis.SetValue(currentlyBatching, true); err != nil {
+		fmt.Println("err telling redis that a batch is starting:", err)
+		return
+	}
+
 	hwa := new(models.HashesWithApp)
 	if err := hwa.GetHashesForProofing(database.Manager); err != nil {
 		fmt.Println("Had trouble getting hashes for new proof:", err.Error())
+
+		if err := redis.SetValue(currentlyBatching, false); err != nil {
+			fmt.Println("error telling redis that we're done batching")
+		}
+
 		return
 	}
 
 	if len(*hwa) == 0 {
 		fmt.Println("No hashes to proof")
+
+		if err := redis.SetValue(currentlyBatching, false); err != nil {
+			fmt.Println("error telling redis that we're done batching")
+		}
+
 		return
 	}
 
-	fullCollection := make(map[string]*AppHashesBundle)
+	fullCollection := make(map[string]*appHashesBundle)
 
 	for _, ha := range *hwa {
 		hash := models.Hash{
@@ -59,7 +99,7 @@ func mainLoop() {
 		}
 
 		if fullCollection[app.ID] == nil {
-			fullCollection[app.ID] = &AppHashesBundle{App: app}
+			fullCollection[app.ID] = &appHashesBundle{App: app}
 		}
 
 		fullCollection[app.ID].Hashes = append(fullCollection[app.ID].Hashes, hash)
@@ -103,19 +143,54 @@ func mainLoop() {
 			TransactionHash:     tx,
 		}
 
-		if err := bt.CreateBlockchainTransaction(database.Manager); err != nil {
+		dbtx := database.Manager.Begin()
+
+		if err := bt.CreateBlockchainTransaction(dbtx); err != nil {
 			fmt.Println("Had trouble creating blockchain transaction record:", err.Error())
+			dbtx.Rollback()
 			continue
 		}
 
-		if err := bundle.Hashes.UpdateWithProof(database.Manager, &p.ID); err != nil {
+		if err := bundle.Hashes.UpdateWithProof(dbtx, &p.ID); err != nil {
 			fmt.Println("Had trouble updating hashes with proof:", err.Error())
+			dbtx.Rollback()
 			continue
 		}
+
+		dbtx.Commit()
 	}
+
+	if err := redis.SetValue(currentlyBatching, false); err != nil {
+		fmt.Println("error telling redis that we're done batching")
+	}
+
+	time.Sleep(time.Duration(afterBatchSleep) * time.Millisecond)
 }
 
 func main() {
+	err := godotenv.Load(".env")
+	if err != nil {
+		fmt.Println("couldn't load dotenv:", err.Error())
+	}
+
+	var gracefulStop = make(chan os.Signal)
+	signal.Notify(gracefulStop, syscall.SIGTERM)
+	signal.Notify(gracefulStop, syscall.SIGINT)
+	go func() {
+		sig := <-gracefulStop
+		fmt.Printf("caught sig: %+v\n", sig)
+
+		tick := time.Tick(time.Duration((afterBatchSleep / 2)) * time.Millisecond)
+		for {
+			select {
+			case <-tick:
+				if safeBatch() {
+					os.Exit(0)
+				}
+			}
+		}
+	}()
+
 	i, _ := strconv.Atoi(os.Getenv("BATCH_TICKER"))
 	tick := time.Tick(time.Duration(i) * time.Second)
 	for {

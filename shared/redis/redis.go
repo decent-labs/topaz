@@ -6,14 +6,22 @@ import (
 	"time"
 
 	"github.com/gomodule/redigo/redis"
+	"github.com/joho/godotenv"
 )
 
 var (
 	pool        *redis.Pool
-	redisServer = fmt.Sprintf("%s:%s", os.Getenv("REDIS_HOST"), os.Getenv("REDIS_PORT"))
+	redisServer string
 )
 
 func init() {
+	err := godotenv.Load(".env")
+	if err != nil {
+		fmt.Println("couldn't load dotenv:", err.Error())
+	}
+
+	redisServer = fmt.Sprintf("%s:%s", os.Getenv("REDIS_HOST"), os.Getenv("REDIS_PORT"))
+
 	pool = &redis.Pool{
 		MaxIdle:     3,
 		IdleTimeout: 240 * time.Second,
@@ -24,7 +32,7 @@ func init() {
 }
 
 // SetValue takes data and configuration to store a value in redis
-func SetValue(key string, value string, expiration ...interface{}) error {
+func SetValue(key string, value interface{}, expiration ...interface{}) error {
 	conn := pool.Get()
 	defer conn.Close()
 
@@ -37,10 +45,18 @@ func SetValue(key string, value string, expiration ...interface{}) error {
 	return err
 }
 
-// GetValue returns the value stored at a specific key
-func GetValue(key string) (interface{}, error) {
+// GetString returns the string value stored at a specific key
+func GetString(key string) (string, error) {
 	conn := pool.Get()
 	defer conn.Close()
 
-	return conn.Do("GET", key)
+	return redis.String(conn.Do("GET", key))
+}
+
+// GetBool returns the string value stored at a specific key
+func GetBool(key string) (bool, error) {
+	conn := pool.Get()
+	defer conn.Close()
+
+	return redis.Bool(conn.Do("GET", key))
 }
