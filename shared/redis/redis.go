@@ -52,3 +52,11 @@ func GetString(key string) (string, error) {
 
 	return redis.String(conn.Do("GET", key))
 }
+
+// GetBool returns the string value stored at a specific key
+func GetBool(key string) (bool, error) {
+	conn := pool.Get()
+	defer conn.Close()
+
+	return redis.Bool(conn.Do("GET", key))
+}
