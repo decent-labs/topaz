@@ -20,6 +20,8 @@ type appHashesBundle struct {
 
 type fullCollection map[string]*appHashesBundle
 
+var afterBatchSleep = 1000
+
 func mainLoop() {
 	hwa := new(models.HashesWithApp)
 	if err := hwa.GetHashesForProofing(database.Manager); err != nil {
@@ -118,6 +120,8 @@ func mainLoop() {
 
 		dbtx.Commit()
 	}
+
+	time.Sleep(time.Duration(afterBatchSleep) * time.Millisecond)
 }
 
 func main() {
