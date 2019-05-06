@@ -9,6 +9,7 @@ import (
 	"github.com/decentorganization/topaz/shared/database"
 	"github.com/decentorganization/topaz/shared/ethereum"
 	"github.com/decentorganization/topaz/shared/models"
+	"github.com/joho/godotenv"
 	"github.com/multiformats/go-multihash"
 )
 
@@ -120,6 +121,11 @@ func mainLoop() {
 }
 
 func main() {
+	err := godotenv.Load(".env")
+	if err != nil {
+		fmt.Println("couldn't load dotenv:", err.Error())
+	}
+
 	i, _ := strconv.Atoi(os.Getenv("BATCH_TICKER"))
 	tick := time.Tick(time.Duration(i) * time.Second)
 	for {
