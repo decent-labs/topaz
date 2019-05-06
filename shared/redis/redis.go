@@ -6,14 +6,22 @@ import (
 	"time"
 
 	"github.com/gomodule/redigo/redis"
+	"github.com/joho/godotenv"
 )
 
 var (
 	pool        *redis.Pool
-	redisServer = fmt.Sprintf("%s:%s", os.Getenv("REDIS_HOST"), os.Getenv("REDIS_PORT"))
+	redisServer string
 )
 
 func init() {
+	err := godotenv.Load(".env")
+	if err != nil {
+		fmt.Println("couldn't load dotenv:", err.Error())
+	}
+
+	redisServer = fmt.Sprintf("%s:%s", os.Getenv("REDIS_HOST"), os.Getenv("REDIS_PORT"))
+
 	pool = &redis.Pool{
 		MaxIdle:     3,
 		IdleTimeout: 240 * time.Second,
