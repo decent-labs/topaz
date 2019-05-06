@@ -100,9 +100,9 @@ func (backend *JWTAuthenticationBackend) Logout(tokenString string, token *jwt.T
 
 // IsInBlacklist ...
 func (backend *JWTAuthenticationBackend) IsInBlacklist(token string) bool {
-	redisToken, _ := redis.GetValue(token)
+	redisToken, _ := redis.GetString(token)
 
-	if redisToken == nil {
+	if redisToken == "" {
 		return false
 	}
 
