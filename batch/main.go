@@ -27,12 +27,7 @@ var currentlyBatching = "currently_batching"
 var afterBatchSleep = 1000
 
 func safeBatch() bool {
-	isBatching, err := redis.GetBool(currentlyBatching)
-
-	if err != nil {
-		fmt.Println("error getting batch status from redis:", err)
-		return false
-	}
+	isBatching, _ := redis.GetBool(currentlyBatching)
 
 	if isBatching == true {
 		fmt.Println("batch process is already executing")
