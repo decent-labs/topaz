@@ -152,7 +152,6 @@ func (hs *HashesWithApp) GetHashesForProofing(db *gorm.DB) error {
 			WHEN a.last_proofed IS NOT NULL THEN (EXTRACT(epoch FROM now()) - a.last_proofed >= a.interval)
 			ELSE (EXTRACT(epoch FROM now()) - EXTRACT(epoch FROM a.created_at) >= a.interval)
 		END
-	ORDER BY h.created_at
 	`
 
 	return db.Raw(clause).Scan(&hs).Error
