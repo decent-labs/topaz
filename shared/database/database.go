@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/jinzhu/gorm"
 	"github.com/joho/godotenv"
@@ -39,4 +40,9 @@ func init() {
 	if err := Manager.DB().Ping(); err != nil {
 		log.Fatal(err)
 	}
+
+	maxOpenConns, _ := strconv.Atoi(os.Getenv("DB_MAX_OPEN_CONNS"))
+	maxIdleConns, _ := strconv.Atoi(os.Getenv("DB_MAX_IDLE_CONNS"))
+	Manager.DB().SetMaxOpenConns(maxOpenConns)
+	Manager.DB().SetMaxIdleConns(maxIdleConns)
 }
