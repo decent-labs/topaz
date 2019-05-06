@@ -9,6 +9,7 @@ import (
 	"github.com/decentorganization/topaz/shared/database"
 	"github.com/decentorganization/topaz/shared/ethereum"
 	"github.com/decentorganization/topaz/shared/models"
+	"github.com/decentorganization/topaz/shared/redis"
 	"github.com/joho/godotenv"
 	"github.com/multiformats/go-multihash"
 )
@@ -20,9 +21,30 @@ type appHashesBundle struct {
 
 type fullCollection map[string]*appHashesBundle
 
+var currentlyBatching = "currently_batching"
 var afterBatchSleep = 1000
 
+func safeBatch() bool {
+	isBatching, err := redis.GetBool(currentlyBatching)
+
+	if err != nil {
+		fmt.Println("error getting batch status from redis:", err)
+		return false
+	}
+
+	if isBatching == true {
+		fmt.Println("batch process is already executing")
+		return false
+	}
+
+	return true
+}
+
 func mainLoop() {
+	if !safeBatch() {
+		return
+	}
+
 	hwa := new(models.HashesWithApp)
 	if err := hwa.GetHashesForProofing(database.Manager); err != nil {
 		fmt.Println("Had trouble getting hashes for new proof:", err.Error())
