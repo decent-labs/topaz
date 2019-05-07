@@ -31,10 +31,9 @@ func safeBatch() bool {
 
 	if isBatching == true {
 		fmt.Println("batch process is already executing")
-		return false
 	}
 
-	return true
+	return !isBatching
 }
 
 func mainLoop() {
