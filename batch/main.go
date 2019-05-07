@@ -98,8 +98,8 @@ func makeMerkleRoot(hashes models.Hashes) ([]byte, error) {
 	return root, err
 }
 
-func submitBlockchainTransactions(root []byte) (string, error) {
-	tx, err := ethereum.Store(root)
+func submitBlockchainTransactions(root []byte, nonce uint64) (string, error) {
+	tx, err := ethereum.Store(root, nonce)
 	if err != nil {
 		fmt.Println("Had trouble storing hash in Ethereum transation:", err.Error())
 	}
@@ -159,16 +159,22 @@ func saveProofData(p *models.Proof, bt models.BlockchainTransaction, hashes mode
 }
 
 func makeProofs(fullCollection fullCollection) {
+	nonce, err := ethereum.GetCurrentNonce()
+	if err != nil {
+		return
+	}
+
 	for _, bundle := range fullCollection {
 		root, err := makeMerkleRoot(bundle.Hashes)
 		if err != nil {
 			continue
 		}
 
-		tx, err := submitBlockchainTransactions(root)
+		tx, err := submitBlockchainTransactions(root, nonce)
 		if err != nil {
 			continue
 		}
+		nonce++
 
 		// make sure the app LastProofed is actually getting updated
 		p := makeProofModel(root, bundle.App)

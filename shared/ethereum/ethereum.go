@@ -22,13 +22,17 @@ var from common.Address
 var client *ethclient.Client
 var privateKey *ecdsa.PrivateKey
 
-// Store takes a hash and puts it in a transaction
-func Store(hash []byte) (string, error) {
+// GetCurrentNonce ...
+func GetCurrentNonce() (uint64, error) {
 	nonce, err := client.PendingNonceAt(context.Background(), from)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("couldn't get nonce:", err)
 	}
+	return nonce, err
+}
 
+// Store takes a hash and puts it in a transaction
+func Store(hash []byte, nonce uint64) (string, error) {
 	to := from
 	value := big.NewInt(0)
 
