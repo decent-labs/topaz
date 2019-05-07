@@ -36,34 +36,33 @@ func safeBatch() bool {
 	return !isBatching
 }
 
+func updateBatchingState(newState bool) error {
+	err := redis.SetValue(currentlyBatching, newState)
+	if err != nil {
+		fmt.Println("error changing redis batching state to", newState, ":", err)
+	}
+	return err
+}
+
 func mainLoop() {
 	if !safeBatch() {
 		return
 	}
 
-	if err := redis.SetValue(currentlyBatching, true); err != nil {
-		fmt.Println("err telling redis that a batch is starting:", err)
+	if err := updateBatchingState(true); err != nil {
 		return
 	}
 
 	hwa := new(models.HashesWithApp)
 	if err := hwa.GetHashesForProofing(database.Manager); err != nil {
 		fmt.Println("Had trouble getting hashes for new proof:", err.Error())
-
-		if err := redis.SetValue(currentlyBatching, false); err != nil {
-			fmt.Println("error telling redis that we're done batching")
-		}
-
+		updateBatchingState(false)
 		return
 	}
 
 	if len(*hwa) == 0 {
 		fmt.Println("No hashes to proof")
-
-		if err := redis.SetValue(currentlyBatching, false); err != nil {
-			fmt.Println("error telling redis that we're done batching")
-		}
-
+		updateBatchingState(false)
 		return
 	}
 
@@ -154,9 +153,7 @@ func mainLoop() {
 		dbtx.Commit()
 	}
 
-	if err := redis.SetValue(currentlyBatching, false); err != nil {
-		fmt.Println("error telling redis that we're done batching")
-	}
+	updateBatchingState(false)
 
 	time.Sleep(time.Duration(afterBatchSleep) * time.Millisecond)
 }
