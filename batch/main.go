@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"math/big"
 	"os"
 	"os/signal"
+	"sort"
 	"strconv"
 	"syscall"
 	"time"
@@ -17,11 +19,12 @@ import (
 )
 
 type appHashesBundle struct {
-	App    models.App
-	Hashes models.Hashes
+	App      models.App
+	Hashes   models.Hashes
+	TimeLeft int
 }
 
-type fullCollection map[string]*appHashesBundle
+type fullCollection []*appHashesBundle
 
 var currentlyBatching = "currently_batching"
 var afterBatchSleep = 1000
@@ -31,44 +34,30 @@ func safeBatch() bool {
 
 	if isBatching == true {
 		fmt.Println("batch process is already executing")
-		return false
 	}
 
-	return true
+	return !isBatching
 }
 
-func mainLoop() {
-	if !safeBatch() {
-		return
+func updateBatchingState(newState bool) error {
+	err := redis.SetValue(currentlyBatching, newState)
+	if err != nil {
+		fmt.Println("error changing redis batching state to", newState, ":", err)
 	}
+	return err
+}
 
-	if err := redis.SetValue(currentlyBatching, true); err != nil {
-		fmt.Println("err telling redis that a batch is starting:", err)
-		return
-	}
-
+func getAllHashes() (*models.HashesWithApp, error) {
 	hwa := new(models.HashesWithApp)
-	if err := hwa.GetHashesForProofing(database.Manager); err != nil {
+	err := hwa.GetHashesForProofing(database.Manager)
+	if err != nil {
 		fmt.Println("Had trouble getting hashes for new proof:", err.Error())
-
-		if err := redis.SetValue(currentlyBatching, false); err != nil {
-			fmt.Println("error telling redis that we're done batching")
-		}
-
-		return
 	}
+	return hwa, err
+}
 
-	if len(*hwa) == 0 {
-		fmt.Println("No hashes to proof")
-
-		if err := redis.SetValue(currentlyBatching, false); err != nil {
-			fmt.Println("error telling redis that we're done batching")
-		}
-
-		return
-	}
-
-	fullCollection := make(map[string]*appHashesBundle)
+func makeCollection(hwa *models.HashesWithApp) fullCollection {
+	appMap := make(map[string]*appHashesBundle)
 
 	for _, ha := range *hwa {
 		hash := models.Hash{
@@ -93,72 +82,158 @@ func mainLoop() {
 			UserID:      ha.AppUserID,
 		}
 
-		if fullCollection[app.ID] == nil {
-			fullCollection[app.ID] = &appHashesBundle{App: app}
+		if appMap[app.ID] == nil {
+			appMap[app.ID] = &appHashesBundle{App: app}
+			appMap[app.ID].TimeLeft = ha.TimeLeft
 		}
 
-		fullCollection[app.ID].Hashes = append(fullCollection[app.ID].Hashes, hash)
+		appMap[app.ID].Hashes = append(appMap[app.ID].Hashes, hash)
+	}
+
+	var fullCollection fullCollection
+	for _, bundle := range appMap {
+		fullCollection = append(fullCollection, bundle)
+	}
+
+	sort.Slice(fullCollection, func(i, j int) bool {
+		return fullCollection[i].TimeLeft < fullCollection[j].TimeLeft
+	})
+
+	return fullCollection
+}
+
+func makeMerkleRoot(hashes models.Hashes) ([]byte, error) {
+	ms := hashes.MakeMerkleLeafs()
+	root, err := ms.GetMerkleRoot()
+	if err != nil {
+		fmt.Println("Had trouble creating merkle root:", err.Error())
+	}
+	return root, err
+}
+
+func submitBlockchainTransactions(root []byte, nonce uint64, gasPrice, networkID *big.Int) (string, error) {
+	tx, err := ethereum.Store(root, nonce, gasPrice, networkID)
+	if err != nil {
+		fmt.Println("Had trouble storing hash in Ethereum transation:", err.Error())
+	}
+	return tx, err
+}
+
+func makeProofModel(root []byte, app models.App) models.Proof {
+	ut := time.Now().Unix()
+	app.LastProofed = &ut
+
+	var rootMultihash multihash.Multihash = root
+	rootString := rootMultihash.B58String()
+
+	p := models.Proof{
+		App:           &app,
+		MerkleRoot:    rootString,
+		UnixTimestamp: ut,
+	}
+
+	return p
+}
+
+func createBlockchainTransaction(p *models.Proof, tx string) (*models.BlockchainTransaction, error) {
+	bcNetwork := new(models.BlockchainNetwork)
+	if err := bcNetwork.GetBlockchainNetworkFromName(database.Manager, "ethereum goerli"); err != nil {
+		fmt.Println("Had trouble getting blockchain network:", err.Error())
+		return nil, err
+	}
+
+	bt := models.BlockchainTransaction{
+		Proof:               p,
+		BlockchainNetworkID: bcNetwork.ID,
+		TransactionHash:     tx,
+	}
+
+	return &bt, nil
+}
+
+func saveProofData(p *models.Proof, bt models.BlockchainTransaction, hashes models.Hashes) error {
+	dbtx := database.Manager.Begin()
+
+	if err := bt.CreateBlockchainTransaction(dbtx); err != nil {
+		fmt.Println("Had trouble creating blockchain transaction record:", err.Error())
+		dbtx.Rollback()
+		return err
+	}
+
+	if err := hashes.UpdateWithProof(dbtx, &p.ID); err != nil {
+		fmt.Println("Had trouble updating hashes with proof:", err.Error())
+		dbtx.Rollback()
+		return err
+	}
+
+	dbtx.Commit()
+
+	return nil
+}
+
+func makeProof(bundle *appHashesBundle, nonce uint64, gasPrice, networkID *big.Int) {
+	root, err := makeMerkleRoot(bundle.Hashes)
+	if err != nil {
+		return
+	}
+
+	tx, err := submitBlockchainTransactions(root, nonce, gasPrice, networkID)
+	if err != nil {
+		return
+	}
+
+	p := makeProofModel(root, bundle.App)
+
+	bt, err := createBlockchainTransaction(&p, tx)
+	if err != nil {
+		return
+	}
+
+	saveProofData(&p, *bt, bundle.Hashes)
+}
+
+func makeProofs(fullCollection fullCollection) {
+	nonce, err := ethereum.GetCurrentNonce()
+	if err != nil {
+		return
+	}
+
+	gasPrice, err := ethereum.GetSuggestedGasPrice()
+	if err != nil {
+		return
+	}
+
+	networkID, err := ethereum.GetNetworkID()
+	if err != nil {
+		return
 	}
 
 	for _, bundle := range fullCollection {
-		ms := bundle.Hashes.MakeMerkleLeafs()
-		root, err := ms.GetMerkleRoot()
-		if err != nil {
-			fmt.Println("Had trouble creating merkle root:", err.Error())
-			continue
-		}
+		makeProof(bundle, nonce, gasPrice, networkID)
+		nonce++
+	}
+}
 
-		tx, err := ethereum.Store(root)
-		if err != nil {
-			fmt.Println("Had trouble storing hash in Ethereum transation:", err.Error())
-			continue
-		}
-
-		ut := time.Now().Unix()
-		bundle.App.LastProofed = &ut
-
-		var rootMultihash multihash.Multihash = root
-		rootString := rootMultihash.B58String()
-
-		p := models.Proof{
-			App:           &bundle.App,
-			MerkleRoot:    rootString,
-			UnixTimestamp: ut,
-		}
-
-		bcNetwork := new(models.BlockchainNetwork)
-		if err := bcNetwork.GetBlockchainNetworkFromName(database.Manager, "ethereum goerli"); err != nil {
-			fmt.Println("Had trouble getting blockchain network:", err.Error())
-			continue
-		}
-
-		bt := models.BlockchainTransaction{
-			Proof:               &p,
-			BlockchainNetworkID: bcNetwork.ID,
-			TransactionHash:     tx,
-		}
-
-		dbtx := database.Manager.Begin()
-
-		if err := bt.CreateBlockchainTransaction(dbtx); err != nil {
-			fmt.Println("Had trouble creating blockchain transaction record:", err.Error())
-			dbtx.Rollback()
-			continue
-		}
-
-		if err := bundle.Hashes.UpdateWithProof(dbtx, &p.ID); err != nil {
-			fmt.Println("Had trouble updating hashes with proof:", err.Error())
-			dbtx.Rollback()
-			continue
-		}
-
-		dbtx.Commit()
+func mainLoop() {
+	if !safeBatch() {
+		return
 	}
 
-	if err := redis.SetValue(currentlyBatching, false); err != nil {
-		fmt.Println("error telling redis that we're done batching")
+	if err := updateBatchingState(true); err != nil {
+		return
 	}
 
+	hwa, err := getAllHashes()
+	if err != nil {
+		return
+	}
+
+	if len(*hwa) > 0 {
+		fullCollection := makeCollection(hwa)
+		makeProofs(fullCollection)
+	}
+
+	updateBatchingState(false)
 	time.Sleep(time.Duration(afterBatchSleep) * time.Millisecond)
 }
 

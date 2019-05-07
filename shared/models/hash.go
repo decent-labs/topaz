@@ -61,6 +61,7 @@ type HashWithApp struct {
 	AppName           string     `gorm:"column:app_name"`
 	AppLastProofed    *int64     `gorm:"column:app_last_proofed"`
 	AppUserID         string     `gorm:"column:app_user_id"`
+	TimeLeft          int        `gorm:"column:time_left"`
 }
 
 // HashesWithApp ...
@@ -140,7 +141,11 @@ func (hs *HashesWithApp) GetHashesForProofing(db *gorm.DB) error {
 		a.interval AS app_interval,
 		a.name AS app_name,
 		a.last_proofed AS app_last_proofed,
-		a.user_id AS app_user_id
+		a.user_id AS app_user_id,
+		CASE 
+			WHEN a.last_proofed IS NOT NULL THEN CAST(a.interval - (EXTRACT(epoch FROM now()) - a.last_proofed) AS INTEGER)
+			ELSE CAST(a.interval - (EXTRACT(epoch FROM now()) - EXTRACT(epoch FROM a.created_at)) AS INTEGER)
+		END AS time_left
 	FROM
 		hashes h
 		JOIN objects o ON o.id = h.object_id
