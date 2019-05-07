@@ -44,6 +44,24 @@ func updateBatchingState(newState bool) error {
 	return err
 }
 
+func getAllHashes() (*models.HashesWithApp, error) {
+	hwa := new(models.HashesWithApp)
+
+	if err := hwa.GetHashesForProofing(database.Manager); err != nil {
+		fmt.Println("Had trouble getting hashes for new proof:", err.Error())
+		updateBatchingState(false)
+		return nil, err
+	}
+
+	if len(*hwa) == 0 {
+		fmt.Println("No hashes to proof")
+		updateBatchingState(false)
+		return nil, nil
+	}
+
+	return hwa, nil
+}
+
 func mainLoop() {
 	if !safeBatch() {
 		return
@@ -53,16 +71,8 @@ func mainLoop() {
 		return
 	}
 
-	hwa := new(models.HashesWithApp)
-	if err := hwa.GetHashesForProofing(database.Manager); err != nil {
-		fmt.Println("Had trouble getting hashes for new proof:", err.Error())
-		updateBatchingState(false)
-		return
-	}
-
-	if len(*hwa) == 0 {
-		fmt.Println("No hashes to proof")
-		updateBatchingState(false)
+	hwa, err := getAllHashes()
+	if err != nil {
 		return
 	}
 
