@@ -5,6 +5,7 @@ import (
 	"math/big"
 	"os"
 	"os/signal"
+	"sort"
 	"strconv"
 	"syscall"
 	"time"
@@ -93,6 +94,10 @@ func makeCollection(hwa *models.HashesWithApp) fullCollection {
 	for _, bundle := range appMap {
 		fullCollection = append(fullCollection, bundle)
 	}
+
+	sort.Slice(fullCollection, func(i, j int) bool {
+		return fullCollection[i].TimeLeft < fullCollection[j].TimeLeft
+	})
 
 	return fullCollection
 }
