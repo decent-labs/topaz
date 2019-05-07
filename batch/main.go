@@ -22,7 +22,7 @@ type appHashesBundle struct {
 	Hashes models.Hashes
 }
 
-type fullCollection map[string]*appHashesBundle
+type fullCollection []*appHashesBundle
 
 var currentlyBatching = "currently_batching"
 var afterBatchSleep = 1000
@@ -55,7 +55,7 @@ func getAllHashes() (*models.HashesWithApp, error) {
 }
 
 func makeCollection(hwa *models.HashesWithApp) fullCollection {
-	fullCollection := make(fullCollection)
+	appMap := make(map[string]*appHashesBundle)
 
 	for _, ha := range *hwa {
 		hash := models.Hash{
@@ -80,11 +80,16 @@ func makeCollection(hwa *models.HashesWithApp) fullCollection {
 			UserID:      ha.AppUserID,
 		}
 
-		if fullCollection[app.ID] == nil {
-			fullCollection[app.ID] = &appHashesBundle{App: app}
+		if appMap[app.ID] == nil {
+			appMap[app.ID] = &appHashesBundle{App: app}
 		}
 
-		fullCollection[app.ID].Hashes = append(fullCollection[app.ID].Hashes, hash)
+		appMap[app.ID].Hashes = append(appMap[app.ID].Hashes, hash)
+	}
+
+	var fullCollection fullCollection
+	for _, bundle := range appMap {
+		fullCollection = append(fullCollection, bundle)
 	}
 
 	return fullCollection
