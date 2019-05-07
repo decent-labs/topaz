@@ -66,7 +66,7 @@ func mainLoop() {
 		return
 	}
 
-	fullCollection := make(map[string]*appHashesBundle)
+	fullCollection := make(fullCollection)
 
 	for _, ha := range *hwa {
 		hash := models.Hash{
