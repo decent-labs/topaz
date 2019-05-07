@@ -107,6 +107,66 @@ func makeMerkleRoot(hashes models.Hashes) ([]byte, error) {
 	return root, err
 }
 
+func submitBlockchainTransactions(root []byte) (string, error) {
+	tx, err := ethereum.Store(root)
+	if err != nil {
+		fmt.Println("Had trouble storing hash in Ethereum transation:", err.Error())
+	}
+	return tx, err
+}
+
+func makeProofModel(root []byte, app models.App) models.Proof {
+	ut := time.Now().Unix()
+	app.LastProofed = &ut
+
+	var rootMultihash multihash.Multihash = root
+	rootString := rootMultihash.B58String()
+
+	p := models.Proof{
+		App:           &app,
+		MerkleRoot:    rootString,
+		UnixTimestamp: ut,
+	}
+
+	return p
+}
+
+func createBlockchainTransaction(p *models.Proof, tx string) (*models.BlockchainTransaction, error) {
+	bcNetwork := new(models.BlockchainNetwork)
+	if err := bcNetwork.GetBlockchainNetworkFromName(database.Manager, "ethereum goerli"); err != nil {
+		fmt.Println("Had trouble getting blockchain network:", err.Error())
+		return nil, err
+	}
+
+	bt := models.BlockchainTransaction{
+		Proof:               p,
+		BlockchainNetworkID: bcNetwork.ID,
+		TransactionHash:     tx,
+	}
+
+	return &bt, nil
+}
+
+func saveProofData(p *models.Proof, bt models.BlockchainTransaction, hashes models.Hashes) error {
+	dbtx := database.Manager.Begin()
+
+	if err := bt.CreateBlockchainTransaction(dbtx); err != nil {
+		fmt.Println("Had trouble creating blockchain transaction record:", err.Error())
+		dbtx.Rollback()
+		return err
+	}
+
+	if err := hashes.UpdateWithProof(dbtx, &p.ID); err != nil {
+		fmt.Println("Had trouble updating hashes with proof:", err.Error())
+		dbtx.Rollback()
+		return err
+	}
+
+	dbtx.Commit()
+
+	return nil
+}
+
 func makeProofs(fullCollection fullCollection) {
 	for _, bundle := range fullCollection {
 		root, err := makeMerkleRoot(bundle.Hashes)
@@ -114,51 +174,22 @@ func makeProofs(fullCollection fullCollection) {
 			continue
 		}
 
-		tx, err := ethereum.Store(root)
+		tx, err := submitBlockchainTransactions(root)
 		if err != nil {
-			fmt.Println("Had trouble storing hash in Ethereum transation:", err.Error())
 			continue
 		}
 
-		ut := time.Now().Unix()
-		bundle.App.LastProofed = &ut
+		// make sure the app LastProofed is actually getting updated
+		p := makeProofModel(root, bundle.App)
 
-		var rootMultihash multihash.Multihash = root
-		rootString := rootMultihash.B58String()
-
-		p := models.Proof{
-			App:           &bundle.App,
-			MerkleRoot:    rootString,
-			UnixTimestamp: ut,
-		}
-
-		bcNetwork := new(models.BlockchainNetwork)
-		if err := bcNetwork.GetBlockchainNetworkFromName(database.Manager, "ethereum goerli"); err != nil {
-			fmt.Println("Had trouble getting blockchain network:", err.Error())
+		bt, err := createBlockchainTransaction(&p, tx)
+		if err != nil {
 			continue
 		}
 
-		bt := models.BlockchainTransaction{
-			Proof:               &p,
-			BlockchainNetworkID: bcNetwork.ID,
-			TransactionHash:     tx,
-		}
-
-		dbtx := database.Manager.Begin()
-
-		if err := bt.CreateBlockchainTransaction(dbtx); err != nil {
-			fmt.Println("Had trouble creating blockchain transaction record:", err.Error())
-			dbtx.Rollback()
+		if err := saveProofData(&p, *bt, bundle.Hashes); err != nil {
 			continue
 		}
-
-		if err := bundle.Hashes.UpdateWithProof(dbtx, &p.ID); err != nil {
-			fmt.Println("Had trouble updating hashes with proof:", err.Error())
-			dbtx.Rollback()
-			continue
-		}
-
-		dbtx.Commit()
 	}
 }
 
