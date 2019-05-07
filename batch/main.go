@@ -99,8 +99,8 @@ func makeMerkleRoot(hashes models.Hashes) ([]byte, error) {
 	return root, err
 }
 
-func submitBlockchainTransactions(root []byte, nonce uint64, gasPrice *big.Int) (string, error) {
-	tx, err := ethereum.Store(root, nonce, gasPrice)
+func submitBlockchainTransactions(root []byte, nonce uint64, gasPrice, networkID *big.Int) (string, error) {
+	tx, err := ethereum.Store(root, nonce, gasPrice, networkID)
 	if err != nil {
 		fmt.Println("Had trouble storing hash in Ethereum transation:", err.Error())
 	}
@@ -159,13 +159,13 @@ func saveProofData(p *models.Proof, bt models.BlockchainTransaction, hashes mode
 	return nil
 }
 
-func makeProof(bundle *appHashesBundle, nonce uint64, gasPrice *big.Int) {
+func makeProof(bundle *appHashesBundle, nonce uint64, gasPrice, networkID *big.Int) {
 	root, err := makeMerkleRoot(bundle.Hashes)
 	if err != nil {
 		return
 	}
 
-	tx, err := submitBlockchainTransactions(root, nonce, gasPrice)
+	tx, err := submitBlockchainTransactions(root, nonce, gasPrice, networkID)
 	if err != nil {
 		return
 	}
@@ -191,8 +191,13 @@ func makeProofs(fullCollection fullCollection) {
 		return
 	}
 
+	networkID, err := ethereum.GetNetworkID()
+	if err != nil {
+		return
+	}
+
 	for _, bundle := range fullCollection {
-		makeProof(bundle, nonce, gasPrice)
+		makeProof(bundle, nonce, gasPrice, networkID)
 		nonce++
 	}
 }

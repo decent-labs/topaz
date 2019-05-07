@@ -40,8 +40,17 @@ func GetSuggestedGasPrice() (*big.Int, error) {
 	return gasPrice, err
 }
 
+// GetNetworkID ...
+func GetNetworkID() (*big.Int, error) {
+	chainID, err := client.NetworkID(context.Background())
+	if err != nil {
+		fmt.Println("couldn't get the chainID", err)
+	}
+	return chainID, err
+}
+
 // Store takes a hash and puts it in a transaction
-func Store(hash []byte, nonce uint64, gasPrice *big.Int) (string, error) {
+func Store(hash []byte, nonce uint64, gasPrice, chainID *big.Int) (string, error) {
 	to := from
 	value := big.NewInt(0)
 
@@ -60,12 +69,6 @@ func Store(hash []byte, nonce uint64, gasPrice *big.Int) (string, error) {
 	gasLimit := uint64(baseFee + (byteFee * len(hash)))
 
 	newTx := types.NewTransaction(nonce, to, value, gasLimit, gasPrice, hash)
-
-	chainID, err := client.NetworkID(context.Background())
-	if err != nil {
-		fmt.Println("couldn't get the chainID", err)
-		return "", err
-	}
 
 	signedTx, err := types.SignTx(newTx, types.NewEIP155Signer(chainID), privateKey)
 	if err != nil {
