@@ -18,8 +18,9 @@ import (
 )
 
 type appHashesBundle struct {
-	App    models.App
-	Hashes models.Hashes
+	App      models.App
+	Hashes   models.Hashes
+	TimeLeft int
 }
 
 type fullCollection []*appHashesBundle
@@ -82,6 +83,7 @@ func makeCollection(hwa *models.HashesWithApp) fullCollection {
 
 		if appMap[app.ID] == nil {
 			appMap[app.ID] = &appHashesBundle{App: app}
+			appMap[app.ID].TimeLeft = ha.TimeLeft
 		}
 
 		appMap[app.ID].Hashes = append(appMap[app.ID].Hashes, hash)
