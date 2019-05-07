@@ -158,6 +158,27 @@ func saveProofData(p *models.Proof, bt models.BlockchainTransaction, hashes mode
 	return nil
 }
 
+func makeProof(bundle *appHashesBundle, nonce uint64) {
+	root, err := makeMerkleRoot(bundle.Hashes)
+	if err != nil {
+		return
+	}
+
+	tx, err := submitBlockchainTransactions(root, nonce)
+	if err != nil {
+		return
+	}
+
+	p := makeProofModel(root, bundle.App)
+
+	bt, err := createBlockchainTransaction(&p, tx)
+	if err != nil {
+		return
+	}
+
+	saveProofData(&p, *bt, bundle.Hashes)
+}
+
 func makeProofs(fullCollection fullCollection) {
 	nonce, err := ethereum.GetCurrentNonce()
 	if err != nil {
@@ -165,28 +186,8 @@ func makeProofs(fullCollection fullCollection) {
 	}
 
 	for _, bundle := range fullCollection {
-		root, err := makeMerkleRoot(bundle.Hashes)
-		if err != nil {
-			continue
-		}
-
-		tx, err := submitBlockchainTransactions(root, nonce)
-		if err != nil {
-			continue
-		}
+		makeProof(bundle, nonce)
 		nonce++
-
-		// make sure the app LastProofed is actually getting updated
-		p := makeProofModel(root, bundle.App)
-
-		bt, err := createBlockchainTransaction(&p, tx)
-		if err != nil {
-			continue
-		}
-
-		if err := saveProofData(&p, *bt, bundle.Hashes); err != nil {
-			continue
-		}
 	}
 }
 
