@@ -31,8 +31,17 @@ func GetCurrentNonce() (uint64, error) {
 	return nonce, err
 }
 
+// GetSuggestedGasPrice ...
+func GetSuggestedGasPrice() (*big.Int, error) {
+	gasPrice, err := client.SuggestGasPrice(context.Background())
+	if err != nil {
+		fmt.Println("couldn't get the suggested gas price", err)
+	}
+	return gasPrice, err
+}
+
 // Store takes a hash and puts it in a transaction
-func Store(hash []byte, nonce uint64) (string, error) {
+func Store(hash []byte, nonce uint64, gasPrice *big.Int) (string, error) {
 	to := from
 	value := big.NewInt(0)
 
@@ -49,11 +58,6 @@ func Store(hash []byte, nonce uint64) (string, error) {
 	}
 
 	gasLimit := uint64(baseFee + (byteFee * len(hash)))
-	gasPrice, err := client.SuggestGasPrice(context.Background())
-	if err != nil {
-		fmt.Println("couldn't get the suggested gas price", err)
-		return "", err
-	}
 
 	newTx := types.NewTransaction(nonce, to, value, gasLimit, gasPrice, hash)
 

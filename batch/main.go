@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/big"
 	"os"
 	"os/signal"
 	"strconv"
@@ -98,8 +99,8 @@ func makeMerkleRoot(hashes models.Hashes) ([]byte, error) {
 	return root, err
 }
 
-func submitBlockchainTransactions(root []byte, nonce uint64) (string, error) {
-	tx, err := ethereum.Store(root, nonce)
+func submitBlockchainTransactions(root []byte, nonce uint64, gasPrice *big.Int) (string, error) {
+	tx, err := ethereum.Store(root, nonce, gasPrice)
 	if err != nil {
 		fmt.Println("Had trouble storing hash in Ethereum transation:", err.Error())
 	}
@@ -158,13 +159,13 @@ func saveProofData(p *models.Proof, bt models.BlockchainTransaction, hashes mode
 	return nil
 }
 
-func makeProof(bundle *appHashesBundle, nonce uint64) {
+func makeProof(bundle *appHashesBundle, nonce uint64, gasPrice *big.Int) {
 	root, err := makeMerkleRoot(bundle.Hashes)
 	if err != nil {
 		return
 	}
 
-	tx, err := submitBlockchainTransactions(root, nonce)
+	tx, err := submitBlockchainTransactions(root, nonce, gasPrice)
 	if err != nil {
 		return
 	}
@@ -185,8 +186,13 @@ func makeProofs(fullCollection fullCollection) {
 		return
 	}
 
+	gasPrice, err := ethereum.GetSuggestedGasPrice()
+	if err != nil {
+		return
+	}
+
 	for _, bundle := range fullCollection {
-		makeProof(bundle, nonce)
+		makeProof(bundle, nonce, gasPrice)
 		nonce++
 	}
 }
