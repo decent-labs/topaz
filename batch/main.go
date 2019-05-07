@@ -98,22 +98,7 @@ func makeCollection(hwa *models.HashesWithApp) fullCollection {
 	return fullCollection
 }
 
-func mainLoop() {
-	if !safeBatch() {
-		return
-	}
-
-	if err := updateBatchingState(true); err != nil {
-		return
-	}
-
-	hwa, err := getAllHashes()
-	if err != nil {
-		return
-	}
-
-	fullCollection := makeCollection(hwa)
-
+func makeProofs(fullCollection fullCollection) {
 	for _, bundle := range fullCollection {
 		ms := bundle.Hashes.MakeMerkleLeafs()
 		root, err := ms.GetMerkleRoot()
@@ -168,6 +153,25 @@ func mainLoop() {
 
 		dbtx.Commit()
 	}
+}
+
+func mainLoop() {
+	if !safeBatch() {
+		return
+	}
+
+	if err := updateBatchingState(true); err != nil {
+		return
+	}
+
+	hwa, err := getAllHashes()
+	if err != nil {
+		return
+	}
+
+	fullCollection := makeCollection(hwa)
+
+	makeProofs(fullCollection)
 
 	updateBatchingState(false)
 
