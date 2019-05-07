@@ -38,30 +38,35 @@ func Store(hash []byte, nonce uint64) (string, error) {
 
 	baseFee, err := strconv.Atoi(os.Getenv("GETH_BASE_GAS"))
 	if err != nil {
-		log.Fatal("set the geth base gas fee:", err)
+		fmt.Println("couldn't get the geth base gas fee:", err)
+		return "", err
 	}
 
 	byteFee, err := strconv.Atoi(os.Getenv("GETH_BYTE_COST"))
 	if err != nil {
-		log.Fatal("set the geth byte cost fee:", err)
+		fmt.Println("couldn't get the geth byte cost fee:", err)
+		return "", err
 	}
 
 	gasLimit := uint64(baseFee + (byteFee * len(hash)))
 	gasPrice, err := client.SuggestGasPrice(context.Background())
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("couldn't get the suggested gas price", err)
+		return "", err
 	}
 
 	newTx := types.NewTransaction(nonce, to, value, gasLimit, gasPrice, hash)
 
 	chainID, err := client.NetworkID(context.Background())
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("couldn't get the chainID", err)
+		return "", err
 	}
 
 	signedTx, err := types.SignTx(newTx, types.NewEIP155Signer(chainID), privateKey)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("couldn't sign the transaction:", err)
+		return "", err
 	}
 
 	ts := types.Transactions{signedTx}
@@ -73,7 +78,8 @@ func Store(hash []byte, nonce uint64) (string, error) {
 
 	err = client.SendTransaction(context.Background(), tx)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("couldn't send the transaction:", err)
+		return "", err
 	}
 
 	return tx.Hash().Hex(), nil
