@@ -98,12 +98,19 @@ func makeCollection(hwa *models.HashesWithApp) fullCollection {
 	return fullCollection
 }
 
+func makeMerkleRoot(hashes models.Hashes) ([]byte, error) {
+	ms := hashes.MakeMerkleLeafs()
+	root, err := ms.GetMerkleRoot()
+	if err != nil {
+		fmt.Println("Had trouble creating merkle root:", err.Error())
+	}
+	return root, err
+}
+
 func makeProofs(fullCollection fullCollection) {
 	for _, bundle := range fullCollection {
-		ms := bundle.Hashes.MakeMerkleLeafs()
-		root, err := ms.GetMerkleRoot()
+		root, err := makeMerkleRoot(bundle.Hashes)
 		if err != nil {
-			fmt.Println("Had trouble creating merkle root:", err.Error())
 			continue
 		}
 
