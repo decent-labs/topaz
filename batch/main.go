@@ -62,20 +62,7 @@ func getAllHashes() (*models.HashesWithApp, error) {
 	return hwa, nil
 }
 
-func mainLoop() {
-	if !safeBatch() {
-		return
-	}
-
-	if err := updateBatchingState(true); err != nil {
-		return
-	}
-
-	hwa, err := getAllHashes()
-	if err != nil {
-		return
-	}
-
+func makeCollection(hwa *models.HashesWithApp) fullCollection {
 	fullCollection := make(fullCollection)
 
 	for _, ha := range *hwa {
@@ -107,6 +94,25 @@ func mainLoop() {
 
 		fullCollection[app.ID].Hashes = append(fullCollection[app.ID].Hashes, hash)
 	}
+
+	return fullCollection
+}
+
+func mainLoop() {
+	if !safeBatch() {
+		return
+	}
+
+	if err := updateBatchingState(true); err != nil {
+		return
+	}
+
+	hwa, err := getAllHashes()
+	if err != nil {
+		return
+	}
+
+	fullCollection := makeCollection(hwa)
 
 	for _, bundle := range fullCollection {
 		ms := bundle.Hashes.MakeMerkleLeafs()
