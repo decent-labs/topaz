@@ -19,6 +19,8 @@ func main() {
 		Box: packr.NewBox("sql"),
 	}
 
+	merkleRootMigration(migrations)
+
 	n, err := migrate.Exec(db, "postgres", migrations, migrate.Up)
 	if err != nil {
 		log.Println("couldn't execute migrations")
