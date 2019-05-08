@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/decentorganization/topaz/api/migrations"
 	"github.com/decentorganization/topaz/api/routers"
 	"github.com/decentorganization/topaz/api/settings"
 	"github.com/joho/godotenv"
@@ -33,4 +34,5 @@ func init() {
 	}
 
 	settings.GenerateRootContent()
+	migrations.Attempt()
 }
