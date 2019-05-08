@@ -1,10 +1,12 @@
 package models
 
 import (
+	"encoding/json"
 	"strings"
 	"time"
 
 	"github.com/jinzhu/gorm"
+	multihash "github.com/multiformats/go-multihash"
 )
 
 // Proof ...
@@ -14,8 +16,9 @@ type Proof struct {
 	UpdatedAt time.Time  `json:"-"`
 	DeletedAt *time.Time `sql:"index" json:"-"`
 
-	MerkleRoot    string `json:"merkleRoot"`
-	UnixTimestamp int64  `json:"unixTimestamp"`
+	MerkleRoot          string `json:"merkleRoot" gorm:"-"`
+	MerkleRootMultiHash []byte `json:"-" gorm:"column:merkle_root"`
+	UnixTimestamp       int64  `json:"unixTimestamp"`
 
 	AppID string `json:"appId"`
 	App   *App   `json:"-"`
@@ -26,6 +29,24 @@ type Proof struct {
 
 // Proofs ...
 type Proofs []Proof
+
+// MarshalJSON ...
+func (p *Proof) MarshalJSON() ([]byte, error) {
+	type Alias Proof
+	return json.Marshal(&struct {
+		*Alias
+		MerkleRoot string `json:"merkleRoot"`
+	}{
+		Alias:      (*Alias)(p),
+		MerkleRoot: MerkleRootBytesToString(p.MerkleRootMultiHash),
+	})
+}
+
+// MerkleRootBytesToString ...
+func MerkleRootBytesToString(merkleRoot []byte) string {
+	var mh multihash.Multihash = merkleRoot
+	return "Ox" + mh.HexString()
+}
 
 // GetProofs ...
 func (ps *Proofs) GetProofs(p *Proof, db *gorm.DB) error {
