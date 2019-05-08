@@ -15,7 +15,6 @@ import (
 	"github.com/decentorganization/topaz/shared/models"
 	"github.com/decentorganization/topaz/shared/redis"
 	"github.com/joho/godotenv"
-	"github.com/multiformats/go-multihash"
 )
 
 type appHashesBundle struct {
@@ -123,13 +122,10 @@ func makeProofModel(root []byte, app models.App) models.Proof {
 	ut := time.Now().Unix()
 	app.LastProofed = &ut
 
-	var rootMultihash multihash.Multihash = root
-	rootString := rootMultihash.B58String()
-
 	p := models.Proof{
-		App:           &app,
-		MerkleRoot:    rootString,
-		UnixTimestamp: ut,
+		App:                 &app,
+		MerkleRootMultiHash: root,
+		UnixTimestamp:       ut,
 	}
 
 	return p
