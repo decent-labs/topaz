@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/decentorganization/topaz/shared/database"
-	_ "github.com/lib/pq"
 	multihash "github.com/multiformats/go-multihash"
 	migrate "github.com/rubenv/sql-migrate"
 )

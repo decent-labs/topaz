@@ -8,7 +8,6 @@ import (
 
 	"github.com/gobuffalo/packr"
 	"github.com/joho/godotenv"
-	_ "github.com/lib/pq"
 	migrate "github.com/rubenv/sql-migrate"
 )
 
