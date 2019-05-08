@@ -1,4 +1,4 @@
-package main
+package migrations
 
 import (
 	"database/sql"
@@ -14,7 +14,8 @@ import (
 
 var db *sql.DB
 
-func main() {
+// Attempt ...
+func Attempt() {
 	migrations := &migrate.PackrMigrationSource{
 		Box: packr.NewBox("sql"),
 	}
