@@ -23,34 +23,23 @@ func (IntermediateProof) TableName() string {
 }
 
 func merkleRootMigration(migrations migrate.MigrationSource) (int, error) {
+	n := 0
+
 	records, err := migrate.GetMigrationRecords(db, "postgres")
 	if err != nil {
-		fmt.Println("couldn't get migration records")
-		return 0, err
+		return n, err
 	}
 
 	lastRecord := records[len(records)-1]
 	if strings.Compare(lastRecord.Id, "20190502111700_blockchain_explorers.sql") == 0 {
-		n1, err := migrate.ExecMax(db, "postgres", migrations, migrate.Up, 1)
+		n, err = migrate.ExecMax(db, "postgres", migrations, migrate.Up, 1)
 		if err != nil {
-			fmt.Println("couldn't execute starting merkle root migration")
-			return 0, err
+			return n, err
 		}
-
-		if err := convertRoots(); err != nil {
-			return 0, err
-		}
-
-		n2, err := migrate.ExecMax(db, "postgres", migrations, migrate.Up, 1)
-		if err != nil {
-			fmt.Println("couldn't execute finishing merkle root migration")
-			return 0, err
-		}
-
-		return n1 + n2, nil
+		err = convertRoots()
 	}
 
-	return 0, nil
+	return n, err
 }
 
 func convertRoots() error {
