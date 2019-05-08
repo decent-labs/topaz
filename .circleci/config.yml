@@ -53,8 +53,12 @@ jobs: # basic units of work in a run
       #       trap "go-junit-report <${TEST_RESULTS}/go-test.out > ${TEST_RESULTS}/go-test-report.xml" EXIT
       #       make test | tee ${TEST_RESULTS}/go-test.out
 
-      - run: cd api && make build -mod=vendor # pull and build dependencies for the project
-
+      - run: 
+          command: |
+            cd api
+            go get -u github.com/gobuffalo/packr/packr
+            packr build -mod=vendor -ldflags "-linkmode external -extldflags -static" -tags netgo -installsuffix netgo -a -o ../topaz-api
+        
       - save_cache: # Store cache in the /go/pkg directory
           key: v1-pkg-cache
           paths:
@@ -69,7 +73,7 @@ jobs: # basic units of work in a run
             DB_NAME: postgres
             DB_USER: postgres
             DB_PASS: postgres
-          command: ./build/topaz-api
+          command: ./topaz-api
           background: true # keep service running and proceed to next step
 
       - run:
