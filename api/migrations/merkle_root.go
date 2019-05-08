@@ -29,6 +29,10 @@ func merkleRootMigration(migrations migrate.MigrationSource) (int, error) {
 		return n, err
 	}
 
+	if len(records) == 0 {
+		return n, err
+	}
+
 	lastRecord := records[len(records)-1]
 	if strings.Compare(lastRecord.Id, "20190502111700_blockchain_explorers.sql") == 0 {
 		n, err = migrate.ExecMax(database.Manager.DB(), "postgres", migrations, migrate.Up, 1)
