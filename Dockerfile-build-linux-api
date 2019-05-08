@@ -9,7 +9,8 @@ RUN mkdir /topaz
 COPY . /topaz/
 
 WORKDIR /topaz/api
-RUN go build -mod=vendor -ldflags "-linkmode external -extldflags -static" -tags netgo -installsuffix netgo -a -o ../topaz-api .
+RUN go get -u github.com/gobuffalo/packr/packr
+RUN packr build -mod=vendor -ldflags "-linkmode external -extldflags -static" -tags netgo -installsuffix netgo -a -o ../topaz-api .
 
 WORKDIR /topaz
 
