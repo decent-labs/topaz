@@ -4,9 +4,7 @@ services:
 
   ## the database service provides the topaz database
   database:
-    build:
-      context: ./
-      dockerfile: Dockerfile-database
+    image: postgres:11.1
     ports:
       - "${DB_PORT}:5432"
 
