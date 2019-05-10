@@ -15,10 +15,7 @@ var (
 )
 
 func init() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		fmt.Println("couldn't load dotenv:", err.Error())
-	}
+	godotenv.Load()
 
 	redisServer = fmt.Sprintf("%s:%s", os.Getenv("REDIS_HOST"), os.Getenv("REDIS_PORT"))
 
