@@ -234,10 +234,7 @@ func mainLoop() {
 }
 
 func main() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		fmt.Println("couldn't load dotenv:", err.Error())
-	}
+	godotenv.Load(".env")
 
 	var gracefulStop = make(chan os.Signal)
 	signal.Notify(gracefulStop, syscall.SIGTERM)
