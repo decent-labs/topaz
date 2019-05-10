@@ -28,11 +28,8 @@ func main() {
 }
 
 func init() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Println("couldn't load dotenv:", err.Error())
-	}
-
+	godotenv.Load(".env")
+	
 	settings.GenerateRootContent()
 	migrations.Attempt()
 }
