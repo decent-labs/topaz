@@ -18,13 +18,13 @@ jobs:
     steps:
       - aws-ecr/build-and-push-image:
           repo: ${AWS_API_REPO_NAME}
-          dockerfile: ${API_DOCKERFILE_NAME}
+          dockerfile: ${API_DOCKERFILE_PATH}
   build-batcher:
     executor: builder
     steps:
       - aws-ecr/build-and-push-image:
           repo: ${AWS_BATCH_REPO_NAME}
-          dockerfile: ${BATCH_DOCKERFILE_NAME}
+          dockerfile: ${BATCH_DOCKERFILE_PATH}
   deploy-api:
     executor: deployer
     steps:
