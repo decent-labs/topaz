@@ -16,4 +16,5 @@ WORKDIR /topaz
 
 FROM alpine:3.9.3
 COPY --from=builder /topaz/topaz-api .
-CMD ["./topaz-api"]  
+RUN apk add --update --no-cache libc6-compat ca-certificates
+CMD ["./topaz-api"]
