@@ -17,10 +17,7 @@ import (
 var Manager *gorm.DB
 
 func init() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Println("couldn't load dotenv:", err.Error())
-	}
+	godotenv.Load()
 
 	dbConn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		os.Getenv("DB_HOST"),
