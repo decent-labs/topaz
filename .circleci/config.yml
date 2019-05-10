@@ -47,25 +47,25 @@ workflows:
     jobs:
       - build-api:
           context: topaz-prod-api
-          # filters:
-          #   branches:
-          #     only: master
+          filters:
+            branches:
+              only: develop
       - build-batcher:
           context: topaz-prod-batch
-          # filters:
-          #   branches:
-          #     only: master
+          filters:
+            branches:
+              only: develop
       - deploy-api:
           context: topaz-prod-api
           requires:
             - build-api
-          # filters:
-          #   branches:
-          #     only: master
+          filters:
+            branches:
+              only: develop
       - deploy-batcher:
           context: topaz-prod-batch
           requires:
             - build-batcher
-          # filters:
-          #   branches:
-          #     only: master
+          filters:
+            branches:
+              only: develop
