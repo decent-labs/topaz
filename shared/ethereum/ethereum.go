@@ -93,10 +93,7 @@ func Store(hash []byte, nonce uint64, gasPrice, chainID *big.Int) (string, error
 }
 
 func init() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Println("couldn't load dotenv:", err.Error())
-	}
+	godotenv.Load()
 
 	conn := fmt.Sprintf("%s:%s", os.Getenv("GETH_HOST"), os.Getenv("GETH_PORT"))
 	bc, err := ethclient.Dial(conn)
