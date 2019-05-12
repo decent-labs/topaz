@@ -254,7 +254,7 @@ func main() {
 		}
 	}()
 
-	i, _ := strconv.Atoi(os.Getenv("BATCH_TICKER"))
+	i, _ := strconv.Atoi(os.Getenv("BATCH_TICKER_S"))
 	tick := time.Tick(time.Duration(i) * time.Second)
 	for {
 		select {
