@@ -212,7 +212,16 @@ func makeProofs(fullCollection fullCollection) {
 	}
 }
 
+var tick bool
+
 func mainLoop() {
+	if tick {
+		fmt.Println("tock")
+	} else {
+		fmt.Println("tick")
+	}
+	tick = !tick
+
 	if !safeBatch() {
 		return
 	}
