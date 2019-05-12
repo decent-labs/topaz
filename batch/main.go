@@ -26,7 +26,8 @@ type appHashesBundle struct {
 type fullCollection []*appHashesBundle
 
 var currentlyBatching = "currently_batching"
-var afterBatchSleep = 1000
+var afterBatchSleep time.Duration
+var redisExpiration int
 
 func safeBatch() bool {
 	isBatching, _ := redis.GetBool(currentlyBatching)
@@ -39,20 +40,20 @@ func safeBatch() bool {
 }
 
 func updateBatchingState(newState bool) error {
-	err := redis.SetValue(currentlyBatching, newState)
+	err := redis.SetValue(currentlyBatching, newState, redisExpiration)
 	if err != nil {
 		fmt.Println("error changing redis batching state to", newState, ":", err)
 	}
 	return err
 }
 
-func getAllHashes() (*models.HashesWithApp, error) {
+func getAllHashes() *models.HashesWithApp {
 	hwa := new(models.HashesWithApp)
 	err := hwa.GetHashesForProofing(database.Manager)
 	if err != nil {
 		fmt.Println("Had trouble getting hashes for new proof:", err.Error())
 	}
-	return hwa, err
+	return hwa
 }
 
 func makeCollection(hwa *models.HashesWithApp) fullCollection {
@@ -204,13 +205,25 @@ func makeProofs(fullCollection fullCollection) {
 		return
 	}
 
+	fmt.Println("creating", len(fullCollection), "transactions with gasPrice", gasPrice, "starting at nonce", nonce)
+
 	for _, bundle := range fullCollection {
+		updateBatchingState(true)
 		makeProof(bundle, nonce, gasPrice, networkID)
 		nonce++
 	}
 }
 
+var tick bool
+
 func mainLoop() {
+	if tick {
+		fmt.Println("tock")
+	} else {
+		fmt.Println("tick")
+	}
+	tick = !tick
+
 	if !safeBatch() {
 		return
 	}
@@ -219,22 +232,26 @@ func mainLoop() {
 		return
 	}
 
-	hwa, err := getAllHashes()
-	if err != nil {
-		return
-	}
-
+	hwa := getAllHashes()
 	if len(*hwa) > 0 {
-		fullCollection := makeCollection(hwa)
-		makeProofs(fullCollection)
+		makeProofs(makeCollection(hwa))
 	}
 
 	updateBatchingState(false)
-	time.Sleep(time.Duration(afterBatchSleep) * time.Millisecond)
+	time.Sleep(afterBatchSleep)
 }
 
 func main() {
 	godotenv.Load()
+
+	batchTicker, _ := strconv.Atoi(os.Getenv("BATCH_TICKER_S"))
+	redisExpiration, _ = strconv.Atoi(os.Getenv("BATCH_REDIS_FLAG_EXPIRATION_S"))
+	afterBatchSleepS, _ := strconv.Atoi(os.Getenv("BATCH_SLEEP_AFTER_LOOP_S"))
+	afterBatchSleep = time.Duration(afterBatchSleepS) * time.Second
+
+	fmt.Println("batch ticker duraiton:", batchTicker, "s")
+	fmt.Println("redis flag expiration duration:", redisExpiration, "s")
+	fmt.Println("sleep after loop duration:", afterBatchSleepS, "s")
 
 	var gracefulStop = make(chan os.Signal)
 	signal.Notify(gracefulStop, syscall.SIGTERM)
@@ -243,7 +260,7 @@ func main() {
 		sig := <-gracefulStop
 		fmt.Printf("caught sig: %+v\n", sig)
 
-		tick := time.Tick(time.Duration((afterBatchSleep / 2)) * time.Millisecond)
+		tick := time.Tick(afterBatchSleep / 2)
 		for {
 			select {
 			case <-tick:
@@ -254,8 +271,7 @@ func main() {
 		}
 	}()
 
-	i, _ := strconv.Atoi(os.Getenv("BATCH_TICKER"))
-	tick := time.Tick(time.Duration(i) * time.Second)
+	tick := time.Tick(time.Duration(batchTicker) * time.Second)
 	for {
 		select {
 		case <-tick:
