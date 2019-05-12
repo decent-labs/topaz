@@ -206,6 +206,7 @@ func makeProofs(fullCollection fullCollection) {
 	}
 
 	for _, bundle := range fullCollection {
+		updateBatchingState(true)
 		makeProof(bundle, nonce, gasPrice, networkID)
 		nonce++
 	}
