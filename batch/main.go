@@ -27,6 +27,7 @@ type fullCollection []*appHashesBundle
 
 var currentlyBatching = "currently_batching"
 var afterBatchSleep time.Duration
+var redisExpiration int
 
 func safeBatch() bool {
 	isBatching, _ := redis.GetBool(currentlyBatching)
@@ -39,7 +40,7 @@ func safeBatch() bool {
 }
 
 func updateBatchingState(newState bool) error {
-	err := redis.SetValue(currentlyBatching, newState)
+	err := redis.SetValue(currentlyBatching, newState, redisExpiration)
 	if err != nil {
 		fmt.Println("error changing redis batching state to", newState, ":", err)
 	}
@@ -231,6 +232,7 @@ func mainLoop() {
 func main() {
 	godotenv.Load()
 
+	redisExpiration, _ = strconv.Atoi(os.Getenv("BATCH_REDIS_FLAG_EXPIRATION_S"))
 	afterBatchSleepS, _ := strconv.Atoi(os.Getenv("BATCH_SLEEP_AFTER_LOOP_S"))
 	afterBatchSleep = time.Duration(afterBatchSleepS) * time.Second
 
