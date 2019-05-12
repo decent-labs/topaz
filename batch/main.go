@@ -26,7 +26,7 @@ type appHashesBundle struct {
 type fullCollection []*appHashesBundle
 
 var currentlyBatching = "currently_batching"
-var afterBatchSleep = 1000
+var afterBatchSleep time.Duration
 
 func safeBatch() bool {
 	isBatching, _ := redis.GetBool(currentlyBatching)
@@ -230,11 +230,14 @@ func mainLoop() {
 	}
 
 	updateBatchingState(false)
-	time.Sleep(time.Duration(afterBatchSleep) * time.Millisecond)
+	time.Sleep(afterBatchSleep)
 }
 
 func main() {
 	godotenv.Load()
+
+	afterBatchSleepS, _ := strconv.Atoi(os.Getenv("BATCH_SLEEP_AFTER_LOOP_S"))
+	afterBatchSleep = time.Duration(afterBatchSleepS) * time.Second
 
 	var gracefulStop = make(chan os.Signal)
 	signal.Notify(gracefulStop, syscall.SIGTERM)
@@ -243,7 +246,7 @@ func main() {
 		sig := <-gracefulStop
 		fmt.Printf("caught sig: %+v\n", sig)
 
-		tick := time.Tick(time.Duration((afterBatchSleep / 2)) * time.Millisecond)
+		tick := time.Tick(afterBatchSleep / 2)
 		for {
 			select {
 			case <-tick:
