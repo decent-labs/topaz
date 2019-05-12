@@ -205,6 +205,8 @@ func makeProofs(fullCollection fullCollection) {
 		return
 	}
 
+	fmt.Println("creating", len(fullCollection), "transactions with gasPrice", gasPrice, "starting at nonce", nonce)
+
 	for _, bundle := range fullCollection {
 		updateBatchingState(true)
 		makeProof(bundle, nonce, gasPrice, networkID)
