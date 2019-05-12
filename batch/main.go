@@ -46,13 +46,13 @@ func updateBatchingState(newState bool) error {
 	return err
 }
 
-func getAllHashes() (*models.HashesWithApp, error) {
+func getAllHashes() *models.HashesWithApp {
 	hwa := new(models.HashesWithApp)
 	err := hwa.GetHashesForProofing(database.Manager)
 	if err != nil {
 		fmt.Println("Had trouble getting hashes for new proof:", err.Error())
 	}
-	return hwa, err
+	return hwa
 }
 
 func makeCollection(hwa *models.HashesWithApp) fullCollection {
@@ -219,14 +219,9 @@ func mainLoop() {
 		return
 	}
 
-	hwa, err := getAllHashes()
-	if err != nil {
-		return
-	}
-
+	hwa := getAllHashes()
 	if len(*hwa) > 0 {
-		fullCollection := makeCollection(hwa)
-		makeProofs(fullCollection)
+		makeProofs(makeCollection(hwa))
 	}
 
 	updateBatchingState(false)
