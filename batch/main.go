@@ -242,9 +242,14 @@ func mainLoop() {
 func main() {
 	godotenv.Load()
 
+	batchTicker, _ := strconv.Atoi(os.Getenv("BATCH_TICKER_S"))
 	redisExpiration, _ = strconv.Atoi(os.Getenv("BATCH_REDIS_FLAG_EXPIRATION_S"))
 	afterBatchSleepS, _ := strconv.Atoi(os.Getenv("BATCH_SLEEP_AFTER_LOOP_S"))
 	afterBatchSleep = time.Duration(afterBatchSleepS) * time.Second
+
+	fmt.Println("batch ticker duraiton:", batchTicker, "s")
+	fmt.Println("redis flag expiration duration:", redisExpiration, "s")
+	fmt.Println("sleep after loop duration:", afterBatchSleepS, "s")
 
 	var gracefulStop = make(chan os.Signal)
 	signal.Notify(gracefulStop, syscall.SIGTERM)
@@ -264,8 +269,7 @@ func main() {
 		}
 	}()
 
-	i, _ := strconv.Atoi(os.Getenv("BATCH_TICKER_S"))
-	tick := time.Tick(time.Duration(i) * time.Second)
+	tick := time.Tick(time.Duration(batchTicker) * time.Second)
 	for {
 		select {
 		case <-tick:
