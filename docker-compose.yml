@@ -1,27 +1,30 @@
 version: "3"
 
 services:
-  batch:
-    build:
-      context: .
-      dockerfile: Dockerfile.batch
+
+  ## the database service provides the topaz database
+  database:
+    image: postgres:11.1
     ports:
-      - "8081:8081"
-  collect:
-    build:
-      context: .
-      dockerfile: Dockerfile.collect
+      - "${DB_PORT}:5432"
+
+  ## the ethereum service for pushing txs to the networks
+  ethereum:
+    image: trufflesuite/ganache-cli:v6.3.0
+    command: -m ${GANACHE_MNEMONIC} -i 5777 --db /ganache_data
     ports:
-      - "8080:8080"
-  ipfs:
-    image: "jbenet/go-ipfs:latest"
-    ports:
-      - "4001:4001"
-      - "127.0.0.1:5001:5001"
+      - "${GETH_PORT}:8545"
     volumes:
-      - "./ipfs/staging:/export"
-      - "./ipfs/data:/data/ipfs"
-  postgres:
-    image: "postgres:latest"
+      - ./chainstate:/ganache_data
+
+  ## the redis store provides to track blacklisted or expired JWTs
+  redis:
+    image: 'redis:5.0-alpine'
+    command: redis-server
     ports:
-      - "5432:5432"
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - 'redis:/data'
+
+volumes:
+  redis:

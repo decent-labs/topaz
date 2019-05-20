@@ -1,7 +1,3 @@
-### IPFS ###
-
-ipfs/
-
 ### Go ###
 
 # Binaries for programs and plugins
@@ -17,11 +13,6 @@ ipfs/
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
-### Go Patch ###
-
-/vendor/
-/Godeps/
-
 ### Terraform
 
 **/.terraform/*
@@ -31,3 +22,8 @@ ipfs/
 crash.log
 
 terraform.tfvars
+
+.env
+build/
+chainstate/*
+!chainstate/.keep

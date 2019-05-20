@@ -1,0 +1,71 @@
+version: 2.1
+
+orbs:
+  aws-cli: circleci/aws-cli@0.1.4
+  aws-ecr: circleci/aws-ecr@4.0.1
+  aws-ecs: circleci/aws-ecs@0.0.8
+
+executors:
+  builder:
+    machine: true
+  deployer:
+    docker:
+      - image: circleci/python:3.7.1
+
+jobs:
+  build-api:
+    executor: builder
+    steps:
+      - aws-ecr/build-and-push-image:
+          repo: ${AWS_API_REPO_NAME}
+          dockerfile: ${API_DOCKERFILE_PATH}
+  build-batcher:
+    executor: builder
+    steps:
+      - aws-ecr/build-and-push-image:
+          repo: ${AWS_BATCH_REPO_NAME}
+          dockerfile: ${BATCH_DOCKERFILE_PATH}
+  deploy-api:
+    executor: deployer
+    steps:
+      - aws-cli/install
+      - aws-ecs/update-service:
+          family: ${AWS_API_TASK_DEFINITION_NAME}
+          cluster-name: ${AWS_ECS_CLUSTER_NAME}
+          container-image-name-updates: container=${AWS_API_TASK_DEFINITION_NAME},tag=latest
+  deploy-batcher:
+    executor: deployer
+    steps:
+      - aws-cli/install
+      - aws-ecs/update-service:
+          family: ${AWS_BATCH_TASK_DEFINITION_NAME}
+          cluster-name: ${AWS_ECS_CLUSTER_NAME}
+          container-image-name-updates: container=${AWS_BATCH_TASK_DEFINITION_NAME},tag=latest
+
+workflows:
+  build-and-deploy:
+    jobs:
+      - build-api:
+          context: topaz-prod-api
+          filters:
+            branches:
+              only: master
+      - build-batcher:
+          context: topaz-prod-batch
+          filters:
+            branches:
+              only: master
+      - deploy-api:
+          context: topaz-prod-api
+          requires:
+            - build-api
+          filters:
+            branches:
+              only: master
+      - deploy-batcher:
+          context: topaz-prod-batch
+          requires:
+            - build-batcher
+          filters:
+            branches:
+              only: master
