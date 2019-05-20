@@ -2,7 +2,7 @@
     "swagger": "2.0",
     "info": {
         "title": "Topaz API",
-        "version": "0.1.23",
+        "version": "0.2.0",
         "contact": {
             "name": "Topaz",
             "url": "https://topaz.io",
