@@ -22,8 +22,6 @@ Update appropriately.
 $ docker-compose up -d
 ```
 
-The ganache-cli node will save all local blockchain and account state into the `/chainstate` folder of this repo, the contents of which are gitignored. This lets it stay persisted between `docker-compose` runs. If you need to wipe your local blockchain, delete all the files in `/chainstate` (except for `.keep`)
-
 ### Run DB migrations if you have to
 
 ```sh
