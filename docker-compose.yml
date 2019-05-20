@@ -11,11 +11,9 @@ services:
   ## the ethereum service for pushing txs to the networks
   ethereum:
     image: trufflesuite/ganache-cli:v6.3.0
-    command: -m ${GANACHE_MNEMONIC} -i 5777 --db /ganache_data
+    command: -m ${GANACHE_MNEMONIC} -i 5777
     ports:
       - "${GETH_PORT}:8545"
-    volumes:
-      - ./chainstate:/ganache_data
 
   ## the redis store provides to track blacklisted or expired JWTs
   redis:
