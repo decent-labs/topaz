@@ -5,7 +5,7 @@ import "os"
 // Rc ...
 var Rc rootContent
 
-var version = "0.1.23"
+var version = "0.2.0"
 
 type rootContent struct {
 	Version         string          `json:"version"`
