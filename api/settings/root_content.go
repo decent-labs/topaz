@@ -5,16 +5,11 @@ import "os"
 // Rc ...
 var Rc rootContent
 
-var version = "0.2.0"
+var version = "0.2.1"
 
 type rootContent struct {
-	Version         string          `json:"version"`
-	Environment     string          `json:"environment"`
-	EthereumContent ethereumContent `json:"ethereum"`
-}
-
-type ethereumContent struct {
-	EthereumNode string `json:"node"`
+	Version     string `json:"version"`
+	Environment string `json:"environment"`
 }
 
 // GenerateRootContent ...
@@ -22,8 +17,5 @@ func GenerateRootContent() {
 	Rc = rootContent{
 		Version:     version,
 		Environment: os.Getenv("GO_ENV"),
-		EthereumContent: ethereumContent{
-			EthereumNode: os.Getenv("GETH_HOST"),
-		},
 	}
 }

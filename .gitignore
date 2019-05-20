@@ -25,5 +25,3 @@ terraform.tfvars
 
 .env
 build/
-chainstate/*
-!chainstate/.keep
