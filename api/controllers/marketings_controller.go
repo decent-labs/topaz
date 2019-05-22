@@ -10,7 +10,7 @@ import (
 
 // CreateMarketingEmail ...
 func CreateMarketingEmail(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	m := new(models.SendgridEmail)
+	m := new(models.EmailWithList)
 	d := json.NewDecoder(r.Body)
 	d.Decode(&m)
 
