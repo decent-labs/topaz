@@ -101,10 +101,6 @@ func addEmailToContacts(to *models.SendgridEmails) (*models.SendgridNewContactRe
 
 	createRes, err := sendgrid.API(create)
 
-	fmt.Println(createRes.StatusCode)
-	fmt.Println(createRes.Body)
-	fmt.Println(createRes.Headers)
-
 	if err != nil {
 		fmt.Println(err)
 		return nil, false
@@ -135,10 +131,6 @@ func addContactToList(contactID, listID string) {
 	list.Method = "POST"
 
 	listRes, err := sendgrid.API(list)
-
-	fmt.Println(listRes.StatusCode)
-	fmt.Println(listRes.Body)
-	fmt.Println(listRes.Headers)
 
 	if err != nil {
 		fmt.Println(err)
