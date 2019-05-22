@@ -4,6 +4,8 @@ Topaz is a platform for api-based blockchain interaction
 
 ## Getting Started
 
+You'll need [`go`](https://golang.org/) installed.
+
 ### Sync dependencies
 
 This project uses golang modules, so simply building or running the project(s) will download and install the correct version of dependencies, based on `go.mod` and `go.sum`.
@@ -20,13 +22,6 @@ Update appropriately.
 
 ```sh
 $ docker-compose up -d
-```
-
-### Run DB migrations if you have to
-
-```sh
-$ cd migrate
-$ make run
 ```
 
 ### Start the API
