@@ -16,7 +16,12 @@ func CreateMarketingEmail(ewl *models.EmailWithList) int {
 	var mes models.SendgridEmails
 	mes = append(mes, models.SendgridEmail{Email: ewl.Email})
 
-	go CreateNewEmailOnList(&mes, os.Getenv("SENDGRID_MARKETING_UPDATES_LIST"))
+	switch ewl.List {
+	case "topaz":
+		go CreateNewEmailOnList(&mes, os.Getenv("SENDGRID_MARKETING_UPDATES_LIST"))
+	case "decentlabs":
+		go CreateNewEmailOnList(&mes, os.Getenv("SENDGRID_MARKETING_DECENTLABS_UPDATES_LIST"))
+	}
 
 	return http.StatusAccepted
 }
