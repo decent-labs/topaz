@@ -1,5 +1,11 @@
 package models
 
+// EmailWithList ...
+type EmailWithList struct {
+	Email string `json:"email"`
+	List  string `json:"list"`
+}
+
 // SendgridEmail ...
 type SendgridEmail struct {
 	Email string `json:"email"`
