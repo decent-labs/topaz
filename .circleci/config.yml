@@ -43,6 +43,23 @@ jobs:
           container-image-name-updates: container=${AWS_BATCH_TASK_DEFINITION_NAME},tag=latest
 
 workflows:
+  build:
+    jobs:
+      - build-api:
+          context: topaz-prod-api
+          filters:
+            branches:
+              ignore:
+                - develop
+                - master
+      - build-batcher:
+          context: topaz-prod-batch
+          filters:
+            branches:
+              ignore:
+                - develop
+                - master
+
   build-and-deploy:
     jobs:
       - build-api:
