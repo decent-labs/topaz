@@ -1,4 +1,4 @@
-FROM golang:1.12.4-alpine3.9 as builder
+FROM golang:1.12.8-alpine3.10 as builder
 
 RUN apk add --update --no-cache libc6-compat \
         git \
@@ -14,7 +14,7 @@ RUN packr build -mod=vendor -ldflags "-linkmode external -extldflags -static" -t
 
 WORKDIR /topaz
 
-FROM alpine:3.9.3
+FROM alpine:3.10.1
 COPY --from=builder /topaz/topaz-api .
 RUN apk add --update --no-cache libc6-compat ca-certificates
 CMD ["./topaz-api"]
