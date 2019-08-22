@@ -111,6 +111,10 @@ func (backend *JWTAuthenticationBackend) IsInBlacklist(token string) bool {
 
 func getPrivateKey() *rsa.PrivateKey {
 	data, _ := pem.Decode([]byte(pkString))
+	if data == nil {
+		panic("Can't decode JWT_PRIVATE_KEY")
+	}
+
 	privateKeyImported, err := x509.ParsePKCS1PrivateKey(data.Bytes)
 
 	if err != nil {
@@ -122,6 +126,10 @@ func getPrivateKey() *rsa.PrivateKey {
 
 func getPublicKey() *rsa.PublicKey {
 	data, _ := pem.Decode([]byte(pubString))
+	if data == nil {
+		panic("Can't decode JWT_PUBLIC_KEY")
+	}
+
 	publicKeyImported, err := x509.ParsePKIXPublicKey(data.Bytes)
 
 	if err != nil {
