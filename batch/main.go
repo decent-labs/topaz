@@ -104,7 +104,7 @@ func makeCollection(hwa *models.HashesWithApp) fullCollection {
 
 func makeMerkleRoot(hashes models.Hashes) ([]byte, error) {
 	ms := hashes.MakeMerkleLeafs()
-	root, err := ms.GetMerkleRoot()
+	root, err := ProvideMerkleRootMaker().GetRoot(&ms)
 	if err != nil {
 		fmt.Println("Had trouble creating merkle root:", err.Error())
 	}
