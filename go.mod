@@ -1,5 +1,7 @@
 module github.com/decentorganization/topaz
 
+replace git.apache.org/thrift.git => github.com/apache/thrift v0.12.0
+
 require (
 	cloud.google.com/go v0.36.0 // indirect
 	github.com/allegro/bigcache v1.2.0 // indirect
