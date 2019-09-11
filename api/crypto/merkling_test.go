@@ -82,30 +82,6 @@ var leaves = crypto.MerkleLeafs{oneLeaf}
 var contents = []merkletree.Content{oneLeaf}
 var root = []byte{1, 2, 3}
 
-func TestGetRoot_RootError(t *testing.T) {
-	rootMaker := mockRootMaker{t, contents, nil, errors.New("Can't make root")}
-	hashEncoder := mockHashEncoder{t, nil, nil, nil}
-	merkleRootMaker := crypto.NewMerkleRootMaker(rootMaker, hashEncoder)
-	_, err := merkleRootMaker.GetRoot(&leaves)
-	if err == nil {
-		t.Error("Didn't get an error")
-	} else if err.Error() != "Can't make root" {
-		t.Errorf("Got '%v' instead", err.Error())
-	}
-}
-
-func TestGetRoot_EncodeError(t *testing.T) {
-	rootMaker := mockRootMaker{t, contents, root, nil}
-	hashEncoder := mockHashEncoder{t, root, nil, errors.New("Can't encode")}
-	merkleRootMaker := crypto.NewMerkleRootMaker(rootMaker, hashEncoder)
-	_, err := merkleRootMaker.GetRoot(&leaves)
-	if err == nil {
-		t.Error("Didn't get an error")
-	} else if err.Error() != "Can't encode" {
-		t.Errorf("Got '%v' instead", err.Error())
-	}
-}
-
 func TestGetRoot_Success(t *testing.T) {
 	var encodedRoot = []byte{3, 2, 1}
 	rootMaker := mockRootMaker{t, contents, root, nil}
@@ -119,43 +95,27 @@ func TestGetRoot_Success(t *testing.T) {
 	}
 }
 
-func TestGetRoot(t *testing.T) {
-	var oneLeaf = crypto.MerkleLeaf{Hash: oneHash}
-	var leaves = crypto.MerkleLeafs{oneLeaf}
-	var contents = []merkletree.Content{oneLeaf}
-	var root = []byte{1, 2, 3}
-	var encodedRoot = []byte{3, 2, 1}
+func TestGetRoot_RootError(t *testing.T) {
+	errorText := "Can't make root"
+	rootMaker := mockRootMaker{t, contents, nil, errors.New(errorText)}
+	hashEncoder := mockHashEncoder{t, nil, nil, nil}
+	merkleRootMaker := crypto.NewMerkleRootMaker(rootMaker, hashEncoder)
+	assertError(t, &merkleRootMaker, errorText)
+}
 
-	tests := []struct {
-		root        []byte
-		rootErr     error
-		encodedRoot []byte
-		encodedErr  error
-		result      []byte
-		err         error
-	}{
-		{nil, errors.New("Can't make root"), nil, nil, nil, errors.New("Can't make root")},
-		{root, nil, nil, errors.New("Can't encode"), nil, errors.New("Can't encode")},
-		{root, nil, encodedRoot, nil, encodedRoot, nil},
-	}
+func TestGetRoot_EncodeError(t *testing.T) {
+	errorText := "Can't encode"
+	rootMaker := mockRootMaker{t, contents, root, nil}
+	hashEncoder := mockHashEncoder{t, root, nil, errors.New(errorText)}
+	merkleRootMaker := crypto.NewMerkleRootMaker(rootMaker, hashEncoder)
+	assertError(t, &merkleRootMaker, errorText)
+}
 
-	for _, tc := range tests {
-		rootMaker := mockRootMaker{t, contents, tc.root, tc.rootErr}
-		hashEncoder := mockHashEncoder{t, root, tc.encodedRoot, tc.encodedErr}
-		merkleRootMaker := crypto.NewMerkleRootMaker(rootMaker, hashEncoder)
-		b, err := merkleRootMaker.GetRoot(&leaves)
-		if tc.err == nil {
-			if err != nil {
-				t.Error(err.Error())
-			} else if string(tc.encodedRoot) != string(b) {
-				t.Error("Wrong encoded result")
-			}
-		} else {
-			if err == nil {
-				t.Error("Didn't get an error")
-			} else if err.Error() != tc.err.Error() {
-				t.Errorf("Got '%v' instead", err.Error())
-			}
-		}
+func assertError(t *testing.T, rm *crypto.MerkleRootMaker, text string) {
+	_, err := rm.GetRoot(&leaves)
+	if err == nil {
+		t.Error(text)
+	} else if err.Error() != text {
+		t.Errorf("Got '%v' instead of '%v'", err.Error(), text)
 	}
 }
