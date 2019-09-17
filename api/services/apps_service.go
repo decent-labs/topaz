@@ -12,8 +12,19 @@ import (
 	"github.com/decentorganization/topaz/shared/models"
 )
 
+type appService struct {
+	dm database.DataManager
+}
+
+// AppService ...
+type AppService interface {
+	CreateApp(u *models.User, ra *models.App) (int, []byte)
+	GetApps(u *models.User) (int, []byte)
+	GetApp(u *models.User, aid string) (int, []byte)
+}
+
 // CreateApp ...
-func CreateApp(u *models.User, ra *models.App) (int, []byte) {
+func (s appService) CreateApp(u *models.User, ra *models.App) (int, []byte) {
 	a, ok := authorization.AuthorizeApps(u)
 	if !ok {
 		return http.StatusUnauthorized, []byte("")
@@ -32,7 +43,7 @@ func CreateApp(u *models.User, ra *models.App) (int, []byte) {
 	a.Name = ra.Name
 	a.Interval = ra.Interval
 
-	if err := a.CreateApp(database.Manager); err != nil {
+	if err := s.dm.CreateApp(a); err != nil {
 		return http.StatusInternalServerError, []byte("")
 	}
 
@@ -45,14 +56,14 @@ func CreateApp(u *models.User, ra *models.App) (int, []byte) {
 }
 
 // GetApps ...
-func GetApps(u *models.User) (int, []byte) {
+func (s appService) GetApps(u *models.User) (int, []byte) {
 	a, ok := authorization.AuthorizeApps(u)
 	if !ok {
 		return http.StatusUnauthorized, []byte("")
 	}
 
 	as := new(models.Apps)
-	if err := as.GetApps(a, database.Manager); err != nil {
+	if err := s.dm.GetApps(as, a); err != nil {
 		return http.StatusUnauthorized, []byte("")
 	}
 
@@ -65,14 +76,14 @@ func GetApps(u *models.User) (int, []byte) {
 }
 
 // GetApp ...
-func GetApp(u *models.User, aid string) (int, []byte) {
+func (s appService) GetApp(u *models.User, aid string) (int, []byte) {
 	a, ok := authorization.AuthorizeApps(u)
 	if !ok {
 		return http.StatusUnauthorized, []byte("")
 	}
 
 	a.ID = aid
-	if err := a.GetApp(database.Manager); err != nil {
+	if err := s.dm.GetApp(a); err != nil {
 		return http.StatusUnauthorized, []byte("")
 	}
 
@@ -82,4 +93,9 @@ func GetApp(u *models.User, aid string) (int, []byte) {
 	}
 
 	return http.StatusOK, r
+}
+
+// NewAppService ...
+func NewAppService(dm database.DataManager) AppService {
+	return appService{dm}
 }

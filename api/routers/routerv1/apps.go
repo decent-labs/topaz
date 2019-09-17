@@ -8,25 +8,25 @@ import (
 )
 
 // SetAppsRoutes ...
-func SetAppsRoutes(r *mux.Router) *mux.Router {
+func SetAppsRoutes(r *mux.Router, c controllers.AppController) *mux.Router {
 	s := r.PathPrefix("/apps").Subrouter()
 
 	// Create new app
 	s.Handle("", negroni.New(
 		negroni.HandlerFunc(authentication.APIAuth),
-		negroni.HandlerFunc(controllers.CreateApp),
+		negroni.HandlerFunc(c.CreateApp),
 	)).Methods("POST")
 
 	// Get all apps
 	s.Handle("", negroni.New(
 		negroni.HandlerFunc(authentication.APIAuth),
-		negroni.HandlerFunc(controllers.GetApps),
+		negroni.HandlerFunc(c.GetApps),
 	)).Methods("GET")
 
 	// Get single app
 	s.Handle("/{id}", negroni.New(
 		negroni.HandlerFunc(authentication.APIAuth),
-		negroni.HandlerFunc(controllers.GetApp),
+		negroni.HandlerFunc(c.GetApp),
 	)).Methods("GET")
 
 	return r

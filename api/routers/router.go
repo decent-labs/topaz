@@ -14,7 +14,7 @@ func InitRoutes() *mux.Router {
 	sv1 = v1.SetAuthRoutes(sv1)
 	sv1 = v1.SetUsersRoutes(sv1)
 	sv1 = v1.SetAPITokensRoutes(sv1)
-	sv1 = v1.SetAppsRoutes(sv1)
+	sv1 = v1.SetAppsRoutes(sv1, ProvideAppController())
 	sv1 = v1.SetObjectsRoutes(sv1)
 	sv1 = v1.SetHashesRoutes(sv1)
 	sv1 = v1.SetProofsRoutes(sv1)
