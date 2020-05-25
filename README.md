@@ -1,11 +1,14 @@
 <p align="center">
   <a href="https://topaz.io">
-    <img alt="Topaz" src="topaz.svg" width="120" />
+    <img alt="Topaz" src="topaz.svg" width="240" />
   </a>
 </p>
-<h1 align="center">
-  Topaz
-</h1>
+<h3 align="center">
+  💎 ⛓️ 🔒
+</h3>
+<h3 align="center">
+  Placing trust in technology
+</h3>
 
 ## Getting Started
 
