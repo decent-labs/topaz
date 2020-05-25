@@ -1,6 +1,11 @@
-# Topaz
-
-Topaz is a platform for api-based blockchain interaction
+<p align="center">
+  <a href="https://topaz.io">
+    <img alt="Topaz" src="topaz.svg" width="120" />
+  </a>
+</p>
+<h1 align="center">
+  Topaz
+</h1>
 
 ## Getting Started
 
