@@ -9,6 +9,10 @@
 <h3 align="center">
   Placing trust in technology
 </h3>
+<p align="center">
+  Topaz is a free and open source "Layer 2" solution that helps developers
+  secure data from any application using Ethereum.
+</p>
 
 ## Getting Started
 
