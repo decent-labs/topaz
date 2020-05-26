@@ -14,6 +14,14 @@
   secure data from any application using Ethereum.
 </p>
 
+<h3 align="center">
+  <a href="https://topaz.io/docs/">Documentation</a>
+  <span> · </span>
+  <a href="https://topaz.io/tutorial/">Tutorial</a>
+  <span> · </span>
+  <a href="https://join.slack.com/t/topaz-developers/shared_invite/zt-7bxno80m-nGrysu2fid_vh0iFFr5hUg">Community Slack</a>
+</h3>
+
 ## Getting Started
 
 You'll need [`go`](https://golang.org/) installed.
