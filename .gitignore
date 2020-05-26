@@ -25,3 +25,6 @@ terraform.tfvars
 
 .env
 build/
+
+### VIM
+*.swp
