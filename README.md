@@ -22,6 +22,30 @@
   <a href="https://join.slack.com/t/topaz-developers/shared_invite/zt-7bxno80m-nGrysu2fid_vh0iFFr5hUg">Community Slack</a>
 </h3>
 
+Topaz is a self-hosted web service that secures data at scale on Ethereum.
+
+- **Simplify Blockchain Software Development.** Integrate any existing
+  application with Ethereum, enabling blockchain use cases without smart
+  contract development or prior experience in blockchain development.
+
+- **Bypass Transaction Constraints.** Topaz batches transactions into secure
+  data structures, anchoring many transactions on chain at once avoiding the
+  scaling constraints of transaction throughput.
+
+- **Outscale Any Blockchain.** Our hybrid development pattern using data from
+  centralized applications secured on decentralized networks enables the usage
+  of blockchains for data integrity at the massive scale the web demands.
+
+- **Trial with Ease.** Our SDKs enable Topaz integration with just three lines
+  of code - now, anyone can experiment with using blockchains to create
+  transparent, trustless applications with ease.
+
+- **Go to Mainnet for Pennies.** Topaz enables applications that simply could
+  not exist due to scaling constraints brought on by the cost of Ethereum
+  transactions.
+
+[**Learn how to use Topaz for your dApp project.**](https://topaz.io/docs)
+
 ## Getting Started
 
 You'll need [`go`](https://golang.org/) installed.
