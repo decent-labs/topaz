@@ -21,9 +21,40 @@
   <span> · </span>
   <a href="https://join.slack.com/t/topaz-developers/shared_invite/zt-7bxno80m-nGrysu2fid_vh0iFFr5hUg">Community Slack</a>
 </h3>
-
-Topaz is a self-hosted web service that secures data at scale on Ethereum.
-
+<p align="center">
+  Topaz is a self-hosted web service that secures data at scale on Ethereum.
+</p>
+<p align="center">
+  <a href="https://github.com/decent-labs/topaz/blob/master/LICENSE">
+    <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="Topaz is
+    released under the MIT license." />
+  </a>
+  <a href="https://circleci.com/gh/decent-labs/topaz">
+    <img src="https://circleci.com/gh/decent-labs/topaz.svg?style=shield"
+    alt="Current CircleCI build status." />
+  </a>
+  <a href="https://www.npmjs.org/package/topaz">
+    <img src="https://img.shields.io/npm/v/topaz.svg" alt="Current NPM
+    package version." />
+  </a>
+  <a href="https://npmcharts.com/compare/topaz?minimal=true">
+    <img src="https://img.shields.io/npm/dm/topaz.svg" alt="Downloads
+    per month on NPM." />
+  </a>
+  <a href="https://npmcharts.com/compare/topaz?minimal=true">
+    <img src="https://img.shields.io/npm/dt/topaz.svg" alt="Total
+    downloads on NPM." />
+  </a>
+  <a href="https://topaz.io/tutorial">
+    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg"
+    alt="PRs welcome!" />
+  </a>
+  <a href="https://twitter.com/intent/follow?screen_name=topaztellstruth">
+    <img
+    src="https://img.shields.io/twitter/follow/topaztellstruth.svg?label=Follow%20topaztellstruth"
+    alt="Follow @topaztellstruth" />
+  </a>
+</p>
 - **Simplify Blockchain Software Development.** Integrate any existing
   application with Ethereum, enabling blockchain use cases without smart
   contract development or prior experience in blockchain development.
