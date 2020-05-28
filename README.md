@@ -76,16 +76,20 @@
   not exist due to scaling constraints brought on by the cost of Ethereum
   transactions.
 
-[**Learn how to use Topaz for your dApp project.**](https://topaz.io/docs)
+<p align="center">
+  <a href="https://topaz.io/tutorial">
+    <b>Learn how to use Topaz for your next dApp project.</b>
+  </a>
+</p>
 
 ## What’s In This Document
 
-- [Getting Started](#-getting-started)
-- [Learning Topaz](#-learning-topaz)
-- [Code of Conduct](#-code-of-conduct)
-- [How to Contribute](#-how-to-contribute)
-- [License](#-license)
-- [Thanks](#-thanks)
+- [Getting Started](#getting-started)
+- [Learning Topaz](#learning-topaz)
+- [Code of Conduct](#code-of-conduct)
+- [How to Contribute](#how-to-contribute)
+- [License](#license)
+- [Thanks](#thanks)
 
 ## Getting Started
 
@@ -157,14 +161,16 @@ take a look at our [Code of Conduct](./CODE_OF_CONDUCT) for more information.
 Regardless of how you seek to contribute, we'd love to have you as part of the
 Topaz developer community!
 
-Check out our [**Developer Community Slack**](https://join.slack.com/t/topaz-developers/shared_invite/zt-7bxno80m-nGrysu2fid_vh0iFFr5hUg)
+Check out our [Developer Community Slack](https://join.slack.com/t/topaz-developers/shared_invite/zt-7bxno80m-nGrysu2fid_vh0iFFr5hUg)
 for more information about contributing to Topaz.
 
 ## License
 
 Licensed under the [MIT License](./LICENSE).
 
-## Where you at?
+## Thanks
+
+Thanks to everyone who has made a contribution, no matter how big or small!
 
 Made with :heart: in:
 * British Airways Flight 1575
