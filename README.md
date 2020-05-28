@@ -46,43 +46,58 @@ Topaz is a self-hosted web service that secures data at scale on Ethereum.
 
 [**Learn how to use Topaz for your dApp project.**](https://topaz.io/docs)
 
+## What’s In This Document
+
+- [Getting Started](#-getting-started)
+- [Learning Topaz](#-learning-topaz)
+- [How to Contribute](#-how-to-contribute)
+- [License](#-license)
+- [Thanks](#-thanks)
+
 ## Getting Started
 
 You'll need [`go`](https://golang.org/) installed.
 
-### Sync dependencies
+You can get Topaz running on your local dev environment in a few minutes with
+these four steps:
 
-This project uses golang modules, so simply building or running the project(s) will download and install the correct version of dependencies, based on `go.mod` and `go.sum`.
+1. **Configure your dev environment.**
 
-### Set up your `.env`
+    This project uses golang modules, so simple building or running the
+    project(s) will download and install the correct version of dependencies,
+    based on `go.mod` and `go.sum`.
 
-```sh
-$ cp .env.example .env
-```
+    Configure your environment:
 
-Update appropriately.
+    ```shell
+    cp .env.example .env
+    ```
 
-### Spin up external services
+2. **Start the Docker containers.**
 
-```sh
-$ docker-compose up -d
-```
+    Next, spin up your containers:
 
-### Start the API
+    ```shell
+    docker-compose up -d
+    ```
 
-```sh
-$ cd api
-$ make run
-```
+3. **Start the API.**
 
-### Begin the batch process
+    Launch the API with `make`.
 
-In a new terminal window
+    ```shell
+    cd api
+    make run
+    ```
 
-```sh
-$ cd batch
-$ make run
-```
+4. **Start the Batch process.**
+
+    In a new terminal window,
+
+    ```shell
+    cd batch
+    make run
+    ```
 
 ### Use the API
 
