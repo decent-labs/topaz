@@ -10,8 +10,8 @@
   Placing trust in technology
 </h3>
 <p align="center">
-  Topaz is a free and open source "Layer 2" solution that helps developers
-  secure data from any application using Ethereum.
+  Topaz is an open source Layer 2 solution that helps developers secure data
+  from any application using Ethereum.
 </p>
 
 <h3 align="center">
