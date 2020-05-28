@@ -55,6 +55,7 @@
     alt="Follow @topaztellstruth" />
   </a>
 </p>
+
 - **Simplify Blockchain Software Development.** Integrate any existing
   application with Ethereum, enabling blockchain use cases without smart
   contract development or prior experience in blockchain development.
@@ -81,6 +82,7 @@
 
 - [Getting Started](#-getting-started)
 - [Learning Topaz](#-learning-topaz)
+- [Code of Conduct](#-code-of-conduct)
 - [How to Contribute](#-how-to-contribute)
 - [License](#-license)
 - [Thanks](#-thanks)
@@ -130,9 +132,37 @@ these four steps:
     make run
     ```
 
-### Use the API
+At this point, you've got a fully functional Topaz running on your machine. For
+instructions on how to use Topaz and our API, see our
+[documentation](https://topaz.io/docs) and
+[tutorial](https://topaz.io/tutorial).
 
-Check out `api.md` to learn how the API functions.
+## Learning Topaz
+
+Full documentation for the Topaz API lives on our
+[docsite](https://topaz.io/docs).
+
+**For most developers, we recommend starting with our [in-depth tutorial on
+integrating an app with Topaz](https://topaz.io/tutorial).** It walks through
+every step of the process.
+
+## Code of Conduct
+
+We strive to create a healthy, inclusive, and safe environment for all people
+and follow the [Contributor Covenant](https://contributor-covenant.org). Please
+take a look at our [Code of Conduct](./CODE_OF_CONDUCT) for more information.
+
+## How to Contribute
+
+Regardless of how you seek to contribute, we'd love to have you as part of the
+Topaz developer community!
+
+Check out our [**Developer Community Slack**](https://join.slack.com/t/topaz-developers/shared_invite/zt-7bxno80m-nGrysu2fid_vh0iFFr5hUg)
+for more information about contributing to Topaz.
+
+## License
+
+Licensed under the [MIT License](./LICENSE).
 
 ## Where you at?
 
