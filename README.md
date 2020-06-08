@@ -150,7 +150,8 @@ every step of the process.
 
 We strive to create a healthy, inclusive, and safe environment for all people
 and follow the [Contributor Covenant](https://contributor-covenant.org). Please
-take a look at our [Code of Conduct](./CODE_OF_CONDUCT) for more information.
+take a look at our [Code of Conduct](./CODE_OF_CONDUCT.md) for more
+information.
 
 ## How to Contribute
 
