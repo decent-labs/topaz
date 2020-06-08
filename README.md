@@ -9,11 +9,6 @@
 <h3 align="center">
   Placing trust in technology
 </h3>
-<p align="center">
-  Topaz is an open source Layer 2 solution that helps developers secure data
-  from any application using Ethereum.
-</p>
-
 <h3 align="center">
   <a href="https://topaz.io/docs/">Documentation</a>
   <span> · </span>
@@ -22,7 +17,8 @@
   <a href="https://join.slack.com/t/topaz-developers/shared_invite/zt-7bxno80m-nGrysu2fid_vh0iFFr5hUg">Community Slack</a>
 </h3>
 <p align="center">
-  Topaz is a self-hosted web service that secures data at scale on Ethereum.
+  Topaz is an open source Layer 2 solution that helps developers secure data
+  from any application using Ethereum.
 </p>
 <p align="center">
   <a href="https://github.com/decent-labs/topaz/blob/master/LICENSE">
