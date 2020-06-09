@@ -168,16 +168,3 @@ Licensed under the [MIT License](./LICENSE).
 ## Thanks
 
 Thanks to everyone who has made a contribution, no matter how big or small!
-
-Made with :heart: in:
-* British Airways Flight 1575
-* Miami, Florida
-* Positano, Italy
-* Santa Cruz, California
-* Cleveland, Ohio
-* Boston, Massachusetts
-* Copenhagen, Denmark
-* Prague, Czech Republic
-* Stockholm, Sweden
-* Berlin, Germany
-* Amsterdam, Netherlands
