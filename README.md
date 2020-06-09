@@ -52,6 +52,10 @@
   </a>
 </p>
 
+- **Secure Data with Any Blockchain.** Using a blockchain-agnostic protocol,
+  Topaz can easily be adapted to work with any public blockchain. The default
+  blockchain is Ethereum.
+
 - **Simplify Blockchain Software Development.** Integrate any existing
   application with a blockchain, enabling blockchain use cases without smart
   contract development or prior experience in blockchain development.
