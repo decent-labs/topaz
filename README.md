@@ -18,7 +18,7 @@
 </h3>
 <p align="center">
   Topaz is an open source Layer 2 solution that helps developers secure data
-  from any application using Ethereum.
+  from any application using public blockchains.
 </p>
 <p align="center">
   <a href="https://github.com/decent-labs/topaz/blob/master/LICENSE">
@@ -53,7 +53,7 @@
 </p>
 
 - **Simplify Blockchain Software Development.** Integrate any existing
-  application with Ethereum, enabling blockchain use cases without smart
+  application with a blockchain, enabling blockchain use cases without smart
   contract development or prior experience in blockchain development.
 
 - **Bypass Transaction Constraints.** Topaz batches transactions into secure
@@ -69,7 +69,7 @@
   transparent, trustless applications with ease.
 
 - **Go to Mainnet for Pennies.** Topaz enables applications that simply could
-  not exist due to scaling constraints brought on by the cost of Ethereum
+  not exist due to scaling constraints brought on by the cost of blockchain
   transactions.
 
 <p align="center">
