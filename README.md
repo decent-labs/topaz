@@ -45,10 +45,10 @@
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg"
     alt="PRs welcome!" />
   </a>
-  <a href="https://twitter.com/intent/follow?screen_name=topaztellstruth">
+  <a href="https://twitter.com/intent/follow?screen_name=decent_labs">
     <img
-    src="https://img.shields.io/twitter/follow/topaztellstruth.svg?label=Follow%20topaztellstruth"
-    alt="Follow @topaztellstruth" />
+    src="https://img.shields.io/twitter/follow/decent_labs.svg?label=Follow%20decent_labs"
+    alt="Follow @decent_labs" />
   </a>
 </p>
 
