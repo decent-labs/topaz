@@ -168,3 +168,4 @@ Licensed under the [MIT License](./LICENSE).
 ## Thanks
 
 Thanks to everyone who has made a contribution, no matter how big or small!
+:heart:
