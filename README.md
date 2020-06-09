@@ -18,7 +18,7 @@
 </h3>
 <p align="center">
   Topaz is an open source Layer 2 solution that helps developers secure data
-  from any application using public blockchains.
+  from any application at scale using a public blockchain.
 </p>
 <p align="center">
   <a href="https://github.com/decent-labs/topaz/blob/master/LICENSE">
@@ -52,9 +52,8 @@
   </a>
 </p>
 
-- **Secure Data with Any Blockchain.** Using a blockchain-agnostic protocol,
-  Topaz can easily be adapted to work with any public blockchain. The default
-  blockchain is Ethereum.
+- **Secure Data with Any Blockchain.** Secure data on any network using a
+  blockchain-agnostic protocol. The default network is Ethereum.
 
 - **Simplify Blockchain Software Development.** Integrate any existing
   application with a blockchain, enabling blockchain use cases without smart
@@ -64,13 +63,14 @@
   data structures, anchoring many transactions on chain at once avoiding the
   scaling constraints of transaction throughput.
 
-- **Outscale Any Blockchain.** Our hybrid development pattern using data from
-  centralized applications secured on decentralized networks enables the usage
-  of blockchains for data integrity at the massive scale the web demands.
+- **Outscale Any Blockchain.** Our hybrid development pattern, using data from
+  centralized applications secured on decentralized networks, enables the usage
+  of blockchains for data integrity at the massive scale the traditional web
+  demands.
 
-- **Trial with Ease.** Our SDKs enable Topaz integration with just three lines
-  of code - now, anyone can experiment with using blockchains to create
-  transparent, trustless applications with ease.
+- **Trial with Ease.** Our SDKs enable blockchain integration with just three
+  lines of code. Now, anyone can rapidly create trustless, decentralized
+  applications.
 
 - **Go to Mainnet for Pennies.** Topaz enables applications that simply could
   not exist due to scaling constraints brought on by the cost of blockchain
@@ -100,7 +100,7 @@ these four steps:
 
 1. **Configure your dev environment.**
 
-    This project uses golang modules, so simple building or running the
+    This project uses golang modules, so simply building or running the
     project(s) will download and install the correct version of dependencies,
     based on `go.mod` and `go.sum`.
 
